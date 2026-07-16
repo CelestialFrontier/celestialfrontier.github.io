@@ -3,7 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<title>Celestial Frontier: Cosmic Codex</title>
+<title>Celestial Frontier</title>
+<meta name="description" content="Explore an infinite, shared universe — chart galaxies, catalogue living worlds, and finish the Pathfinders&#8217; unfinished survey. Free, in your browser.">
+<meta property="og:title" content="Celestial Frontier">
+<meta property="og:description" content="Explore an infinite, shared universe — chart galaxies, catalogue living worlds, and finish the Pathfinders&#8217; unfinished survey. Free, in your browser.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://celestialfrontier.github.io/">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600&family=Inter:wght@400;500&display=swap" rel="stylesheet">
@@ -114,7 +119,7 @@
     background:var(--glass);border:1px solid var(--glass-brd);border-radius:13px;padding:10px 12px;
     backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);box-shadow:0 14px 40px rgba(0,0,0,0.55)}
   #setpanel .shead{font:600 10px var(--ui);letter-spacing:.14em;text-transform:uppercase;color:var(--plasma);margin-bottom:8px}
-  #setpanel .srow2{display:flex;justify-content:space-between;align-items:center;font-size:11px;color:var(--dim);margin:7px 0}
+  #setpanel .srow2{display:flex;justify-content:space-between;align-items:center;gap:12px;font-size:11px;color:var(--dim);margin:7px 0}
   #setpanel .opts{display:flex;gap:5px}
   #setpanel .fsopt{padding:3px 9px;border-radius:7px;cursor:pointer;font:600 10px var(--ui);
     border:1px solid rgba(150,162,210,0.25);color:var(--dim)}
@@ -8541,10 +8546,18 @@ document.addEventListener('focusout', ()=>{ if(_tipFor) hideTip(); });
    @section release-notes [app] — versioned release notes, update popup + history
    Owns: GAME_VERSION, RELEASES, _rnSeen, openReleaseNotes
    ---------------------------------------------------------------- */
-const GAME_VERSION='1.1';
-const BUILD_ID='14ca544';   /* replaced with the git sha at deploy time */
+const GAME_VERSION='1.1.1';
+const BUILD_ID='c5f1e94';   /* replaced with the git sha at deploy time */
 /* newest first; categories appear in the order listed */
 const RELEASES=[
+{v:'1.1.1', title:'Signal & Polish', date:'July 2026', sections:[
+ ['🎨 UI Enhancements', [
+  'Settings rows breathe — option pills keep a clean gap from their labels instead of crowding them (Font and Motion were touching).',
+ ]],
+ ['🛠 Under the Hood', [
+  'The game now introduces itself as <b>Celestial Frontier</b> everywhere outside the game too — browser tab, link previews and search results. (The old “Cosmic Codex” page subtitle is retired; the Prime Codex keeps its name.)',
+ ]],
+]},
 {v:'1.1', title:'Field Reports', date:'July 2026', sections:[
  ['✨ New Features & Systems', [
   'Core-loop <b>sound effects</b>: a soft sonar ping answers every survey tap, and a rushing whoosh carries hyperlane travel and planetfall.',
