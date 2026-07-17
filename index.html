@@ -30,6 +30,17 @@
   body.font-sys{--ui:system-ui,-apple-system,sans-serif;--body:system-ui,-apple-system,sans-serif}
   body.font-mono{--ui:ui-monospace,'SF Mono',Menlo,Consolas,monospace;--body:ui-monospace,'SF Mono',Menlo,Consolas,monospace}
   *{margin:0;padding:0;box-sizing:border-box}
+  /* ---- scrollbars (1.1.2): the browser default thumb vanished against the
+     void — a playtester couldn't tell the release-notes card scrolled. Every
+     scrolling panel gets a visible lavender-ink thumb + a faint track that
+     marks the gutter even before you scroll. Both syntaxes on purpose:
+     Chrome/Firefox honor scrollbar-color, Safari the ::-webkit-scrollbar
+     rules — same colors either way. */
+  *{scrollbar-width:thin;scrollbar-color:rgba(178,188,226,0.5) rgba(150,162,210,0.12)}
+  ::-webkit-scrollbar{width:9px;height:9px}
+  ::-webkit-scrollbar-track{background:rgba(150,162,210,0.12);border-radius:9px}
+  ::-webkit-scrollbar-thumb{background:rgba(178,188,226,0.5);border-radius:9px}
+  ::-webkit-scrollbar-thumb:hover{background:rgba(178,188,226,0.75)}
   html,body{height:100%;background:var(--void);overflow:hidden;color:var(--ink);font-family:var(--body);-webkit-font-smoothing:antialiased;
     touch-action:none;overscroll-behavior:none;
     -webkit-user-select:none;-moz-user-select:none;user-select:none;-webkit-touch-callout:none;-webkit-tap-highlight-color:transparent}
@@ -115,12 +126,17 @@
     background:var(--glass);border:1px solid var(--glass-brd);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
     transition:transform .3s,color .15s}
   #setbtn:hover{color:var(--ink);transform:rotate(60deg)}
-  #setpanel{position:fixed;right:16px;bottom:58px;z-index:14;width:210px;display:none;
+  /* 236px: the three-pill rows (Font, Motion) need ~215px of content width —
+     at 210px they overflowed the panel's right edge (Nick's phone, 1.1.2) */
+  #setpanel{position:fixed;right:16px;bottom:58px;z-index:14;width:236px;max-width:calc(100vw - 32px);display:none;
     background:var(--glass);border:1px solid var(--glass-brd);border-radius:13px;padding:10px 12px;
     backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);box-shadow:0 14px 40px rgba(0,0,0,0.55)}
   #setpanel .shead{font:600 10px var(--ui);letter-spacing:.14em;text-transform:uppercase;color:var(--plasma);margin-bottom:8px}
-  #setpanel .srow2{display:flex;justify-content:space-between;align-items:center;gap:12px;font-size:11px;color:var(--dim);margin:7px 0}
-  #setpanel .opts{display:flex;gap:5px}
+  /* wrap-safe: pill labels are set in the CHOSEN font (Mono runs wide), so a
+     row that can't fit drops its pills to a second, right-aligned line
+     instead of poking past the panel edge */
+  #setpanel .srow2{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:7px 12px;font-size:11px;color:var(--dim);margin:7px 0}
+  #setpanel .opts{display:flex;gap:5px;margin-left:auto;flex-wrap:wrap;justify-content:flex-end}
   #setpanel .fsopt{padding:3px 9px;border-radius:7px;cursor:pointer;font:600 10px var(--ui);
     border:1px solid rgba(150,162,210,0.25);color:var(--dim)}
   #setpanel .fsopt:hover{color:var(--ink)}
@@ -240,7 +256,8 @@
   #stats{position:fixed;top:calc(var(--row1-h,58px) + 6px);left:18px;z-index:22;width:302px;max-height:min(74vh,640px);overflow-y:auto;display:none;
     background:var(--glass);border:1px solid var(--glass-brd);border-radius:15px;padding:13px;
     backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);box-shadow:0 18px 50px rgba(0,0,0,0.55)}
-  #stats::-webkit-scrollbar{width:8px} #stats::-webkit-scrollbar-thumb{background:rgba(255,207,138,0.25);border-radius:8px}
+  #stats{scrollbar-color:rgba(255,207,138,0.5) rgba(150,162,210,0.12)}
+  #stats::-webkit-scrollbar{width:8px} #stats::-webkit-scrollbar-thumb{background:rgba(255,207,138,0.5);border-radius:8px}
   #stats h4{font:600 10px var(--ui);letter-spacing:.13em;text-transform:uppercase;color:var(--plasma);margin:12px 0 6px}
   #stats h4:first-child{margin-top:0}
   #stats .srow{display:flex;justify-content:space-between;gap:8px;font-size:11.5px;color:#e2e7f8;margin:4px 0}
@@ -548,6 +565,18 @@
   #panel .row.grade .v{color:#e7d49a;font-weight:600;letter-spacing:.01em}
   #panel .row.grade .k{color:#b8a45e}
   #panel .row.civ .v{color:#cdbcff}
+  /* 1.1.2 condensed card: actions ride at the top; the environment block and
+     civ census fold behind keyboard-operable chevron rows (state remembered) */
+  #panel .bdiv{height:1px;background:var(--line);margin:10px -14px 8px}
+  #panel .grp{margin:5px 0}
+  #panel .ghead{cursor:pointer;margin:0;border-radius:8px}
+  #panel .ghead:hover .k{color:var(--ink)}
+  #panel .ghead .gdig{min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  #panel .grp.open .ghead .gdig{white-space:normal;overflow:visible}
+  #panel .ghead .chev{flex:none;align-self:center;font-size:9px;color:var(--faint);transition:transform .18s}
+  #panel .grp.open .chev{transform:rotate(90deg)}
+  #panel .gbody{display:none;padding-left:7px;border-left:1px solid var(--line);margin:2px 0 8px 2px}
+  #panel .grp.open .gbody{display:block}
   #panel .tag{display:inline-block;font-size:9px;letter-spacing:.14em;text-transform:uppercase;
     color:var(--label);margin-top:9px;padding-top:9px;border-top:1px solid var(--line);width:100%}
   #panel .act{display:block;width:100%;margin-top:9px;padding:8px 0;font-family:var(--ui);
@@ -785,7 +814,8 @@
     background:var(--glass);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
     border:1px solid rgba(150,162,210,0.2);border-radius:15px;padding:6px;display:none;
     box-shadow:0 18px 50px rgba(0,0,0,0.5)}
-  #codex::-webkit-scrollbar{width:8px} #codex::-webkit-scrollbar-thumb{background:rgba(127,230,160,0.25);border-radius:8px}
+  #codex{scrollbar-color:rgba(127,230,160,0.5) rgba(150,162,210,0.12)}
+  #codex::-webkit-scrollbar{width:8px} #codex::-webkit-scrollbar-thumb{background:rgba(127,230,160,0.5);border-radius:8px}
   #codex .empty{padding:18px 14px;font-size:11.5px;color:var(--faint);text-align:center;line-height:1.55}
   #codex .chead{padding:9px 11px 7px;font-family:var(--ui);font-size:10px;letter-spacing:.12em;
     text-transform:uppercase;color:var(--faint)}
@@ -863,7 +893,8 @@
   #log{position:fixed;top:calc(var(--row1-h,58px) + 130px);right:18px;z-index:12;width:300px;max-height:min(62vh,540px);overflow-y:auto;
     display:none;background:var(--glass);border:1px solid var(--glass-brd);border-radius:16px;padding:6px;
     backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);box-shadow:0 16px 50px rgba(0,0,0,0.6)}
-  #log::-webkit-scrollbar{width:8px} #log::-webkit-scrollbar-thumb{background:rgba(150,162,210,0.25);border-radius:8px}
+  #log{scrollbar-color:rgba(178,188,226,0.55) rgba(150,162,210,0.12)}
+  #log::-webkit-scrollbar{width:8px} #log::-webkit-scrollbar-thumb{background:rgba(178,188,226,0.55);border-radius:8px}
   #log .empty{padding:18px 14px;font-size:11.5px;color:var(--faint);text-align:center;line-height:1.5}
   #log .item{display:flex;gap:10px;align-items:center;padding:8px 9px;border-radius:11px;cursor:pointer;transition:background .15s}
   #log .item:hover{background:rgba(143,180,255,0.08)}
@@ -5232,9 +5263,13 @@ const {perfTime, t0, drawUniverse, drawGalaxy, drawSystem, drawSurface}=Renderer
 /* ---------------- survey panel + scan log ---------------- */
 /* ----------------------------------------------------------------
    @section ui-panel [app] — survey-card panel — render, lock, bookmark row, actions
-   Owns: _lastDesc, _panelKey, panelRect, stickyPick, _spExpanded, _frozenFor, _frozenPos, _autoScanned, renderPanel
+   Owns: _lastDesc, _panelKey, panelRect, stickyPick, _spExpanded, _frozenFor, _frozenPos, _autoScanned, cardExpand, renderPanel
    ---------------------------------------------------------------- */
 let _lastDesc=null, _panelKey=null, panelRect=null, stickyPick=null, _spExpanded=null, _frozenFor=null, _frozenPos=null, _autoScanned=null;
+/* condensed-card expand state (1.1.2): bit 1 = Environment open, bit 2 =
+   Civilization census open. Remembered across cards AND sessions (save
+   field cx, absent-default 0 = collapsed) — set it once, keep your view. */
+let cardExpand=0;
 function renderPanel(p, isLocked){
   if(!p){ panelEl.style.display='none'; panelEl.classList.remove('locked'); _lastDesc=null; _panelKey=null; panelRect=null; _frozenFor=null; return; }
   const d=describePick(p);
@@ -5251,7 +5286,8 @@ function renderPanel(p, isLocked){
   const codexStamp=codex.size;
   const _cq=d.planetSeed!=null?conquered.get(d.planetSeed):null;
   const key=d.logId+'|'+st.mode+'|'+(inLog?1:0)+'|'+(isLocked?'L':'')+'|'+codexStamp+'|'+(lifeOpen?'X':'')+
-    '|'+(_cq?('C'+(Date.now()-_cq.t>=HARVEST_CD?'R':'W')):'')+'|'+(d._nameKey?(customNames.get(d._nameKey)||''):'')+'|'+(_favOn?'F':'')+(_homeOn?'H':'');
+    '|'+(_cq?('C'+(Date.now()-_cq.t>=HARVEST_CD?'R':'W')):'')+'|'+(d._nameKey?(customNames.get(d._nameKey)||''):'')+'|'+(_favOn?'F':'')+(_homeOn?'H':'')+
+    '|cx'+cardExpand;   /* keep cx LAST — the toggle handler patches it in place */
   panelEl.classList.toggle('locked', !!isLocked);
   if(key!==_panelKey){               /* rebuild content only when it actually changes */
     _panelKey=key;
@@ -5266,11 +5302,56 @@ function renderPanel(p, isLocked){
     const thumb = d.thumb ? '<img class="thumb'+(d.thumbSq?' sq':'')+'" src="'+d.thumb+'" alt="">' : '';
     let rows='';
     const spRows=d.rows.filter(row=>row[3]&&row[3].startsWith('sp:'));
-    for(const row of d.rows){
-      if(row[3]&&row[3].startsWith('sp:')) continue;   /* species handled as a group below */
-      let cls=row[2]==='bio'?' bio':(row[2]==='civ'?' civ':(row[2]==='grade'?' grade':''));
+    const rowHtml=row=>{
+      const cls=row[2]==='bio'?' bio':(row[2]==='civ'?' civ':(row[2]==='grade'?' grade':''));
       const vStyle=(row[2]==='grade' && d.designation)?' style="color:'+d.designation.hex+'"':'';
-      rows+='<div class="row'+cls+'"><span class="k">'+row[0]+'</span><span class="v"'+vStyle+'>'+row[1]+'</span></div>';
+      return '<div class="row'+cls+'"><span class="k">'+row[0]+'</span><span class="v"'+vStyle+'>'+row[1]+'</span></div>';
+    };
+    /* condensed planet card (1.1.2, Nick's call): identity, life and the
+       civilization HEADLINE stay open — they're what players care about —
+       while the verbose environment block and the civ census fold behind
+       remembered toggles. The ⟁ Signal row never folds: it's a discovery
+       hook. Grouping is label-driven UI only; planetDescriptor (domain,
+       fingerprinted) is untouched. */
+    let civHtml='';
+    if(d.planetSeed!=null){
+      const ENV_K={'Made of':1,'Atmosphere':1,'Climate':1,'Water':1,'Gravity':1,'Magnetism':1,'Weather':1,'Seasons':1};
+      const CIV_K={'Tech era':1,'Local year':1,'Population':1};
+      const envRows=[], civDet=[]; let civHead=null, sigRow=null;
+      for(const row of d.rows){
+        if(row[3]&&row[3].startsWith('sp:')) continue;   /* species handled as a group below */
+        if(ENV_K[row[0]]) envRows.push(row);
+        else if(CIV_K[row[0]]) civDet.push(row);
+        else if(row[0]==='Civilization') civHead=row;
+        else if(row[0]==='⟁ Signal') sigRow=row;
+        else rows+=rowHtml(row);                         /* Spectral class, Life, Earth's Flora/Fauna */
+      }
+      if(envRows.length){
+        /* the collapsed header still gives the world character: first clause
+           of the climate + the gravity line, ellipsis-clamped to one line */
+        const _cl=((envRows.find(r=>r[0]==='Climate')||['',''])[1]||'').split(/[,—]/)[0].trim();
+        const _gv=(envRows.find(r=>r[0]==='Gravity')||['',''])[1]||'';
+        const _eo=!!(cardExpand&1);
+        rows+='<div class="grp'+(_eo?' open':'')+'"><div class="row ghead" data-gtoggle="1" role="button" tabindex="0" '+
+          'data-tip="The full environmental survey — atmosphere, water, weather and more">'+
+          '<span class="k">🌍 Environment</span><span class="v gdig">'+[_cl,_gv].filter(Boolean).join(' · ')+'</span>'+
+          '<span class="chev">▸</span></div><div class="gbody">'+envRows.map(rowHtml).join('')+'</div></div>';
+      }
+      if(civHead){
+        if(civDet.length){
+          const _co=!!(cardExpand&2);
+          civHtml='<div class="grp'+(_co?' open':'')+'"><div class="row civ ghead" data-gtoggle="2" role="button" tabindex="0" '+
+            'data-tip="The census — tech era, local calendar and population">'+
+            '<span class="k">'+civHead[0]+'</span><span class="v gdig">'+civHead[1]+'</span>'+
+            '<span class="chev">▸</span></div><div class="gbody">'+civDet.map(rowHtml).join('')+'</div></div>';
+        } else civHtml=rowHtml(civHead);                 /* wilderness — one line, nothing to expand */
+      }
+      if(sigRow) civHtml+=rowHtml(sigRow);
+    } else {
+      for(const row of d.rows){
+        if(row[3]&&row[3].startsWith('sp:')) continue;   /* species handled as a group below */
+        rows+=rowHtml(row);
+      }
     }
     if(spRows.length && !lifeOpen){
       /* collapsed: life is detected, not yet catalogued — scanning is a deliberate act */
@@ -5308,6 +5389,7 @@ function renderPanel(p, isLocked){
           '<span class="spk">+'+(spRows.length-PREVIEW)+'</span><span class="v">more species — open the Compendium to see them all</span></div>';
       }
     }
+    rows+=civHtml;   /* civilization (+ ⟁ Signal) reads below the life roster */
     let conqBtn='';
     if(d.planetSeed!=null && d.species && d.species.some(g=>g.kingdom==='fauna')){
       const c=conquered.get(d.planetSeed);
@@ -5346,9 +5428,12 @@ function renderPanel(p, isLocked){
       '</div>';
     const btn = atlasRow + conqBtn + mineBtn +
       (d.where ? '<button class="act" data-act="share" data-guide="codes" data-tip="Copy a code — friends land on this exact world">⇪ Share this discovery</button>' : '');
+    /* actions live at the TOP of the body (1.1.2): on phones the old
+       bottom placement put "+ Add to Star Atlas" below the fold — a
+       playtester got stranded at training step 4 because of it */
     panelEl.innerHTML =
       '<div class="head">'+thumb+'<div class="htxt"><h3>'+d.title+'</h3><div class="sub">'+d.sub+'</div></div></div>'+
-      '<div class="body">'+rows+btn+
+      '<div class="body">'+btn+'<div class="bdiv"></div>'+rows+
       '<span class="tag">'+(st.mode==='surface'?'You are here':'Procedural survey')+'</span></div>';
     /* the rarity color language: tint the whole card border by spectral designation */
     const gr=d.designation||d.grade;
@@ -5384,6 +5469,17 @@ function renderPanel(p, isLocked){
 }
 /* add / remove via the panel button */
 panelEl.addEventListener('click', e=>{
+  const gt=e.target.closest('[data-gtoggle]');
+  if(gt){
+    /* fold/unfold in place — no rebuild, so keyboard focus stays on the
+       toggle; the panel key's cx suffix is patched to match */
+    const bit=+gt.dataset.gtoggle||0;
+    cardExpand^=bit;
+    const g=gt.closest('.grp'); if(g) g.classList.toggle('open', !!(cardExpand&bit));
+    if(_panelKey) _panelKey=_panelKey.replace(/\|cx\d+$/, '|cx'+cardExpand);
+    queueSave();
+    return;
+  }
   const more=e.target.closest('[data-opencodex]');
   if(more){ if(!codexOpen){ codexBtn.click(); } return; }
   const scan=e.target.closest('[data-scanlife]');
@@ -6684,7 +6780,7 @@ function doSave(){
       v:4, epoch:COSMIC_EPOCH,
       view:whereOfView(),
       hp:hp, pstats:pstats, fs:fsMode, tone:toneMode, font:fontMode, snd:sndOn?1:0, fx:fxOn?1:0, shake:shakeOn?1:0, notif:notifOn?1:0, tips:tipsOn?1:0,
-      vol:Math.round(sfxVol*100), rm:motionMode,
+      vol:Math.round(sfxVol*100), rm:motionMode, cx:cardExpand,
       notifs:notifications.slice(0,50),
       me:explorerName,
       essence:essence,
@@ -6770,6 +6866,8 @@ function loadSave(){
     const _rmv=num(data.rm,-1);
     motionMode=_rmv===1 ? 1 : (_rmv===0 ? 0 : -1);
     applyMotion();
+    /* cx absent (pre-1.1.2 save) ⇒ 0 = card detail groups collapsed */
+    cardExpand=clamp(num(data.cx), 0, 3)|0;
     for(const n of (data.notifs||[])){ if(n && n.tt!=null && notifications.length<60) notifications.push(n); }
     for(const n of notifications){ if(n.id>=_notifSeq) _notifSeq=n.id+1; }
     renderBell();
@@ -8260,7 +8358,7 @@ const GUIDE=[
  {id:'zoom', t:'Flying the universe', k:'zoom pan pinch scroll drag modes universe galaxy system surface navigate controls', body:
   '<p>The whole cosmos is one continuous view. <b>Pinch or scroll to zoom, drag to pan.</b> Zooming dives through four scales: <em>universe → galaxy → star system → planet surface</em> — and zooming out climbs back up. Everything you can see, you can visit.</p><ul><li>Tap any object to open its <b>survey card</b>; tap it again (or tap elsewhere) to release.</li><li>On a surface, you walk the world itself — the survey card stays pinned.</li><li>Travel beyond your charted frontier is gated — see <span data-gt="regions">Frontier regions</span>.</li></ul>'},
  {id:'survey', t:'Survey cards', k:'survey card panel tap inspect atmosphere climate water gravity descriptor lock pin', body:
-  '<p>Tap anything — galaxy, star, planet, moon, comet, even the void between — and its survey card opens: classification, atmosphere, climate, water, gravity, seasons, hazards, life. Every line is generated from the object’s seed, so <b>your survey matches every other explorer’s</b>.</p><ul><li>Tapping <b>locks</b> the card in place so you can press its buttons while the object drifts.</li><li>Worlds with a biosphere show <b>🔬 Discover Life</b> — see <span data-gt="discover">Discovering life</span>.</li><li>The bookmark row saves the place — see <span data-gt="atlas">The Star Atlas</span>.</li></ul>'},
+  '<p>Tap anything — galaxy, star, planet, moon, comet, even the void between — and its survey card opens: classification, atmosphere, climate, water, gravity, seasons, hazards, life. Every line is generated from the object’s seed, so <b>your survey matches every other explorer’s</b>.</p><ul><li>Tapping <b>locks</b> the card in place so you can press its buttons while the object drifts.</li><li>A planet&#8217;s card leads with its actions and headlines; the <b>🌍 Environment</b> chevron unfolds the full readings, and a civilization&#8217;s headline unfolds its census. Cards remember whether you like them open or folded.</li><li>Worlds with a biosphere show <b>🔬 Discover Life</b> — see <span data-gt="discover">Discovering life</span>.</li><li>The bookmark row saves the place — see <span data-gt="atlas">The Star Atlas</span>.</li></ul>'},
  {id:'search', t:'Search', k:'search box find discoveries paste code lookup', body:
   '<p>The search box (top bar) hunts across <b>everything you’ve already discovered</b>: Atlas places, Compendium species, even cosmic events you’ve witnessed. It also accepts pasted codes:</p><ul><li><b>CF1-…</b> world codes — jump straight to a friend’s discovery.</li><li><b>CFB-…</b> creature codes — load a friend’s creature for a duel.</li></ul><p>See <span data-gt="codes">Share codes</span>.</p>'},
  {id:'codes', t:'Share codes (CF1 / CFB)', k:'share code link friend cf1 cfb copy multiplayer social', body:
@@ -8546,10 +8644,19 @@ document.addEventListener('focusout', ()=>{ if(_tipFor) hideTip(); });
    @section release-notes [app] — versioned release notes, update popup + history
    Owns: GAME_VERSION, RELEASES, _rnSeen, openReleaseNotes
    ---------------------------------------------------------------- */
-const GAME_VERSION='1.1.1';
-const BUILD_ID='c5f1e94';   /* replaced with the git sha at deploy time */
+const GAME_VERSION='1.1.2';
+const BUILD_ID='876e2d2';   /* replaced with the git sha at deploy time */
 /* newest first; categories appear in the order listed */
 const RELEASES=[
+{v:'1.1.2', title:'Clear Signals', date:'July 2026', sections:[
+ ['🎨 UI Enhancements', [
+  '<b>Survey cards, condensed</b> — a world&#8217;s card now leads with what matters: its actions up top, then its rarity, life and civilization. The full environmental survey (atmosphere, climate, water, gravity and more) folds behind a 🌍 chevron, and a civilization&#8217;s census (tech era, calendar, population) folds behind its headline. Open either once and cards stay open to your taste — the choice is remembered.',
+  'Card actions (Star Atlas, Conquer, Mine, Share) moved to the <b>top</b> of every survey card — no more scrolling to chart a world.',
+  '<b>Scrollbars you can actually see</b> — every scrolling panel (release notes, survey cards, the Guide, Compendium and more) now shows a visible thumb and a faint track, so it&#8217;s always clear there&#8217;s more below the fold. One explorer got stranded mid-training because the old scrollbar vanished into the void.',
+  'The Settings panel is a touch wider and its option pills can never poke past its right edge again, whatever font you&#8217;ve chosen.',
+  'The <b>“What&#8217;s new”</b> bulletin for a patch now carries its whole release line — 1.1.2 shows the 1.1.1 and 1.1 notes beneath it, so nobody lands on a patch note with no context.',
+ ]],
+]},
 {v:'1.1.1', title:'Signal & Polish', date:'July 2026', sections:[
  ['🎨 UI Enhancements', [
   'Settings rows breathe — option pills keep a clean gap from their labels instead of crowding them (Font and Motion were touching).',
@@ -8642,10 +8749,17 @@ function openReleaseNotes(mode, then){
   const ok=document.getElementById('relok');
   if(mode==='latest'){
     if(sub) sub.textContent='What’s new in this release';
-    /* pinned to the SHIPPED version's entry, not RELEASES[0] — while v-next
-       bullets pile up unbumped, fresh players must still read the overview
-       of the build they're actually holding */
-    if(body) body.innerHTML=_relHtml(RELEASES.find(r=>r.v===GAME_VERSION)||RELEASES[0]);
+    /* pinned to the SHIPPED version's minor line, not RELEASES[0] — while
+       v-next bullets pile up unbumped, fresh players must still read the
+       overview of the build they're actually holding. A patch bulletin
+       carries its whole line (1.1.2 shows 1.1.2 + 1.1.1 + 1.1, newest
+       first) so nobody lands on a patch note with no context. */
+    if(body){
+      const _si=RELEASES.findIndex(r=>r.v===GAME_VERSION);
+      const _line=GAME_VERSION.split('.').slice(0,2).join('.');
+      const _mine=RELEASES.filter((r,i)=>i>=(_si<0?0:_si) && (r.v===_line || r.v.startsWith(_line+'.')));
+      body.innerHTML=(_mine.length?_mine:[RELEASES[0]]).map(_relHtml).join('');
+    }
     if(ok) ok.textContent='Continue';
   } else {
     if(sub) sub.textContent='Release notes — the story of the build';
