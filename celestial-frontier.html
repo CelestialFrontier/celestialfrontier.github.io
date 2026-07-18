@@ -289,6 +289,23 @@
   #stats .ach b{font-weight:600;color:var(--ink)}
 
   /* ---- explorer welcome / rename dialog ---- */
+  /* the descent confirm (v1.3.5) — a small held breath before the dive */
+  #descbox{position:fixed;inset:0;z-index:37;display:none;align-items:center;justify-content:center;
+    background:rgba(4,5,10,0.55);backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px)}
+  #descbox .card{width:min(340px,calc(100vw - 48px));text-align:center;
+    background:linear-gradient(180deg, rgba(15,17,33,0.97), rgba(8,9,18,0.98));
+    border:1px solid rgba(150,162,210,0.4);border-radius:16px;padding:20px 18px;
+    box-shadow:0 22px 70px rgba(0,0,0,0.65)}
+  #descbox .dh{font:700 17px var(--ui);color:var(--ink);margin:0 0 10px}
+  #desc-risk{font:13px/1.65 var(--ui);color:var(--dim);margin:0 0 16px}
+  #desc-risk .dtier{color:#ffd96a;font-weight:600}
+  #desc-risk .dwx{color:#ffb08a}
+  #desc-risk .dhp{color:var(--dim);font-size:11.5px}
+  #descbox button{font:600 13px var(--ui);padding:10px 14px;border-radius:10px;cursor:pointer;margin:0 4px}
+  #desc-go{background:rgba(111,211,255,0.14);border:1px solid rgba(111,211,255,0.5);color:#bfe9ff}
+  #desc-go:hover{background:rgba(111,211,255,0.24)}
+  #desc-stay{background:rgba(20,24,44,0.6);border:1px solid rgba(150,162,210,0.35);color:var(--dim)}
+  #desc-stay:hover{color:var(--ink)}
   #namebox{position:fixed;inset:0;z-index:38;display:none;align-items:center;justify-content:center;
     background:rgba(4,5,10,0.78);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
   #namebox .card{width:min(400px,calc(100vw - 36px));max-height:calc(100vh - 90px);max-height:calc(100dvh - 40px);overflow-y:auto;
@@ -625,6 +642,20 @@
   #panel.grab .head:active{cursor:grabbing}
   #panel.grab .htxt{padding-right:22px}
   @media (pointer:coarse){ #panel .pxc{width:34px;height:34px;font-size:15px;top:3px;right:3px} }
+  /* the panel-manager ✕ — one close language for every panel (v1.3.5) */
+  .pnx{position:absolute;top:6px;right:6px;width:26px;height:26px;border:0;border-radius:8px;
+    background:rgba(20,24,44,0.6);color:var(--dim);font:600 13px/26px system-ui,sans-serif;
+    text-align:center;cursor:pointer;padding:0;z-index:6}
+  .pnx:hover{color:var(--ink);background:rgba(150,162,210,0.14)}
+  #tray .pnx,#setpanel .pnx{position:absolute}
+  #guidebox .card{position:relative}   /* anchor the guide's ✕ to the card, not the screen */
+  @media (pointer:coarse){ .pnx{width:34px;height:34px;font-size:15px;line-height:34px;top:3px;right:3px} }
+  /* the vista ✕ — safe-area aware, floats over the art */
+  .vxc{position:absolute;top:calc(env(safe-area-inset-top,0px) + 14px);right:calc(env(safe-area-inset-right,0px) + 14px);
+    width:36px;height:36px;border:1px solid rgba(150,162,210,0.35);border-radius:10px;
+    background:rgba(10,12,20,0.55);color:#cdd5f2;font:600 16px/34px system-ui,sans-serif;
+    text-align:center;cursor:pointer;padding:0;z-index:3}
+  .vxc:hover{color:#fff;border-color:rgba(150,162,210,0.7)}
   #panel .thumb{width:54px;height:54px;flex:none;border-radius:50%;background:#05060c;
     box-shadow:0 0 0 1px rgba(150,162,210,0.18),0 4px 14px rgba(0,0,0,0.5)}
   #panel .thumb.sq{border-radius:11px}
@@ -1240,7 +1271,8 @@
       <div id="bell" role="button" tabindex="0" data-tip="Every toast lands here too — nothing is missed." data-guide="settings">🔔<span id="bellct"></span></div>
       <div id="tray">
         <div class="thead"><span>Notifications</span>
-          <span class="tacts"><span id="trayread">mark all read</span> · <span id="trayclear">clear all</span></span></div>
+          <span class="tacts"><span id="trayread">mark all read</span> · <span id="trayclear">clear all</span></span>
+          <button class="pnx" data-pnx="tray" type="button">&#10005;</button></div>
         <div id="traylist"></div>
       </div>
     </div>
@@ -1259,7 +1291,7 @@
 
 <div id="setbtn" role="button" tabindex="0" data-tip="Settings — text size, sound, effects, tooltips, reset.">⚙</div>
 <div id="setpanel">
-  <div class="shead">Settings</div>
+  <div class="shead">Settings<button class="pnx" data-pnx="set" type="button">&#10005;</button></div>
   <div class="stabs">
     <span class="stab on" data-stab="d" role="button" tabindex="0">Display</span><span class="stab" data-stab="g" role="button" tabindex="0">Graphics</span><span class="stab" data-stab="a" role="button" tabindex="0">Audio</span>
   </div>
@@ -1362,7 +1394,7 @@
   <h3>Celestial Frontier</h3>
   <div class="lore">
     <p>You are not the first to chart this universe. An order of explorers came before you — the Pathfinders — and for an age their beacons mapped the dark. Then, one by one, the beacons went quiet. They died a single discovery short of completing their master survey.</p>
-    <p>They left nine Signatures unclaimed, and field notes that swear the spectrum runs deeper than Prismatic. The notes also warn of named titans ruling the worlds where it runs deepest. Document a worthy example of every Signature and the completed Prime Codex will show you what no chart has — the Celestial Frontier.</p>
+    <p>They left nine Signatures unclaimed, and field notes that swear the spectrum runs deeper than Prismatic. The notes also warn of named titans ruling the worlds where it runs deepest. Claim a worthy example of all nine and the finished Prime Codex will show you what no chart ever has — the Celestial Frontier.</p>
     <p class="creed">Nobody can chart it all. Somebody will still be first.</p>
   </div>
   <p class="nnote">First, what shall the stars call you?</p>
@@ -1434,8 +1466,13 @@
   </div>
 </div></div>
 <div id="helpbtn" role="button" tabindex="0" data-tip="Guide to the Universe — every system explained.">?</div>
+<div id="descbox"><div class="card">
+  <div class="dh" id="desc-title">Begin descent?</div>
+  <div id="desc-risk"></div>
+  <div><button id="desc-go" type="button">Begin descent</button><button id="desc-stay" type="button">Stay in orbit</button></div>
+</div></div>
 <div id="guidebox"><div class="card">
-  <div class="gh">🧭 Guide to the Universe</div>
+  <div class="gh">🧭 Guide to the Universe<button class="pnx" data-pnx="guide" type="button">&#10005;</button></div>
   <div class="gsub">Every system explained — search anything, or browse by topic.</div>
   <input id="guidesearch" type="text" placeholder="Search the guide&hellip; breeding, stardust, signatures&hellip;" spellcheck="false" autocomplete="off">
   <div id="guidebody"></div>
@@ -1882,7 +1919,26 @@ function renderPlanetSprite(P, PX){
     }
   }
   g.putImageData(img,0,0);
+  /* v1.3.5 Batch 5c: the biome tints the orbit view, so what you see
+     from space matches what you land into. Only for types whose biome
+     roll never depends on the climate band (ice/rocky/venus/lava/gas)
+     — band-dependent types keep their type look and speak their biome
+     through the card and the vista instead. */
+  try{
+    const bt=_bioSpriteTint(P);
+    if(bt){ g.globalCompositeOperation='source-atop'; g.fillStyle=bt;
+            g.fillRect(0,0,PX,PX); g.globalCompositeOperation='source-over'; }
+  }catch(_){ }
   return c;
+}
+function _bioSpriteTint(P){
+  if(!(P.type==='ice'||P.type==='rocky'||P.type==='venus'||P.type==='lava'||P.type==='gas')) return null;
+  const b=biomeFor(P,'cold'); if(!b) return null;
+  return ({blueice:'rgba(90,150,220,0.20)', cryogeyser:'rgba(210,235,250,0.14)',
+    geode:'rgba(150,100,200,0.12)', carbon:'rgba(0,0,0,0.38)', graben:'rgba(20,20,30,0.15)',
+    sulfurdeck:'rgba(200,170,40,0.18)', abyssgreen:'rgba(20,40,20,0.25)',
+    ashwaste:'rgba(120,116,112,0.25)', obsidian:'rgba(5,3,8,0.35)', magmasea:'rgba(255,90,30,0.18)',
+    ammonia:'rgba(240,238,246,0.20)', hotglow:'rgba(255,60,20,0.22)'})[b.k]||null;
 }
 /* a fast 128px placeholder renders instantly; the full 512px sprite is swapped in a
    beat later — entering a system never freezes a frame on a 262k-pixel noise loop */
@@ -2788,7 +2844,7 @@ const {climateBand, COMP, atmosphereText, climateText, waterText, gravityText, T
 /* ================================================================
    @module SpeciesTraits [domain] — trait tables, rarity grades & spectral anomalies
    Deps: Rand
-   API:  SP_COLOR, FA_BODY, FA_LOCO, FA_TRAIT, FA_SIZE, FA_DIET, FA_HEAD, FA_LIMBS, FA_SKIN, FA_TAIL, FA_PATTERN, FA_EYES, FA_BEHAVIOR, FA_HABITAT, FLORA_DETAIL, FA_TEMPER, FA_SENSE, FA_REPRO, FA_LIFE, FA_METAB, FLORA_FORM, FUNGI_FORM, MICROBE_FORM, speciesName, colorGrade, SP_HEX, FA_SIZE_M, SPECTRA, spectral, GRADE_TIERS, TIER_MAX, rarityRoll
+   API:  SP_COLOR, FA_BODY, FA_LOCO, FA_TRAIT, FA_SIZE, FA_DIET, FA_HEAD, FA_LIMBS, FA_SKIN, FA_TAIL, FA_PATTERN, FA_EYES, FA_BEHAVIOR, FA_HABITAT, FLORA_DETAIL, FA_TEMPER, FA_SENSE, FA_REPRO, FA_LIFE, FA_METAB, FLORA_FORM, FUNGI_FORM, MICROBE_FORM, speciesName, colorGrade, SP_HEX, FA_SIZE_M, SPECTRA, spectral, GRADE_TIERS, TIER_MAX, rarityRoll, EX_HABITAT, EX_LOCO, AQ_FLORA_FORM, AIR_FLORA_FORM, habOf, locoOf, floraFormOf
    ================================================================ */
 const SpeciesTraits=(()=>{
 const SP_KINGDOM=['flora','fungi','microbe','fauna'];
@@ -2930,6 +2986,27 @@ const FUNGI_FORM=['mushroom forests','shelf-fungus terraces','puffball fields','
 const MICROBE_FORM=['photosynthetic mats','chemosynthetic films','iron-oxidizing slime','sulfur-eating colonies',
   'radiation-resistant crusts','bioluminescent plankton','methane-eating mats','acid-pool biofilms',
   'magnetotactic swarms','silica-shelled diatom blooms','purple sulfur films','snow-algae crusts'];
+/* v1.3.5 PARALLEL POOLS — the extremophile / sea / air language. The
+   pinned pools above must NEVER grow (their lengths are baked into every
+   existing genome's index rolls — extending one re-rolls the universe).
+   New species branches carry markers instead (g.x extremophile fauna,
+   g.aq sea flora, g.af air flora) and read these pools through the
+   habOf/locoOf/floraFormOf helpers. */
+const EX_HABITAT=['hydrothermal vent fields','cooling lava margins','beneath the ice sheets',
+  'abyssal trenches','the acid cloud layers','storm-eye updrafts','brine pools',
+  'deep cave systems','the crushing lower decks'];
+const EX_LOCO=['vent-clingers','magma-swimmers','under-ice drifters','pressure-walkers',
+  'acid-cloud floaters','storm-riders','winged hunters','thermal-soarers','brine-crawlers'];
+const AQ_FLORA_FORM=['kelp towers','seagrass meadows','reef-builder colonies','sargassum rafts',
+  'bioluminescent bloom fields','tube-garden banks'];
+const AIR_FLORA_FORM=['aeroplankton veils','drift-spore banners','cloud-garden colonies'];
+function habOf(g){ return (g&&g.x) ? EX_HABITAT[(g.habitat||0)%EX_HABITAT.length] : (FA_HABITAT[((g&&g.habitat)||0)%FA_HABITAT.length]||''); }
+function locoOf(g){ return (g&&g.x) ? EX_LOCO[(g.loco||0)%EX_LOCO.length] : (FA_LOCO[((g&&g.loco)||0)%FA_LOCO.length]||''); }
+function floraFormOf(g){
+  if(g&&g.aq) return AQ_FLORA_FORM[(g.form||0)%AQ_FLORA_FORM.length];
+  if(g&&g.af) return AIR_FLORA_FORM[(g.form||0)%AIR_FLORA_FORM.length];
+  return FLORA_FORM[((g&&g.form)||0)%FLORA_FORM.length]||'';
+}
 /* fauna anatomy — body, locomotion, plus head, limbs, skin, appendages, eyes for real specificity */
 const FA_BODY=['six-limbed','armored','stilt-legged','tentacled','serpentine','many-segmented',
   'shelled','membranous','crystalline-plated','gelatinous','tusked','horned','spindly','squat heavy-boned',
@@ -2991,9 +3068,9 @@ function speciesName(seed){
   const r=mulberry32((seed^0x5eed5)>>>0);
   return SP_NAME_A[(r()*SP_NAME_A.length)|0]+SP_NAME_B[(r()*SP_NAME_B.length)|0]+SP_NAME_C[(r()*SP_NAME_C.length)|0];
 }
-return Object.freeze({SP_COLOR, FA_BODY, FA_LOCO, FA_TRAIT, FA_SIZE, FA_DIET, FA_HEAD, FA_LIMBS, FA_SKIN, FA_TAIL, FA_PATTERN, FA_EYES, FA_BEHAVIOR, FA_HABITAT, FLORA_DETAIL, FA_TEMPER, FA_SENSE, FA_REPRO, FA_LIFE, FA_METAB, FLORA_FORM, FUNGI_FORM, MICROBE_FORM, speciesName, colorGrade, SP_HEX, FA_SIZE_M, SPECTRA, spectral, GRADE_TIERS, TIER_MAX, rarityRoll});
+return Object.freeze({SP_COLOR, FA_BODY, FA_LOCO, FA_TRAIT, FA_SIZE, FA_DIET, FA_HEAD, FA_LIMBS, FA_SKIN, FA_TAIL, FA_PATTERN, FA_EYES, FA_BEHAVIOR, FA_HABITAT, FLORA_DETAIL, FA_TEMPER, FA_SENSE, FA_REPRO, FA_LIFE, FA_METAB, FLORA_FORM, FUNGI_FORM, MICROBE_FORM, speciesName, colorGrade, SP_HEX, FA_SIZE_M, SPECTRA, spectral, GRADE_TIERS, TIER_MAX, rarityRoll, EX_HABITAT, EX_LOCO, AQ_FLORA_FORM, AIR_FLORA_FORM, habOf, locoOf, floraFormOf});
 })();
-const {SP_COLOR, FA_BODY, FA_LOCO, FA_TRAIT, FA_SIZE, FA_DIET, FA_HEAD, FA_LIMBS, FA_SKIN, FA_TAIL, FA_PATTERN, FA_EYES, FA_BEHAVIOR, FA_HABITAT, FLORA_DETAIL, FA_TEMPER, FA_SENSE, FA_REPRO, FA_LIFE, FA_METAB, FLORA_FORM, FUNGI_FORM, MICROBE_FORM, speciesName, colorGrade, SP_HEX, FA_SIZE_M, SPECTRA, spectral, GRADE_TIERS, TIER_MAX, rarityRoll}=SpeciesTraits;
+const {SP_COLOR, FA_BODY, FA_LOCO, FA_TRAIT, FA_SIZE, FA_DIET, FA_HEAD, FA_LIMBS, FA_SKIN, FA_TAIL, FA_PATTERN, FA_EYES, FA_BEHAVIOR, FA_HABITAT, FLORA_DETAIL, FA_TEMPER, FA_SENSE, FA_REPRO, FA_LIFE, FA_METAB, FLORA_FORM, FUNGI_FORM, MICROBE_FORM, speciesName, colorGrade, SP_HEX, FA_SIZE_M, SPECTRA, spectral, GRADE_TIERS, TIER_MAX, rarityRoll, EX_HABITAT, EX_LOCO, AQ_FLORA_FORM, AIR_FLORA_FORM, habOf, locoOf, floraFormOf}=SpeciesTraits;
 /* @end SpeciesTraits */
 /* ================================================================
    @module Genome [domain] — genome synthesis, classification & species description
@@ -3069,8 +3146,8 @@ function sapienceTier(g){
   return 0;
 }
 function realmBiome(g){
-  if(g.kingdom==='fauna') return FA_HABITAT[(g.habitat||0)%FA_HABITAT.length]||'';
-  if(g.kingdom==='flora') return FLORA_FORM[(g.form||0)%FLORA_FORM.length]||'';
+  if(g.kingdom==='fauna') return habOf(g);
+  if(g.kingdom==='flora') return floraFormOf(g);
   if(g.kingdom==='fungi') return FUNGI_FORM[(g.form||0)%FUNGI_FORM.length]||'';
   return MICROBE_FORM[(g.form||0)%MICROBE_FORM.length]||'';
 }
@@ -3083,10 +3160,15 @@ function classifyRealm(g){
     return /swarm|colony|bloom|mat|film/.test(f)?'Colonial Life':'Microbial Life';
   }
   /* fauna — read its world from the habitat & locomotion genes */
-  const hab=FA_HABITAT[(g.habitat||0)%FA_HABITAT.length]||'';
-  const loco=FA_LOCO[(g.loco||0)%FA_LOCO.length]||'';
+  const hab=habOf(g);
+  const loco=locoOf(g);
   if(sapienceTier(g)>=3) return 'Intelligent Natural Life';
   if((g.size||0)>=5) return 'Megafauna';
+  if(g.x){                        /* extremophiles claim the realms built for them */
+    if(/deck/.test(hab)) return 'Gas Giant Life';
+    if(/cave/.test(hab)) return 'Subterranean Life';
+    return 'Extreme-World Life';
+  }
   if((g.heat||1)===2 && /volcanic|ash|vent|lava/.test(hab)) return 'Exotic Biochemistry';
   if(/cavern|subterranean/.test(hab)) return 'Subterranean Life';
   if(/cloud deck/.test(hab)) return 'Gas Giant Life';
@@ -3118,8 +3200,8 @@ function realmModifiers(g){
     if((g.size||0)>=4) mods.push('Megafauna');
     const beh=FA_BEHAVIOR[(g.behavior||0)%FA_BEHAVIOR.length]||'';
     if(/symbiotic/.test(beh)) mods.push('Symbiotic');
-    const hab=FA_HABITAT[(g.habitat||0)%FA_HABITAT.length]||'';
-    if(/volcanic|ash|vent|methane|ammonia|salt-flat/.test(hab)) mods.push('Extremophile');
+    const hab=habOf(g);
+    if(g.x || /volcanic|ash|vent|methane|ammonia|salt-flat/.test(hab)) mods.push('Extremophile');
     const sense=FA_SENSE[(g.sense||0)%FA_SENSE.length]||'';
     if(/magnetic/.test(sense)) mods.push('Magnetic navigator');
     if(/echo/.test(sense)) mods.push('Echolocator');
@@ -3136,7 +3218,7 @@ function describeSpecies(g){
   if(g.kingdom==='flora'){
     const detail=FLORA_DETAIL[(g.detail||0)%FLORA_DETAIL.length];
     return {name:speciesName(g.seed), kind:'Flora', grade:speciesGrade(g),
-      desc:col+' '+FLORA_FORM[g.form%FLORA_FORM.length]+(g.lumin?', faintly bioluminescent':''),
+      desc:col+' '+floraFormOf(g)+(g.lumin?', faintly bioluminescent':''),
       detail:'A photosynthetic species, '+detail+'.'};
   }
   if(g.kingdom==='fungi'){
@@ -3172,12 +3254,12 @@ function speciesGrade(g){
 }
 function faunaDesc(g){
   const col=SP_COLOR[g.color%SP_COLOR.length];
-  const body=FA_BODY[g.body%FA_BODY.length], loco=FA_LOCO[g.loco%FA_LOCO.length];
+  const body=FA_BODY[g.body%FA_BODY.length], loco=locoOf(g);
   const trait=FA_TRAIT[g.trait%FA_TRAIT.length], size=FA_SIZE[g.size%FA_SIZE.length];
   const head=FA_HEAD[(g.head||0)%FA_HEAD.length], skin=FA_SKIN[(g.skin||0)%FA_SKIN.length];
   const tail=FA_TAIL[(g.tail||0)%FA_TAIL.length], eyes=FA_EYES[(g.eyes||0)%FA_EYES.length];
   const pattern=FA_PATTERN[(g.pattern||0)%FA_PATTERN.length];
-  const behavior=FA_BEHAVIOR[(g.behavior||0)%FA_BEHAVIOR.length], habitat=FA_HABITAT[(g.habitat||0)%FA_HABITAT.length];
+  const behavior=FA_BEHAVIOR[(g.behavior||0)%FA_BEHAVIOR.length], habitat=habOf(g);
   const diet=FA_DIET[g.diet%FA_DIET.length];
   const eyeTxt = eyes===0?'no eyes':(eyes===1?'a single great eye':eyes+' eyes');
   const anat = head+', '+skin+'-skinned, with '+eyeTxt+(tail!=='none'?' and a '+tail+' tail':'');
@@ -3339,6 +3421,13 @@ function crossGenome(a, b){
     g[m]=(g[m]+1+((r()*3)|0));
   }
   if(r()<0.2) g.lumin=!g.lumin;
+  /* v1.3.5 extremophile inheritance: markers ride WITHOUT touching the
+     rng stream. Two extremophile parents breed a true extremophile
+     (pool-safe: the child keeps reading the EX pools). A mixed pair
+     breeds back into the standard pools — the hardy line dilutes. */
+  if(a.x && b.x) g.x=1;
+  if(a.aq && b.aq) g.aq=1;
+  if(a.af && b.af) g.af=1;
   return g;
 }
 return Object.freeze({evolveGenome, crossGenome});
@@ -3401,6 +3490,11 @@ function planetSpecies(P, sys, band, level){
   } else if(level==='microbial'||level==='subsurface'||level==='aerial'){
     many('microbe', 2, 4, pr(0.55));      /* extremophile mats, cloud microbes, vent colonies */
     if(level==='subsurface' && r()<0.4*rich) many('fauna', 1, 2, pr(0.35)); /* blind cave/ocean fauna */
+  } else if(level==='xfauna'){
+    /* against all odds: one or two hardy creatures, and the mats they graze */
+    many('fauna', 1, 1, pr(0.4));
+    many('microbe', 2, 2, pr(0.55));
+    for(const gx of list) if(gx.kingdom==='fauna') gx.x=1;   /* reads the extremophile pools */
   }
   /* wild hybrids — on teeming worlds, two resident species have interbred in the wild.
      A naturally-occurring crossbreed you can find and scan, just like Pokémon in tall grass. */
@@ -3411,6 +3505,20 @@ function planetSpecies(P, sys, band, level){
       const a=list[(hr()*list.length)|0], b=list[(hr()*list.length)|0];
       if(a!==b){ const wild=crossGenome(a,b); wild.wild=true; list.push(wild); }
     }
+  }
+  /* v1.3.5 — the sea finally grows things (audit: FLORA_FORM had no kelp
+     at all), and aerial-life worlds get their veils. ADDITIVE slots on a
+     separate stream, added AFTER the wild-hybrid roll so list.length is
+     unchanged when the hybrid picks its parents — every pre-1.3.5
+     species AND hybrid stays byte-identical; the world simply gains its
+     gardens (pre-ship review catch). */
+  if(level==='aquatic'){
+    const r9=mulberry32((P.seed^0xA0F10)>>>0);
+    const n9=1+(r9()<0.5?1:0);
+    for(let i9=0;i9<n9;i9++){ add('flora', 900+i9); list[list.length-1].aq=1; }
+  } else if(level==='aerial'){
+    const r9=mulberry32((P.seed^0xA1F10)>>>0);
+    if(r9()<0.35){ add('flora', 920); list[list.length-1].af=1; }
   }
   if(_speciesMemo.size>48){ const k0=_speciesMemo.keys().next().value; _speciesMemo.delete(k0); }
   _speciesMemo.set(_mkey, list);
@@ -3427,18 +3535,27 @@ function biosphere(P, sys, band, r){
   else if(P.type==='terran' && band==='hot') level = r()<0.4?'sparse':(r()<0.7?'microbial':'none');
   else if(P.type==='ocean' && band==='temperate') level = r()<0.78?'aquatic':'flora';
   else if(P.type==='ocean' && band==='cold') level = r()<0.55?'aquatic':'subsurface';
-  else if(P.type==='ocean' && band==='hot') level = r()<0.35?'microbial':'none';
-  else if(P.type==='desert' && band==='temperate') level = r()<0.6?'sparse':'microbial';
-  else if(P.type==='desert') level = r()<0.3?'sparse':'microbial';
-  else if(P.type==='ice') level = r()<0.5?'subsurface':(r()<0.7?'microbial':'none');
-  else if(P.type==='rocky') level = r()<0.18?'microbial':'none';
-  else if(P.type==='venus') level = r()<0.12?'aerial':'none';      /* acid-cloud microbes */
-  else if(P.type==='lava') level = r()<0.1?'microbial':'none';     /* extremophile vent mats */
-  else if(P.type==='gas') level = r()<0.14?'aerial':'none';        /* cloud-layer floaters */
+  /* EXTREMOPHILE FAUNA (v1.3.5, Nick's authorized domain change,
+     2026-07-18): a thin slice INSIDE each hostile type's existing draw
+     upgrades microbes to actual creatures — sulfur-magma beasts,
+     under-ice vent fauna, acid-cloud drifters, deep-vent grazers.
+     Same r() consumption as before (nested thresholds on one value),
+     so every world OUTSIDE a slice is byte-identical. Chances follow
+     real astrobiology: proven-extreme niches ~1-1.5%, speculative
+     ~0.1-0.25%, near-impossible 0.04% (a magma-sea beast is a legend). */
+  else if(P.type==='ocean' && band==='hot'){ const v=r(); level = v<0.01?'xfauna':(v<0.35?'microbial':'none'); }
+  else if(P.type==='desert' && band==='temperate'){ const v=r(); level = v<0.6?'sparse':(v<0.615?'xfauna':'microbial'); }
+  else if(P.type==='desert'){ const v=r(); level = v<0.3?'sparse':(v<0.315?'xfauna':'microbial'); }
+  else if(P.type==='ice'){ const v=r(); level = v<0.012?'xfauna':(v<0.5?'subsurface':(r()<0.7?'microbial':'none')); }
+  else if(P.type==='rocky'){ const v=r(); level = v<0.003?'xfauna':(v<0.18?'microbial':'none'); }
+  else if(P.type==='venus'){ const v=r(); level = v<0.001?'xfauna':(v<0.12?'aerial':'none'); }
+  else if(P.type==='lava'){ const v=r(); level = v<0.0004?'xfauna':(v<0.1?'microbial':'none'); }
+  else if(P.type==='gas'){ const v=r(); level = v<0.0025?'xfauna':(v<0.14?'aerial':'none'); }
   else level='none';
   const LBL={complex:'Abundant — flora and fauna', flora:'Plant-like flora only',
     aquatic:'Aquatic ecosystems', sparse:'Sparse, hardy vegetation', microbial:'Microbial life only',
     subsurface:'Subsurface microbial life (in hidden seas)', aerial:'Airborne microbial life in the cloud layers',
+    xfauna:'Extremophile fauna — life that should not be possible here',
     none:'No known life'};
   return {level:LBL[level]||'No known life', key:level};
 }
@@ -4061,7 +4178,7 @@ window.addEventListener('pointermove', e=>{
   mouse.x=e.clientX; mouse.y=e.clientY;
   /* hovering over an open panel must never survey what's behind it */
   mouseOverUI = !!(e.target && e.target.closest &&
-    e.target.closest('#codex,#log,#stats,#events,#searchwrap,#topbar,#dailybtn,#eventsbtn,#logbtn,#codexbtn,#pcdxbtn,#primebox,#endingbox,#guidebox,#helpbtn,#sharebox,#duelbox,#pickbox,#reveal,#setpanel,#setbtn,#namebox,#deathbox'));
+    e.target.closest('#codex,#log,#stats,#events,#searchwrap,#topbar,#dailybtn,#eventsbtn,#logbtn,#codexbtn,#pcdxbtn,#primebox,#endingbox,#guidebox,#helpbtn,#sharebox,#duelbox,#pickbox,#reveal,#setpanel,#setbtn,#namebox,#deathbox,#descbox'));
 });
 cv.addEventListener('pointermove', e=>{
   if(!dragging || pinching || activeTouches>=2) return;   /* two fingers down = zoom only, never pan-fight */
@@ -4171,6 +4288,12 @@ document.addEventListener('keydown', e=>{
       flushToasts();   /* pop-ups queued behind the dialog must not strand until a future commit */
       return;
     }
+    /* the descent confirm treats Escape as "stay in orbit" — a bare hide
+       would just reopen it next frame */
+    {
+      const db=document.getElementById('descbox');
+      if(db && db.style.display && db.style.display!=='none'){ _descStay(); return; }
+    }
     /* close the topmost dismissible overlay — one per press */
     for(const id of ['reveal','pickbox','duelbox','sharebox','primebox','guidebox','setpanel']){
       const el=document.getElementById(id);
@@ -4270,6 +4393,7 @@ function checkTransitions(){
       st.gcam.x=st.star.x; st.gcam.y=st.star.y;
       st.gcam.z=(minWH/34)*0.8;
       st.mode='galaxy'; st.fade=1; st.star=null; st.sys=null;
+      try{ _descAbort(); }catch(_){ }
       return;
     }
     const sys = st.sys || (st.sys=systemFor(st.star.seed));
@@ -4281,12 +4405,25 @@ function checkTransitions(){
       const pr=(6*pl.P.sizeMul);
       const apparent=pr*c.z;
       const d=Math.hypot(px-c.x, py-c.y)*c.z;
+      if(pl.P.seed===_descDeclined && apparent<0.36*minWH) _descDeclined=null;
       if(apparent>0.40*minWH){
         if(d<0.5*minWH){
+          /* THE DESCENT (v1.3.5): a manual dive on an unlanded world stops
+             at approach altitude and ASKS — the flat close-up never shows
+             uninvited. Declining holds you in orbit until you pull back
+             out and dive again. Grounded worlds, Earth and training fly
+             straight through, exactly as before. */
+          if(!descentSafe(pl.P.seed)){
+            const zCap=(0.38*minWH)/pr;
+            c.z=Math.min(c.z, zCap);
+            if(_descDeclined!==pl.P.seed && _descOpenFor!==pl.P.seed) openDescentBox(pl);
+            return;
+          }
           st.planet=pl;
           st.pfbm=makeNoise(pl.P.seed);
           st.pcam={x:0,y:0,z:1};
           st.mode='surface'; st.fade=1;
+          _descCleared=null;               /* the clearance is spent on this landing */
           noteLanding(pl.P.seed);          /* planetfall = ground survey (v1.2) */
           _pendingContact=pl.P.seed;       /* inhabited worlds: first contact rides the card render */
           _vistaPend=true;                 /* HD landing vista (v1.3, hd flag) */
@@ -4661,15 +4798,26 @@ function decoSprite(dc){
     g.beginPath();g.arc(C,C,C*0.5,r()*TAU,r()*TAU+2.0);g.stroke();
   } else if(dc.k==='rem'){
     g.globalCompositeOperation='lighter';
-    for(let i=0;i<26;i++){  /* filamentary shell, not a clean circle */
-      const a=r()*TAU, rr2=C*(0.62+(r()-0.5)*0.16);
-      const ln=C*(0.08+r()*0.16);
-      g.strokeStyle='hsla('+(14+r()*26)+',90%,'+(56+r()*14)+'%,'+(0.16+r()*0.22).toFixed(3)+')';
-      g.lineWidth=0.8+r()*1.6;
-      g.beginPath();
-      g.moveTo(C+Math.cos(a)*(rr2-ln/2), C+Math.sin(a)*(rr2-ln/2));
-      g.lineTo(C+Math.cos(a+0.10+r()*0.12)*(rr2+ln/2), C+Math.sin(a+0.10+r()*0.12)*(rr2+ln/2));
-      g.stroke();
+    /* an expanding gas shell — warm puffs crowd a torn, uneven ring, the
+       way real remnants shred. No strokes, no clean circle: Nick's law,
+       everything that dies in space dies as a cloud (v1.3.5). */
+    for(let i=0;i<22;i++){
+      const a=r()*TAU, rr2=C*(0.58+(r()-0.5)*0.24);
+      const bx=C+Math.cos(a)*rr2, by=C+Math.sin(a)*rr2, br=C*(0.10+r()*0.16);
+      const hue=14+r()*26;
+      const ng=g.createRadialGradient(bx,by,0,bx,by,br);
+      ng.addColorStop(0,'hsla('+hue+',88%,'+(56+r()*14)+'%,'+(0.10+r()*0.14).toFixed(3)+')');
+      ng.addColorStop(1,'hsla('+hue+',88%,55%,0)');
+      g.fillStyle=ng;g.beginPath();g.arc(bx,by,br,0,TAU);g.fill();
+    }
+    /* cool wisps drifting free of the shell */
+    for(let i2=0;i2<8;i2++){
+      const a2=r()*TAU, d2=C*(0.28+r()*0.48);
+      const bx2=C+Math.cos(a2)*d2, by2=C+Math.sin(a2)*d2, br2=C*(0.05+r()*0.09);
+      const ng2=g.createRadialGradient(bx2,by2,0,bx2,by2,br2);
+      ng2.addColorStop(0,'hsla('+(200+r()*40)+',70%,72%,'+(0.05+r()*0.07).toFixed(3)+')');
+      ng2.addColorStop(1,'hsla(210,70%,70%,0)');
+      g.fillStyle=ng2;g.beginPath();g.arc(bx2,by2,br2,0,TAU);g.fill();
     }
     const core=g.createRadialGradient(C,C,0,C,C,C*0.12);
     core.addColorStop(0,'rgba(220,235,255,0.95)');core.addColorStop(1,'rgba(220,235,255,0)');
@@ -4677,6 +4825,78 @@ function decoSprite(dc){
   }
   _decoSpr.set(dc,cv);
   return cv;
+}
+/* v1.3.5 space dust — baked sprites for the death family. Everything that
+   dies in space dies as a CLOUD (Nick's law): torn gas shells, soft
+   ripples, no drawn circles. Baking also retires the per-frame gradient
+   allocations the heat pass flagged. */
+const _snSprCache=new Map();
+function snSiteSprite(seed){
+  let sp=_snSprCache.get(seed);
+  if(sp) return sp;
+  if(_snSprCache.size>60) _snSprCache.clear();   /* sites are few; rebuild is cheap */
+  const S=96, cv=document.createElement('canvas'); cv.width=cv.height=S;
+  const g=cv.getContext('2d'), C=S/2, r=mulberry32(seed>>>0);
+  g.globalCompositeOperation='lighter';
+  /* the blue breath of shocked gas — small cool wisps, never one disc
+     (a disc reads as a splotch against dark space) */
+  for(let w=0;w<6;w++){
+    const aw=r()*TAU, dw=Math.pow(r(),1.4)*C*0.4;
+    const wx=C+Math.cos(aw)*dw, wy=C+Math.sin(aw)*dw, wr=C*(0.08+r()*0.12);
+    const wg=g.createRadialGradient(wx,wy,0,wx,wy,wr);
+    wg.addColorStop(0,'rgba(120,180,255,'+(0.08+r()*0.08).toFixed(3)+')');
+    wg.addColorStop(1,'rgba(120,180,255,0)');
+    g.fillStyle=wg; g.beginPath(); g.arc(wx,wy,wr,0,TAU); g.fill();
+  }
+  /* the torn shell — warm puffs, uneven, shredding outward */
+  for(let i=0;i<18;i++){
+    const a=r()*TAU, rr=C*(0.52+(r()-0.5)*0.26);
+    const bx=C+Math.cos(a)*rr, by=C+Math.sin(a)*rr, br=C*(0.09+r()*0.15);
+    const hue=14+r()*26;
+    const ng=g.createRadialGradient(bx,by,0,bx,by,br);
+    ng.addColorStop(0,'hsla('+hue+',88%,'+(56+r()*12)+'%,'+(0.10+r()*0.13).toFixed(3)+')');
+    ng.addColorStop(1,'hsla('+hue+',88%,55%,0)');
+    g.fillStyle=ng; g.beginPath(); g.arc(bx,by,br,0,TAU); g.fill();
+  }
+  _snSprCache.set(seed,cv);
+  return cv;
+}
+let _bhDisc=null;
+function _bhDiscSpr(){
+  if(_bhDisc) return _bhDisc;
+  const S=28, cv=document.createElement('canvas'); cv.width=cv.height=S;
+  const g=cv.getContext('2d'), C=S/2;
+  const ad=g.createRadialGradient(C,C,0,C,C,C);
+  ad.addColorStop(0,'#000'); ad.addColorStop(0.55,'rgba(255,160,60,0.7)'); ad.addColorStop(1,'rgba(255,160,60,0)');
+  g.fillStyle=ad; g.beginPath(); g.arc(C,C,C,0,TAU); g.fill();
+  return (_bhDisc=cv);
+}
+let _proto=null;
+function _protoSpr(){
+  if(_proto) return _proto;
+  const S=24, cv=document.createElement('canvas'); cv.width=cv.height=S;
+  const g=cv.getContext('2d'), C=S/2;
+  const pg=g.createRadialGradient(C,C,0,C,C,C);
+  pg.addColorStop(0,'rgba(255,210,160,1)'); pg.addColorStop(0.5,'rgba(255,150,80,0.6)'); pg.addColorStop(1,'rgba(255,150,80,0)');
+  g.fillStyle=pg; g.beginPath(); g.arc(C,C,C,0,TAU); g.fill();
+  return (_proto=cv);
+}
+let _gwRipple=null;
+function _gwRippleSpr(){
+  if(_gwRipple) return _gwRipple;
+  const S=128, cv=document.createElement('canvas'); cv.width=cv.height=S;
+  const g=cv.getContext('2d'), C=S/2;
+  /* spacetime rings out like breath on cold glass — three soft luminous
+     swells, feathered to nothing, never a stroked line */
+  for(let k=0;k<3;k++){
+    const bk=C*(0.30+k*0.26), w=C*0.11, a=0.30-k*0.08;
+    const rg=g.createRadialGradient(C,C,Math.max(0,bk-w*2),C,C,bk+w*2);
+    rg.addColorStop(0,'rgba(180,200,255,0)');
+    rg.addColorStop(0.5,'rgba(180,200,255,'+a.toFixed(2)+')');
+    rg.addColorStop(1,'rgba(180,200,255,0)');
+    g.fillStyle=rg; g.beginPath(); g.arc(C,C,bk+w*2,0,TAU); g.fill();
+  }
+  return (_gwRipple=cv);
 }
 function drawGalaxy(time){
   drawBackdrop();
@@ -4814,20 +5034,16 @@ function drawGalaxy(time){
     ctx.fillStyle=bh; ctx.beginPath(); ctx.arc(0,0,22,0,TAU); ctx.fill();
     ctx.restore();
   }
-  /* ---- supernova aftermath: remnants + the new stars they breed (shared, epoch-anchored) ---- */
+  /* ---- supernova aftermath: remnants + the new stars they breed (shared, epoch-anchored) ----
+     v1.3.5: every death is a CLOUD now, never a drawn circle (Nick's law),
+     and the shells/glows are baked once per site instead of allocating
+     gradients every frame (heat rule). */
   for(const site of supernovaSites(st.gal.seed, COSMIC_EPOCH)){
-    /* the expanding remnant shell of forged heavy elements */
-    const ng=ctx.createRadialGradient(site.x,site.y,0,site.x,site.y,18);
-    ng.addColorStop(0,'rgba(120,180,255,0.14)'); ng.addColorStop(0.55,'rgba(255,140,90,0.12)'); ng.addColorStop(1,'transparent');
-    ctx.fillStyle=ng; ctx.beginPath(); ctx.arc(site.x,site.y,18,0,TAU); ctx.fill();
-    ctx.strokeStyle='rgba(255,150,90,0.40)'; ctx.lineWidth=Math.max(0.5/c.z,0.9);
-    ctx.beginPath(); ctx.arc(site.x,site.y,16,0,TAU); ctx.stroke();
+    ctx.drawImage(snSiteSprite(site.seed), site.x-24, site.y-24, 48, 48);
     /* the core left behind */
     if(site.remnant==='BH'){
       ctx.save(); ctx.translate(site.x,site.y); ctx.rotate(time*0.3); ctx.scale(1,0.5);
-      const ad=ctx.createRadialGradient(0,0,0,0,0,7);
-      ad.addColorStop(0,'#000'); ad.addColorStop(0.55,'rgba(255,160,60,0.7)'); ad.addColorStop(1,'transparent');
-      ctx.fillStyle=ad; ctx.beginPath(); ctx.arc(0,0,7,0,TAU); ctx.fill(); ctx.restore();
+      ctx.drawImage(_bhDiscSpr(), -7, -7, 14, 14); ctx.restore();
       ctx.fillStyle='#000'; ctx.beginPath(); ctx.arc(site.x,site.y,Math.max(0.4/c.z,1.1),0,TAU); ctx.fill();
     } else if(site.remnant==='NS'){
       ctx.save(); ctx.translate(site.x,site.y); ctx.rotate(time*2.2);
@@ -4838,10 +5054,10 @@ function drawGalaxy(time){
     picks.push({sx:(site.x-c.x)*c.z+W/2, sy:(site.y-c.y)*c.z+H/2, r:Math.max(16*c.z,13*PICK_F), kind:'snova', data:site});
     /* the newborn protostars its shockwave is igniting */
     for(const b of site.births){
-      const pg=ctx.createRadialGradient(b.x,b.y,0,b.x,b.y,3.4);
       const tw=0.7+0.3*Math.sin(time*3+b.seed%7);
-      pg.addColorStop(0,`rgba(255,210,160,${tw.toFixed(2)})`); pg.addColorStop(0.5,'rgba(255,150,80,0.6)'); pg.addColorStop(1,'transparent');
-      ctx.fillStyle=pg; ctx.beginPath(); ctx.arc(b.x,b.y,3.4,0,TAU); ctx.fill();
+      ctx.globalAlpha=tw;
+      ctx.drawImage(_protoSpr(), b.x-3.4, b.y-3.4, 6.8, 6.8);
+      ctx.globalAlpha=1;
       picks.push({sx:(b.x-c.x)*c.z+W/2, sy:(b.y-c.y)*c.z+H/2, r:Math.max(3.4*c.z,11*PICK_F), kind:'protostar', data:b});
     }
     if(c.z>minWH/900){
@@ -4863,12 +5079,13 @@ function drawGalaxy(time){
       const alpha=Math.sin(Math.min(1,p01*4)*Math.PI/2)*(1-p01);
       const ev=bucket%4;
       if(ev===2){
-        /* gravitational waves: two black holes spiral together and merge */
-        ctx.strokeStyle=`rgba(180,200,255,${alpha*0.8})`;
-        for(let k=0;k<3;k++){
-          ctx.lineWidth=Math.max(0.5/c.z, 1.2-k*0.3);
-          ctx.beginPath(); ctx.arc(sx,sy,rad*(0.45+k*0.5),0,TAU); ctx.stroke();
-        }
+        /* gravitational waves: two black holes spiral together and merge.
+           v1.3.5: the ripples are soft luminous swells (baked sprite),
+           never stroked circles — spacetime breathes, it isn't drawn */
+        ctx.globalAlpha=alpha*0.9;
+        const gwR=rad*1.55;
+        ctx.drawImage(_gwRippleSpr(), sx-gwR, sy-gwR, gwR*2, gwR*2);
+        ctx.globalAlpha=1;
         const th2=time*9, insp=2.4*(1-p01);
         ctx.fillStyle=`rgba(8,8,18,${alpha})`;
         ctx.strokeStyle=`rgba(255,180,90,${alpha*0.8})`; ctx.lineWidth=0.5;
@@ -5400,7 +5617,7 @@ function drawSurface(time){
   /* a whisper of seasonal light */
   if(seasonT<-0.2){ ctx.fillStyle=`rgba(120,150,235,${((-seasonT-0.2)*0.07).toFixed(3)})`; ctx.fillRect(0,0,W,H); }
   else if(seasonT>0.2){ ctx.fillStyle=`rgba(255,200,120,${((seasonT-0.2)*0.05).toFixed(3)})`; ctx.fillRect(0,0,W,H); }
-  const TYPE_DESC={gas:'an endless sea of storm bands — there is no surface to land on',
+  const TYPE_DESC={gas:'an endless sea of storm bands — no solid ground, only the high deck',
     terran:'oceans, continents, deserts and ice — a living world',
     ocean:'a global ocean broken by scattered islands',
     ice:'a frozen shell scored with pressure cracks',
@@ -5414,7 +5631,21 @@ function drawSurface(time){
   const WX_NAME={rain:'rain showers',snow:'snowfall',dust:'dust storms',ash:'ash and embers',haze:'thick haze'};
   const parts=['local '+tod];
   if(season) parts.push(season);
-  parts.push(env.wx ? (wxNow ? WX_NAME[effWx] : 'clear skies') : 'airless — no weather');
+  parts.push(env.wx ? (wxNow ? WX_NAME[effWx] : 'clear skies')
+    : (P.type==='gas' ? 'winds beyond any scale' : 'airless — no weather'));
+  /* the showpiece, when one is running (5b-ii) — the status line says so.
+     Cached on the planet's env: biome forever (it's deterministic), the
+     event per 90s spell bucket — this line runs every frame and the heat
+     rules forbid per-frame allocation (pre-ship review catch). */
+  try{
+    if(env._bio===undefined) env._bio=biomeFor(P, env.band)||null;
+    const _evKey=Math.floor(time/90)+'|'+(wxNow?effWx:'');
+    if(env._evKey!==_evKey){
+      env._evKey=_evKey;
+      env._ev=wxEventFor(P, env._bio&&env._bio.k, wxNow?effWx:null);
+    }
+    if(env._ev) parts.push(WX_EVENT_WORD[env._ev]);
+  }catch(_){ }
   if(auroraOn) parts.push('auroras overhead');
   setCtxText((TYPE_DESC[P.type]||'')+' · '+parts.join(' · '));
   /* HD landing vista (v1.3, flag-gated): built here because this is where
@@ -5438,7 +5669,7 @@ function drawSurface(time){
          swimmers break the water, fliers ride the sky */
       const roster=(_lastDesc.species||[]).filter(gg=>gg.kingdom==='fauna');
       const clsOf=gg=>{
-        const lc=FA_LOCO[(gg.loco||0)%FA_LOCO.length]||'', hb=FA_HABITAT[(gg.habitat||0)%FA_HABITAT.length]||'';
+        const lc=locoOf(gg), hb=habOf(gg);
         if(/swim|filter|current/.test(lc)||/open ocean|sea shallows|vent fields/.test(hb)) return 'aqua';   /* current-drifters swim, not fly */
         if(/glider|floater|drift/.test(lc)||/cloud decks/.test(hb)) return 'air';
         return 'land';
@@ -5450,15 +5681,18 @@ function drawSurface(time){
       /* the Life row decides whether the vista grows anything at all;
          the Water row decides the river */
       const lifeRow=_lastDesc.rows&&_lastDesc.rows.find(rr=>rr[0]==='Life');
-      const floraOk=!lifeRow||!/^(No known life|Microbial|Subsurface|Airborne)/.test(lifeRow[1]);
+      const floraOk=!lifeRow||!/^(No known life|Microbial|Subsurface|Airborne|Extremophile)/.test(lifeRow[1]);
       const waterRow=_lastDesc.rows&&_lastDesc.rows.find(rr=>rr[0]==='Water');
       const waterTxt=waterRow?String(waterRow[1]):'';
       const waterV=/Liquid|rivers|ocean/i.test(waterTxt)?'liquid':(/Frozen/i.test(waterTxt)?'frozen':(waterRow?'none':'liquid'));
       const todV=tod==='daytime'?'day':tod;
+      /* a colossal wanderer: the roster's own titanic creature, shown at
+         true scale on a rare roll (5b-ii — the card said titanic) */
+      const _tit=roster.some(gg=>(gg.size||0)>=5) && (mulberry32((P.seed^0x717B)>>>0)()<0.30);
       showVistaBox(P, todV, (env.wx&&wxNow)?effWx:null, era, genes, env.hasField,
         floraOk, env.wx&&effWx==='snow', waterV,
         {ring:P.ring, stc:(st.star&&st.star.c)||null, herd:standable.length,
-         aqua:aquaN, air:airN, title:_lastDesc.title||null, where:_lastDesc.where||null});
+         aqua:aquaN, air:airN, titan:_tit, title:_lastDesc.title||null, where:_lastDesc.where||null});
     }catch(_){}
   }
   if(_vistaPend && !hdOn) _vistaPend=false;
@@ -5537,6 +5771,29 @@ function hdGenesFor(g){
   const base=[bmix((hn>>16)&255,(an>>16)&255), bmix((hn>>8)&255,(an>>8)&255), bmix(hn&255,an&255)];
   const horn=(headTxt.includes('horn')||headTxt.includes('crest')||/crystal antlers/.test(trait))
     ?0.7+r()*0.4:(plan===11?1.0:(plan===10?0.5:0));
+  /* v1.3.5 coherence pass (Nick: creatures read bland/flat): a second
+     harmonious body color rotates off the hide hue — direction and
+     distance from the ACCENT gene, so bred children inherit their
+     two-tone honestly — and the pattern paints in a mixed tone instead
+     of plain shadow. FINISH climbs with the creature's own rarity tier:
+     matte → sheen → iridescent → prismatic pearl. */
+  const rot=((g.accent||0)%2?1:-1)*(26+((g.accent||0)%5)*6);
+  const _h2r=(rgb,deg)=>{
+    const [R,G2,B]=rgb; const mx=Math.max(R,G2,B), mn=Math.min(R,G2,B); const l=(mx+mn)/2;
+    let h=0,s2=0; const d2=mx-mn;
+    if(d2){ s2=l>127?d2/(510-mx-mn):d2/(mx+mn);
+      h= mx===R ? ((G2-B)/d2+(G2<B?6:0)) : mx===G2 ? (B-R)/d2+2 : (R-G2)/d2+4; h*=60; }
+    h=(h+deg+360)%360;
+    const c2=(1-Math.abs(2*l/255-1))*s2*255, x2=c2*(1-Math.abs((h/60)%2-1)), m2=l-c2/2;
+    const [r5,g5,b5]= h<60?[c2,x2,0]:h<120?[x2,c2,0]:h<180?[0,c2,x2]:h<240?[0,x2,c2]:h<300?[x2,0,c2]:[c2,0,x2];
+    return [Math.round(clamp(r5+m2,0,255)),Math.round(clamp(g5+m2,0,255)),Math.round(clamp(b5+m2,0,255))];
+  };
+  const base2=_h2r(base, rot);
+  const pat=[(base2[0]*0.5+((an>>16)&255)*0.3)|0,(base2[1]*0.5+((an>>8)&255)*0.3)|0,(base2[2]*0.5+(an&255)*0.3)|0];
+  /* the iridescent pair — far hue swings for the high finishes, so a
+     Mythic actually LOOKS like oil-on-water, not a rumor of it */
+  const irid=_h2r(base, rot>0?130:-130), irid2=_h2r(base, rot>0?-110:110);
+  const tier=S.tier|0;
   return {bulk:clamp(0.62+sizeM*0.30+(S.vit/400)*0.30,0.6,1.7),
     len:0.82+((g.size||2)%5)*0.09+((g.body||0)%4)*0.05,   /* body length dial */
     neck:0.3+((g.head||0)%5)*0.13,
@@ -5544,11 +5801,15 @@ function hdGenesFor(g){
     tail:0.35+((g.tail||0)%7)*0.09,
     leg:(plan===2||plan===12)?0.9:0.3+((g.limbs||0)%6)*0.09,
     stripes:patTxt==='striped'||patTxt==='banded'?0.75:0,
-    mottle:/mottled|spotted|marbled/.test(patTxt)?0.95:0.5,
-    base:base, dark:[base[0]*0.42|0,base[1]*0.42|0,base[2]*0.42|0],
+    mottle:/mottled|spotted|marbled/.test(patTxt)?0.95:0.62,
+    aqua:/swim|filter|jet|brine-crawl/.test(locoOf(g))||/ocean|shallows|reef|vent|trench|lakeshore|sea/.test(habOf(g)),
+    airb:/glider|floater|drifter|soarer|storm-rider|winged/.test(locoOf(g))||/cloud deck|updraft/.test(habOf(g)),
+    base:base, base2:base2, pat:pat, irid:irid, irid2:irid2,
+    dark:[base[0]*0.42|0,base[1]*0.42|0,base[2]*0.42|0],
+    finish:tier>=8?3:(tier>=6?2:(tier>=4?1:0)),
     rim:g.lumin?col:'rgba(255,220,170,1)', eye:col,
     plan:plan, glow:!!g.lumin, apex:!!g.apex, par:!!g.par,
-    tier:S.tier|0,
+    tier:tier,
     heat:(g.habitat||0)%FA_HABITAT.length};
 }
 function hdBeastBare(G,seed){
@@ -5642,21 +5903,74 @@ function hdBeastBare(G,seed){
     }
   } else if(seg){
     for(let li2=0;li2<6;li2++) leg(x0+S*0.04+li2*(x1-x0)*0.185, li2>2);
+  } else if(G.aqua && !stilt){
+    /* swimmers: flippers instead of legs, a dorsal fin, a tail fluke —
+       the water writes the body (coherence pass) */
+    for(const fx2 of [x0+S*0.07, x1-S*0.05]){
+      sg2.beginPath();sg2.moveTo(fx2,baseY+S*0.01);
+      sg2.quadraticCurveTo(fx2-S*0.05,baseY+S*0.09,fx2-S*0.09,baseY+S*0.075);
+      sg2.quadraticCurveTo(fx2-S*0.03,baseY+S*0.035,fx2,baseY-S*0.005);
+      sg2.closePath();sg2.fill();
+      if(baseY+S*0.09>feetMax)feetMax=baseY+S*0.09;
+    }
+    { const dx=(x0+x1)/2, topY=baseY-S*0.085*G.bulk-S*0.05;
+      sg2.beginPath();sg2.moveTo(dx-S*0.045,topY+S*0.04);
+      sg2.quadraticCurveTo(dx+S*0.01,topY-S*0.075,dx+S*0.075,topY+S*0.015);
+      sg2.closePath();sg2.fill(); }
+    { sg2.beginPath();sg2.moveTo(x0+S*0.005,baseY-S*0.02);
+      sg2.lineTo(x0-S*0.075,baseY-S*0.095);
+      sg2.lineTo(x0-S*0.075,baseY+S*0.05);
+      sg2.closePath();sg2.fill(); }
   } else {
     leg(x0+S*0.05,false);leg(x0+S*0.09,false);leg(x1-S*0.06,true);leg(x1-S*0.02,true);
+    if(G.airb && !winged){
+      /* the airborne that aren't four-winged still wear small sails */
+      for(const sgn of [-1,1]){
+        sg2.globalAlpha=0.8;
+        sg2.beginPath();sg2.moveTo(S*0.47,baseY-S*0.055);
+        sg2.quadraticCurveTo(S*(0.47+sgn*0.11),baseY-S*0.21,S*(0.47+sgn*0.19),baseY-S*0.115);
+        sg2.quadraticCurveTo(S*(0.47+sgn*0.10),baseY-S*0.06,S*0.47,baseY-S*0.015);
+        sg2.closePath();sg2.fill();sg2.globalAlpha=1;
+      }
+    }
   }
   const tex=document.createElement('canvas');tex.width=tex.height=S;const tg=tex.getContext('2d');
   const img=tg.createImageData(S,S),D=img.data;
+  /* the coherence-pass hide: back wears the hide color, the belly rolls
+     into its harmonious partner (base2), patterns paint in a mixed tone
+     — a real pelt, not one flat paint bucket. Iridescent finishes ride
+     a slow hue drift; the pearl finish adds a second, counter drift. */
+  const B2=G.base2||G.base, PT=G.pat||G.dark, FIN=G.finish||0;
   for(let py=0;py<S;py++)for(let px=0;px<S;px++){
     const o=(py*S+px)*4;
     const f=_hdFbm(px*0.024,py*0.024,seed,4)*G.mottle;
     const st2=(Math.sin(px*0.06+_hdFbm(px*0.012,py*0.012,seed+9,3)*6)*0.5+0.5)*G.stripes;
     const m=clamp(f*0.9+st2*0.5,0,1);
-    const cr2=_hdMix3(G.base,G.dark,m);
+    const belly=clamp((py/S)*1.7-0.45,0,1);
+    const bodyC=_hdMix3(G.base,B2,belly);
+    let cr2=_hdMix3(bodyC,PT,m*0.9);
+    cr2=_hdMix3(cr2,G.dark,m*0.26);
+    if(FIN>=2){
+      const ir=_hdFbm(px*0.010+7,py*0.010,seed+31,3);
+      const sw=Math.sin((px+py)*0.045+ir*5)*0.5+0.5;
+      cr2=_hdMix3(cr2,(sw<0.5?(G.irid||B2):(G.irid2||PT)),(FIN>=3?0.34:0.24)*Math.abs(sw-0.5)*2+0.06);
+      if(FIN>=3){
+        const sw2=Math.sin((px-py)*0.05+ir*4)*0.5+0.5;
+        cr2=_hdMix3(cr2,[250,240,255],0.16*sw2);
+      }
+    }
     const lt=clamp(1.18-(py/S)*1.15-(px/S)*0.25,0.22,1.12);
     D[o]=cr2[0]*lt;D[o+1]=cr2[1]*lt;D[o+2]=cr2[2]*lt;D[o+3]=255;
   }
   tg.putImageData(img,0,0);
+  if(FIN>=1){
+    /* the sheen — one soft light-band along the back, kept subtle */
+    const shn=tg.createLinearGradient(0,S*0.18,0,S*0.52);
+    shn.addColorStop(0,'rgba(255,252,240,0)');
+    shn.addColorStop(0.45,'rgba(255,252,240,'+(FIN>=2?0.14:0.10)+')');
+    shn.addColorStop(1,'rgba(255,252,240,0)');
+    tg.fillStyle=shn; tg.fillRect(0,S*0.18,S,S*0.34);
+  }
   const shade=(x,y,rx,ry,al)=>{const sgd=tg.createRadialGradient(x,y,1,x,y,Math.max(rx,ry));
     sgd.addColorStop(0,'rgba(20,12,10,'+al+')');sgd.addColorStop(1,'rgba(20,12,10,0)');
     tg.fillStyle=sgd;tg.beginPath();tg.ellipse(x,y,rx,ry,0,0,7);tg.fill();};
@@ -5830,6 +6144,21 @@ function hdPortraitFauna(g){
   c2.fillStyle=fg;c2.fillRect(0,S2*0.7,S2,S2*0.3);
   return cv.toDataURL();
 }
+/* world camouflage (v1.3.5 coherence pass, Nick's call): the world
+   dictates a share of every creature's field color — a wash of the
+   ground family over the pelt, heavier with distance, so herds sit IN
+   the landscape instead of on top of it. The Compendium portrait keeps
+   the creature's own colors; camouflage is a field condition. */
+function _hdCamo(cv0, col, a){
+  const c9=document.createElement('canvas'); c9.width=cv0.width; c9.height=cv0.height;
+  const g9=c9.getContext('2d'); g9.drawImage(cv0,0,0);
+  g9.globalCompositeOperation='source-atop';
+  g9.globalAlpha=a; g9.fillStyle=col; g9.fillRect(0,0,c9.width,c9.height);
+  c9._feetY=cv0._feetY;   /* the placement anchor rides along — losing it
+                             NaN'd the transform and beached beasts in the
+                             sky's top corner (coherence-pass catch) */
+  return c9;
+}
 function hdPortraitFlora(g){
   const S2=440,cv=document.createElement('canvas');cv.width=cv.height=S2;
   const c2=cv.getContext('2d');
@@ -5976,6 +6305,332 @@ function _hdVolcano(g,W,hz,seed,r,vx0){
 /* the master vista: opts={seed, biome:'land'|'island', era:'none'|'iron'|'space',
    pal key, wx: the card's weather token|null, moons, aurora:bool (the card's
    magnetosphere — auroras crown the poles), genes:[fauna genes]|null} */
+/* WEATHER EVENTS (v1.3.5 Batch 5b-ii) — the Weather row has promised
+   "endless hurricanes" and "planet-circling dust storms" since launch;
+   now the sky pays up. The same seeded ~90s spell mechanism as wxNow,
+   rarer odds, honest to type + biome + the weather actually falling.
+   Airless rocky worlds stay weatherless forever. */
+function wxEventFor(P, wb, wxTok){
+  const b=Math.floor(perfTime()/90);
+  const r=mulberry32((P.seed^0xE7E7^b)>>>0);
+  const t=P.type;
+  if(t==='lava'){ if(wxTok==='ash'&&r()<0.5) return 'volclightning'; if(r()<0.10) return 'firewhirl'; return null; }
+  if(t==='desert'){ if(wxTok==='dust'&&r()<0.5) return 'haboob'; return null; }
+  if(t==='ocean'){ if(wb==='stormsea'&&r()<0.7) return 'hurricane'; if(wxTok==='rain'&&r()<0.22) return 'hurricane'; return null; }
+  if(t==='terran'){ if(wxTok==='rain'&&r()<0.14) return 'tornado'; if(wxTok==='snow'&&r()<0.25) return 'icestorm'; return null; }
+  if(t==='ice'){ if(wb==='cryogeyser'&&r()<0.6) return 'cryoeruption'; if(wxTok==='snow'&&r()<0.2) return 'icestorm'; return null; }
+  if(t==='venus'){ return r()<0.5?'virga':null; }
+  if(t==='gas'){ if(wb==='hotglow'&&r()<0.6) return 'ironrain'; return null; }
+  return null;
+}
+const WX_EVENT_WORD={tornado:'a tornado on the horizon', hurricane:'a hurricane wall closing in',
+  haboob:'a sand wall rolling in', icestorm:'an ice storm glazing everything',
+  cryoeruption:'a cryogeyser in full eruption', virga:'acid rain dying in the air',
+  volclightning:'volcanic lightning in the ash', firewhirl:'fire whirls walking the fields',
+  ironrain:'iron rain glowing as it falls'};
+/* the showpiece painters — one scene-sized statement each, all seeded */
+function _hdWxEvent(g, evt, seed, hz, W, H, night){
+  const r=mulberry32((seed^0xE7A2)>>>0);
+  const A=night?0.7:1;
+  /* the big shapes blur into the air; lightning and rain streaks stay sharp */
+  if(evt==='tornado'){
+    try{ g.filter='blur(2px)'; }catch(_){ }
+    const x=W*(0.55+r()*0.3), top=hz*0.30, w0=34+r()*20;
+    const tg=g.createLinearGradient(0,top,0,hz);
+    tg.addColorStop(0,'rgba(40,42,52,'+(0.75*A)+')'); tg.addColorStop(1,'rgba(30,30,38,'+(0.55*A)+')');
+    g.fillStyle=tg; g.beginPath();
+    g.moveTo(x-w0,top); g.quadraticCurveTo(x-w0*0.2, hz*0.6, x-4+(r()-0.5)*10, hz);
+    g.lineTo(x+6+(r()-0.5)*10, hz); g.quadraticCurveTo(x+w0*0.3, hz*0.6, x+w0*1.1, top);
+    g.closePath(); g.fill();
+    g.fillStyle='rgba(46,46,56,'+(0.8*A)+')'; g.beginPath(); g.ellipse(x,top,w0*2.4,14,0,0,TAU); g.fill();
+    const dg4=g.createRadialGradient(x,hz,0,x,hz,50);
+    dg4.addColorStop(0,'rgba(90,84,70,'+(0.45*A)+')'); dg4.addColorStop(1,'rgba(90,84,70,0)');
+    g.fillStyle=dg4; g.beginPath(); g.arc(x,hz,50,0,TAU); g.fill();
+  } else if(evt==='hurricane'){
+    try{ g.filter='blur(5px)'; }catch(_){ }
+    const cx3=W*(0.28+r()*0.44);
+    for(let k=0;k<4;k++){
+      const rr2=60+k*46, a0=r()*TAU;
+      const ag2=g.createRadialGradient(cx3,hz,rr2-26,cx3,hz,rr2+18);
+      ag2.addColorStop(0,'rgba(70,78,92,0)');
+      ag2.addColorStop(0.55,'rgba(70,78,92,'+((0.34-k*0.06)*A)+')');
+      ag2.addColorStop(1,'rgba(70,78,92,0)');
+      g.fillStyle=ag2; g.beginPath(); g.arc(cx3,hz,rr2+18,Math.PI+a0*0.04,TAU-0.2); g.fill();
+    }
+    const wg2=g.createLinearGradient(0,hz*0.55,0,hz);
+    wg2.addColorStop(0,'rgba(52,58,72,0)'); wg2.addColorStop(1,'rgba(52,58,72,'+(0.5*A)+')');
+    g.fillStyle=wg2; g.fillRect(0,hz*0.55,W,hz*0.45);
+  } else if(evt==='haboob'){
+    try{ g.filter='blur(5px)'; }catch(_){ }
+    const x0=W*(0.5+r()*0.3);
+    const hg2=g.createLinearGradient(x0,0,W,0);
+    hg2.addColorStop(0,'rgba(150,110,60,0)'); hg2.addColorStop(0.35,'rgba(150,110,60,'+(0.65*A)+')');
+    hg2.addColorStop(1,'rgba(120,86,44,'+(0.9*A)+')');
+    g.fillStyle=hg2; g.fillRect(x0,hz*0.18,W-x0,H-hz*0.18);
+    for(let i=0;i<8;i++){
+      const bx=x0+(W-x0)*r(), by=hz*(0.2+r()*0.5), br=20+r()*36;
+      const bg5=g.createRadialGradient(bx,by,0,bx,by,br);
+      bg5.addColorStop(0,'rgba(160,120,70,'+(0.5*A)+')'); bg5.addColorStop(1,'rgba(160,120,70,0)');
+      g.fillStyle=bg5; g.beginPath(); g.arc(bx,by,br,0,TAU); g.fill();
+    }
+  } else if(evt==='icestorm'){
+    g.strokeStyle='rgba(220,236,250,'+(0.5*A)+')'; g.lineWidth=1.1;
+    for(let i=0;i<60;i++){
+      const x=r()*W, y=r()*H*0.9, ln=8+r()*14;
+      g.beginPath(); g.moveTo(x,y); g.lineTo(x-ln*0.5,y+ln); g.stroke();
+    }
+    for(let i=0;i<26;i++){
+      g.fillStyle='rgba(235,247,255,'+(0.35+r()*0.5).toFixed(2)+')';
+      g.fillRect(r()*W, hz+(H-hz)*r(), 2, 1.4);
+    }
+  } else if(evt==='cryoeruption'){
+    try{ g.filter='blur(3px)'; }catch(_){ }
+    const x=W*(0.3+r()*0.4), h=hz*0.85;
+    const pg2=g.createLinearGradient(x,hz,x,hz-h);
+    pg2.addColorStop(0,'rgba(240,248,255,'+(0.75*A)+')'); pg2.addColorStop(1,'rgba(240,248,255,0)');
+    g.fillStyle=pg2; g.beginPath();
+    g.moveTo(x-4,hz); g.quadraticCurveTo(x-14,hz-h*0.55,x-30,hz-h);
+    g.lineTo(x+30,hz-h); g.quadraticCurveTo(x+14,hz-h*0.55,x+4,hz); g.closePath(); g.fill();
+    const fog=g.createRadialGradient(x,hz-h,0,x,hz-h,80);
+    fog.addColorStop(0,'rgba(230,242,252,'+(0.4*A)+')'); fog.addColorStop(1,'rgba(230,242,252,0)');
+    g.fillStyle=fog; g.beginPath(); g.arc(x,hz-h,80,0,TAU); g.fill();
+  } else if(evt==='virga'){
+    try{ g.filter='blur(3px)'; }catch(_){ }
+    for(let i=0;i<7;i++){
+      const x=W*(0.08+r()*0.84), top=hz*0.28+r()*20, fall=hz*0.30;
+      const vg2=g.createLinearGradient(x,top,x,top+fall);
+      vg2.addColorStop(0,'rgba(210,200,160,'+(0.4*A)+')'); vg2.addColorStop(1,'rgba(210,200,160,0)');
+      g.fillStyle=vg2; g.fillRect(x-6,top,12,fall);
+    }
+  } else if(evt==='volclightning'){
+    const x=W*(0.3+r()*0.4), top=hz*0.12;
+    g.strokeStyle='rgba(210,225,255,'+(0.85*A)+')'; g.lineWidth=1.6;
+    for(let k2=0;k2<3;k2++){
+      let cx4=x+(r()-0.5)*60, cy4=top+r()*20;
+      g.beginPath(); g.moveTo(cx4,cy4);
+      for(let s3=0;s3<5;s3++){ cx4+=(r()-0.5)*34; cy4+=hz*0.10; g.lineTo(cx4,cy4); }
+      g.stroke();
+    }
+    const lg3=g.createRadialGradient(x,top+30,0,x,top+30,110);
+    lg3.addColorStop(0,'rgba(190,210,255,'+(0.30*A)+')'); lg3.addColorStop(1,'rgba(190,210,255,0)');
+    g.fillStyle=lg3; g.beginPath(); g.arc(x,top+30,110,0,TAU); g.fill();
+  } else if(evt==='firewhirl'){
+    try{ g.filter='blur(3px)'; }catch(_){ }
+    for(let i=0;i<2;i++){
+      const x=W*(0.25+r()*0.5), h=60+r()*50, y=hz+(H-hz)*(0.25+r()*0.3);
+      const fg2=g.createLinearGradient(x,y,x+(r()-0.5)*16,y-h);
+      fg2.addColorStop(0,'rgba(255,140,50,0.8)'); fg2.addColorStop(0.7,'rgba(255,90,30,0.35)'); fg2.addColorStop(1,'rgba(255,90,30,0)');
+      g.fillStyle=fg2; g.beginPath();
+      g.moveTo(x-3,y); g.quadraticCurveTo(x-8,y-h*0.5,x-4,y-h);
+      g.lineTo(x+4,y-h); g.quadraticCurveTo(x+8,y-h*0.5,x+3,y); g.closePath(); g.fill();
+    }
+  } else if(evt==='ironrain'){
+    g.strokeStyle='rgba(255,150,70,0.75)'; g.lineWidth=1.4;
+    for(let i=0;i<40;i++){
+      const x=r()*W, y=r()*H*0.8, ln=10+r()*16;
+      g.beginPath(); g.moveTo(x,y); g.lineTo(x-2,y+ln); g.stroke();
+    }
+  }
+  try{ g.filter='none'; }catch(_){ }
+}
+/* COLOSSAL WANDERERS — when a world's own roster carries a titanic
+   creature, a rare roll shows it at true scale: a back breaking the
+   horizon, and the scene is suddenly very small. Card-honest since
+   launch (FA_SIZE has always said 'titanic'). */
+function _hdTitan(g, mode, seed, hz, W, H, night){
+  const r=mulberry32((seed^0x717A)>>>0);
+  const x=W*(0.30+r()*0.40), span=W*(0.28+r()*0.14);
+  const col=night?'rgba(8,10,16,0.92)':'rgba(16,18,26,0.85)';
+  if(mode==='deck'){
+    g.fillStyle=col;
+    g.beginPath(); g.ellipse(x, hz*0.5, span*0.5, span*0.09, -0.06, 0, TAU); g.fill();
+    for(let f=0;f<3;f++){ const fx=x-span*0.3+f*span*0.3;
+      g.beginPath(); g.moveTo(fx,hz*0.5); g.lineTo(fx+span*0.05,hz*0.5-span*0.10); g.lineTo(fx+span*0.10,hz*0.5); g.closePath(); g.fill(); }
+    return;
+  }
+  try{ g.filter='blur(1.2px)'; }catch(_){ }
+  /* land/sea: ONE long living back arcing through the ground line — a
+     continuous spine, not floating domes (Nick's globes report). The
+     silhouette rises to a shoulder, runs a ridge of plates, and sinks
+     to a tail; distance haze blends it into the scene's air. */
+  const hh=22+r()*16, x0=x-span*0.55, x1=x+span*0.55;
+  g.fillStyle=col;
+  g.beginPath(); g.moveTo(x0,hz+3);
+  const segs=7;
+  for(let s4=0;s4<=segs;s4++){
+    const t2=s4/segs, sx4=x0+(x1-x0)*t2;
+    /* two rolling crests along one body, tallest a third of the way in */
+    const env2=Math.sin(t2*Math.PI);
+    const crest=(Math.sin(t2*Math.PI*2.2+0.4)*0.30+0.70);
+    g.lineTo(sx4, hz+3-hh*env2*crest);
+  }
+  g.lineTo(x1,hz+3); g.closePath(); g.fill();
+  /* ridge plates along the spine */
+  for(let p2=1;p2<6;p2++){
+    const t3=p2/6, sx5=x0+(x1-x0)*t3;
+    const top=hz+3-(22+r()*16)*Math.sin(t3*Math.PI)*0.92;
+    g.beginPath(); g.moveTo(sx5-5,top+4); g.lineTo(sx5+(r()-0.5)*4,top-6-r()*5); g.lineTo(sx5+5,top+4);
+    g.closePath(); g.fill();
+  }
+  /* spray or dust where the body breaks the surface, both ends */
+  for(const ex of [x0+span*0.06, x1-span*0.06]){
+    const sg3=g.createRadialGradient(ex,hz+2,0,ex,hz+2,26);
+    sg3.addColorStop(0, mode==='sea'?'rgba(210,230,240,0.45)':'rgba(120,100,70,0.40)');
+    sg3.addColorStop(1,'rgba(0,0,0,0)');
+    g.fillStyle=sg3; g.beginPath(); g.arc(ex,hz+2,26,0,TAU); g.fill();
+  }
+  /* distance haze — the air between you and it */
+  const hzW=g.createLinearGradient(0,hz-hh-14,0,hz+6);
+  hzW.addColorStop(0,'rgba(150,165,190,'+(night?0.06:0.14)+')');
+  hzW.addColorStop(1,'rgba(150,165,190,0)');
+  g.fillStyle=hzW; g.fillRect(x0-10,hz-hh-14,(x1-x0)+20,hh+20);
+  try{ g.filter='none'; }catch(_){ }
+}
+/* THE DEEP — the Abyssal world's vista goes beneath the waves: the first
+   sub-surface vantage (the cloud deck set the precedent — the vantage
+   follows the card's truth). No sky, no weather; biolume is the light. */
+function _hdAbyssScene(o){
+  const W=960,H=430,cv=document.createElement('canvas');cv.width=W;cv.height=H;
+  const g=cv.getContext('2d'), r=mulberry32((o.seed^0xAB55)>>>0);
+  const sea=g.createLinearGradient(0,0,0,H);
+  sea.addColorStop(0,'#0a2236'); sea.addColorStop(0.4,'#05131f'); sea.addColorStop(1,'#01060a');
+  g.fillStyle=sea; g.fillRect(0,0,W,H);
+  /* the dim ceiling of the sea — light shafts losing the argument */
+  for(let i=0;i<5;i++){
+    const x=W*(0.1+r()*0.8), w2=30+r()*50;
+    const shaft=g.createLinearGradient(x,0,x+(r()-0.5)*30,H*0.5);
+    shaft.addColorStop(0,'rgba(120,180,210,0.10)'); shaft.addColorStop(1,'rgba(120,180,210,0)');
+    g.fillStyle=shaft; g.fillRect(x-w2/2,0,w2,H*0.5);
+  }
+  /* biolume motes and drifting blooms */
+  for(let i=0;i<120;i++){
+    const x=r()*W, y=H*0.15+r()*H*0.8;
+    g.fillStyle='rgba('+(r()<0.6?'120,230,255':'170,140,255')+','+(0.15+r()*0.5).toFixed(2)+')';
+    g.fillRect(x,y,1.4+r()*1.4,1.2);
+  }
+  /* the vents far below — warm light through black water */
+  for(let i=0;i<3;i++){
+    const x=W*(0.15+r()*0.7), y=H*(0.86+r()*0.1);
+    const vg3=g.createRadialGradient(x,y,0,x,y,60+r()*40);
+    vg3.addColorStop(0,'rgba(255,120,60,0.30)'); vg3.addColorStop(1,'rgba(255,120,60,0)');
+    g.fillStyle=vg3; g.beginPath(); g.arc(x,y,60+r()*40,0,TAU); g.fill();
+  }
+  /* swimmers where the card grants them — deep-sea rules: lures, dark bodies */
+  const n=Math.min(4,(o.aqua||0)+1);
+  for(let i=0;i<n && (o.aqua||0)>0;i++){
+    const x=W*(0.15+r()*0.7), y=H*(0.3+r()*0.45), s2=10+r()*18, dir=r()<0.5?1:-1;
+    g.fillStyle='rgba(4,8,14,0.9)';
+    g.beginPath(); g.ellipse(x,y,s2,s2*0.34,0,0,TAU); g.fill();
+    g.beginPath(); g.moveTo(x+dir*s2,y); g.lineTo(x+dir*(s2+s2*0.5),y-s2*0.25); g.lineTo(x+dir*(s2+s2*0.5),y+s2*0.25); g.closePath(); g.fill();
+    const lg4=g.createRadialGradient(x-dir*s2*0.8,y-s2*0.5,0,x-dir*s2*0.8,y-s2*0.5,5);
+    lg4.addColorStop(0,'rgba(150,240,255,0.9)'); lg4.addColorStop(1,'rgba(150,240,255,0)');
+    g.fillStyle=lg4; g.beginPath(); g.arc(x-dir*s2*0.8,y-s2*0.5,5,0,TAU); g.fill();
+  }
+  const vg4=g.createRadialGradient(W/2,H*0.45,H*0.3,W/2,H*0.5,W*0.62);
+  vg4.addColorStop(0,'rgba(0,0,0,0)'); vg4.addColorStop(1,'rgba(0,2,5,0.5)');
+  g.fillStyle=vg4; g.fillRect(0,0,W,H);
+  return cv;
+}
+/* the biome dressing (v1.3.5 Batch 5b) — the Biome row's words painted
+   into the scene. One compact painter per feature family, all seeded, no
+   strokes-for-glow, layered before the near-ground fringe so the vignette
+   still grades everything as one picture. */
+function _hdBiomeDress(g, o, seed, hz, W, H){
+  const r=mulberry32((seed^0xD135)>>>0), wb=o.wb;
+  const night=o.pal==='night'||o.nightize;
+  const A=night?0.55:1;                          /* the dark knocks features back */
+  const groundY=k=>hz+(H-hz)*k;
+  const wash=(col,a)=>{ const wg=g.createLinearGradient(0,hz,0,H);
+    wg.addColorStop(0,'rgba('+col+','+(a*0.55).toFixed(3)+')');
+    wg.addColorStop(1,'rgba('+col+','+a.toFixed(3)+')');
+    g.fillStyle=wg; g.fillRect(0,hz,W,H-hz); };
+  const spires=(col,glow,n,hMin,hMax)=>{ for(let i=0;i<n;i++){
+    const x=W*(0.08+r()*0.84), y=groundY(0.25+r()*0.55), h=hMin+r()*(hMax-hMin), w2=h*(0.16+r()*0.12);
+    g.fillStyle=col; g.beginPath(); g.moveTo(x-w2,y); g.lineTo(x+(r()-0.5)*w2*0.6,y-h); g.lineTo(x+w2,y); g.closePath(); g.fill();
+    if(glow){ const gg2=g.createRadialGradient(x,y-h*0.55,0,x,y-h*0.55,h*0.7);
+      gg2.addColorStop(0,glow); gg2.addColorStop(1,'rgba(0,0,0,0)');
+      g.fillStyle=gg2; g.beginPath(); g.arc(x,y-h*0.55,h*0.7,0,TAU); g.fill(); } } };
+  const boulders=(col,n)=>{ for(let i=0;i<n;i++){
+    const x=W*r(), y=groundY(0.3+r()*0.6), rr=3+r()*10*(0.5+(y-hz)/(H-hz));
+    g.fillStyle=col; g.beginPath(); g.ellipse(x,y,rr,rr*0.62,0,0,TAU); g.fill();
+    g.fillStyle='rgba(0,0,0,0.25)'; g.beginPath(); g.ellipse(x,y+rr*0.5,rr,rr*0.2,0,0,TAU); g.fill(); } };
+  const ridges=(col,n)=>{ try{ g.filter='blur(3px)'; }catch(_){ } for(let i=0;i<n;i++){
+    const y=groundY(0.18+i*(0.5/n)), amp=6+r()*10;
+    g.fillStyle=col; g.beginPath(); g.moveTo(0,y);
+    for(let x2=0;x2<=W;x2+=40) g.lineTo(x2, y+Math.sin(x2*0.01+i*2+r()*2)*amp);
+    g.lineTo(W,y+amp+8); g.lineTo(0,y+amp+8); g.closePath(); g.fill(); } try{ g.filter='none'; }catch(_){ } };
+  const veins=(col,n)=>{ g.lineWidth=1.4;
+    for(let i=0;i<n;i++){ const x=W*r(), y=groundY(0.25+r()*0.6);
+      g.strokeStyle=col; g.beginPath(); g.moveTo(x,y);
+      let cx2=x, cy2=y;
+      for(let s2=0;s2<4;s2++){ cx2+=(r()-0.5)*40; cy2+=(r()*10); g.lineTo(cx2,cy2); }
+      g.stroke(); } };
+  const shimmer=(col,n)=>{ for(let i=0;i<n;i++){
+    g.fillStyle='rgba('+col+','+(0.2+r()*0.45).toFixed(2)+')';
+    g.fillRect(W*r(), groundY(0.2+r()*0.7), 1.6+r()*2, 1.2); } };
+  const mist=(col,a,y0,h2)=>{ const mg=g.createLinearGradient(0,y0,0,y0+h2);
+    mg.addColorStop(0,'rgba('+col+',0)'); mg.addColorStop(0.5,'rgba('+col+','+a.toFixed(2)+')'); mg.addColorStop(1,'rgba('+col+',0)');
+    g.fillStyle=mg; g.fillRect(0,y0,W,h2); };
+  const plumes=(n)=>{ for(let i=0;i<n;i++){
+    const x=W*(0.12+r()*0.76), y=groundY(0.25+r()*0.4), h=30+r()*60;
+    const pg=g.createLinearGradient(x,y,x+(r()-0.5)*14,y-h);
+    pg.addColorStop(0,'rgba(235,244,252,'+(0.5*A)+')'); pg.addColorStop(1,'rgba(235,244,252,0)');
+    g.fillStyle=pg; g.beginPath();
+    g.moveTo(x-2,y); g.quadraticCurveTo(x-4-r()*6, y-h*0.6, x-8-r()*8, y-h);
+    g.lineTo(x+8+r()*8, y-h); g.quadraticCurveTo(x+4+r()*6, y-h*0.6, x+2,y); g.closePath(); g.fill(); } };
+  const towers=(capCol,stalkCol,n)=>{ for(let i=0;i<n;i++){
+    const x=W*(0.06+r()*0.88), y=groundY(0.3+r()*0.55), h=(14+r()*30)*(0.5+(y-hz)/(H-hz)), w2=h*0.16;
+    g.fillStyle=stalkCol; g.fillRect(x-w2/2, y-h, w2, h);
+    g.fillStyle=capCol; g.beginPath(); g.ellipse(x, y-h, h*0.4, h*0.18, 0, Math.PI, 0); g.fill(); } };
+  const devils=(n)=>{ for(let i=0;i<n;i++){
+    const x=W*(0.15+r()*0.7), y=groundY(0.3+r()*0.3), h=36+r()*50;
+    const dg3=g.createLinearGradient(x,y,x+(r()-0.5)*20,y-h);
+    dg3.addColorStop(0,'rgba(190,150,100,'+(0.35*A)+')'); dg3.addColorStop(1,'rgba(190,150,100,0)');
+    g.fillStyle=dg3; g.beginPath();
+    g.moveTo(x-3,y); g.quadraticCurveTo(x-10, y-h*0.5, x-14, y-h);
+    g.lineTo(x+14, y-h); g.quadraticCurveTo(x+10, y-h*0.5, x+3, y); g.closePath(); g.fill(); } };
+  switch(wb){
+    /* terran */
+    case 'savanna':  wash('150,118,34',0.42); boulders('rgba(70,52,26,0.55)',4); break;
+    case 'jungle':   wash('8,46,12',0.46); towers('rgba(16,52,20,0.9)','rgba(20,34,14,0.9)',24); mist('160,190,150',0.14*A,hz+4,34); break;
+    case 'marsh':    wash('44,72,40',0.30); mist('180,200,180',0.20*A,groundY(0.45),48); spires('rgba(52,74,40,0.7)',null,14,6,16); break;
+    case 'swamp':    wash('8,14,8',0.52); towers('rgba(30,40,22,0.85)','rgba(18,22,12,0.9)',5); mist('120,140,110',0.22*A,groundY(0.3),64); break;
+    case 'mangrove': wash('26,40,26',0.18); towers('rgba(24,48,26,0.9)','rgba(30,26,14,0.95)',7); break;
+    case 'tundra':   wash('96,110,96',0.16); boulders('rgba(88,100,104,0.5)',5); break;
+    case 'karst':    ridges('rgba(60,64,58,0.35)',2); spires('rgba(52,58,50,0.8)',null,5,18,42); break;
+    case 'saltflat': case 'saltpan': wash('228,230,228',0.55); shimmer('255,255,255',90); mist('235,240,240',0.14*A,groundY(0.35),34); break;
+    case 'fungal':   towers('rgba(150,110,160,'+(0.85*A)+')','rgba(90,74,96,0.9)',9); mist('150,120,160',0.08*A,groundY(0.4),40); break;
+    case 'crystalsteppe': spires('rgba(120,150,190,0.55)','rgba(150,190,240,'+(0.10*A)+')',7,16,46); break;
+    /* ocean */
+    case 'coral':    wash('30,150,150',0.10); shimmer('160,240,230',36); break;
+    case 'stormsea': mist('90,100,110',0.22*A,hz-40,50); break;
+    case 'volcisle': spires('rgba(26,14,12,0.9)','rgba(255,120,50,'+(0.10*A)+')',3,30,60); veins('rgba(255,110,40,'+(0.5*A)+')',4); break;
+    case 'milksea':  shimmer('140,230,255',70); mist('120,220,250',0.10,groundY(0.2),50); break;
+    /* ice */
+    case 'packice':  ridges('rgba(190,215,235,0.30)',3); break;
+    case 'cryogeyser': plumes(3); break;
+    case 'blueice':  ridges('rgba(80,140,210,0.35)',2); spires('rgba(90,150,220,0.5)','rgba(120,190,255,'+(0.12*A)+')',4,22,50); break;
+    /* desert */
+    case 'canyon':   ridges('rgba(96,48,26,0.65)',3); wash('116,62,30',0.18); break;
+    case 'oxide':    wash('120,50,20',0.18); devils(2+((r()<0.5)?1:0)); break;
+    case 'glass':    wash('150,170,175',0.10); shimmer('220,245,250',80); spires('rgba(170,200,205,0.35)',null,3,10,26); break;
+    /* rocky */
+    case 'boulder':  boulders('rgba(70,70,80,0.8)',12); break;
+    case 'graben':   ridges('rgba(40,40,50,0.5)',3); break;
+    case 'geode':    spires('rgba(120,80,170,0.6)','rgba(170,120,240,'+(0.12*A)+')',5,12,30); veins('rgba(170,120,240,'+(0.4*A)+')',3); break;
+    case 'carbon':   wash('8,8,10',0.35); shimmer('220,235,255',26); break;
+    /* venus */
+    case 'sulfurdeck': wash('140,120,20',0.20); mist('190,170,60',0.16,hz-30,60); break;
+    case 'abyssgreen': wash('10,20,10',0.35); mist('40,70,40',0.20,hz-20,70); break;
+    /* lava */
+    case 'ashwaste': wash('60,58,56',0.28); mist('120,116,112',0.16,groundY(0.3),50); break;
+    case 'obsidian': wash('6,4,8',0.35); veins('rgba(255,90,30,'+(0.55*A)+')',6); shimmer('200,180,255',18); break;
+    case 'magmasea': { const mg2=g.createLinearGradient(0,groundY(0.35),0,H);
+      mg2.addColorStop(0,'rgba(255,120,40,0)'); mg2.addColorStop(1,'rgba(255,120,40,0.30)');
+      g.fillStyle=mg2; g.fillRect(0,groundY(0.35),W,H-groundY(0.35));
+      veins('rgba(255,150,60,0.7)',8); break; }
+  }
+}
 function hdVista(opts){
   const W=960,H=430,cv=document.createElement('canvas');cv.width=W;cv.height=H;
   const g=cv.getContext('2d'),seed=opts.seed>>>0,r=mulberry32((seed^0x9d7)>>>0);
@@ -6073,6 +6728,7 @@ function hdVista(opts){
     const ah1=AURF[(rA()*AURF.length)|0]+(rA()-0.5)*14;
     const ah2=AURF[(rA()*AURF.length)|0]+(rA()-0.5)*14;
     g.save();g.globalCompositeOperation='lighter';
+    try{ g.filter='blur(5px)'; }catch(_){ }   /* one veil, never columns */
     for(const[hue,off,amp,al] of [[ah1,H*0.06,30,0.15],[ah2,H*0.15,42,0.10]]){
       const ph1=rA()*TAU, ph2=rA()*TAU;
       for(let ax=-3;ax<=W;ax+=3){
@@ -6257,20 +6913,20 @@ function hdVista(opts){
       const nightAmb=opts.pal==='night'?0.18:0;   /* moonlight knocks the near life back */
       const bs=cmpFlip?-1:1;                       /* herd side follows the course */
       if(opts.genes&&opts.genes.length){
-        const bcv=hdBeastBare(opts.genes[0],(seed^0x8EA)>>>0);
+        const bcv=_hdCamo(hdBeastBare(opts.genes[0],(seed^0x8EA)>>>0), P.ground[1], 0.14);
         const tB=0.62+rL()*0.14, pBank=riverAt(tB);
         _hdPlaceBeast(g,bcv,pBank[0]+66*bs,pBank[1]+8,0.32+rL()*0.08,!cmpFlip,nightAmb,P.sun>0?0.10:0);
         const pFar=riverAt(0.24+rL()*0.10);
         _hdPlaceBeast(g,bcv,pFar[0]-64*bs,pFar[1]+10,0.17,!cmpFlip,0.45,0.05);
         if(opts.genes[1]){
-          const bcv2=hdBeastBare(opts.genes[1],(seed^0x77F)>>>0);
+          const bcv2=_hdCamo(hdBeastBare(opts.genes[1],(seed^0x77F)>>>0), P.ground[1], 0.24);
           _hdPlaceBeast(g,bcv2,pFar[0]-110*bs,pFar[1]+4,0.14,!cmpFlip,0.55,0.04);
         }
         /* teeming worlds show it (L1): extra herd silhouettes when the
            roster runs deep */
         if((opts.herd||0)>2){
           for(let hx=0;hx<Math.min((opts.herd||0)-2,2);hx++){
-            const bcvH=hdBeastBare(opts.genes[(hx+1)%opts.genes.length],(seed^(0x51+hx*7))>>>0);
+            const bcvH=_hdCamo(hdBeastBare(opts.genes[(hx+1)%opts.genes.length],(seed^(0x51+hx*7))>>>0), P.ground[1], 0.30);
             const pH=riverAt(0.16+_hdHash(hx,seed,21)*0.16);
             _hdPlaceBeast(g,bcvH,pH[0]+(50+hx*46)*bs*-1,pH[1]+6,0.11,!cmpFlip,0.6,0.03);
           }
@@ -6279,7 +6935,7 @@ function hdVista(opts){
       if(flora){
         for(let tp2=0;tp2<8;tp2++){
           const px5=(tp2+0.5)*(W/8)+(_hdHash(tp2,seed,3)-0.5)*40;
-          _hdStampPlant(g,tp2%2?pcv2:pcv,px5,ridgeY(px5)+3,0.24+_hdHash(tp2,seed,5)*0.14,0.42+frost*0.4,pd,pdc);
+          _hdStampPlant(g,tp2%2?pcv2:pcv,px5,ridgeY(px5)+7,0.24+_hdHash(tp2,seed,5)*0.14,0.62+frost*0.3,pd,pdc);
         }
         _hdStampPlant(g,pcv,rX(W*0.085),H*0.90,0.95,frost,pd*0.9,pdc);
         _hdStampPlant(g,pcv2,rX(W*0.90),H*0.94,1.15,frost,pd*0.9,pdc);
@@ -6292,15 +6948,15 @@ function hdVista(opts){
     const dpv=_hdPlantBare(seed+5,{trunk:'#2a2014',leaf:'rgba(130,120,66,0.85)',spread:1.5,depth:3});
     for(let dp2=0;dp2<6;dp2++){
       const dx2=W*(0.06+dp2*0.16)+(_hdHash(dp2,seed,11)-0.5)*50;
-      _hdStampPlant(g,dpv,dx2,ridgeY(dx2)+4,0.10+_hdHash(dp2,seed,13)*0.08,0.35,pd,pdc);
+      _hdStampPlant(g,dpv,dx2,ridgeY(dx2)+7,0.10+_hdHash(dp2,seed,13)*0.08,0.55,pd,pdc);
     }
     _hdStampPlant(g,dpv,W*0.12,H*0.90,0.5,0,pd*0.9,pdc);
     _hdStampPlant(g,dpv,W*0.83,H*0.94,0.62,0,pd*0.9,pdc);
     if(opts.genes&&opts.genes.length){
-      const bcv=hdBeastBare(opts.genes[0],(seed^0x8EA)>>>0);
+      const bcv=_hdCamo(hdBeastBare(opts.genes[0],(seed^0x8EA)>>>0), P.ground[1], 0.14);
       _hdPlaceBeast(g,bcv,W*0.55,H*0.86,0.30,true,0,P.sun>0?0.12:0,'96,78,40');
       if(opts.genes[1]){
-        const bcv2=hdBeastBare(opts.genes[1],(seed^0x77F)>>>0);
+        const bcv2=_hdCamo(hdBeastBare(opts.genes[1],(seed^0x77F)>>>0), P.ground[1], 0.26);
         _hdPlaceBeast(g,bcv2,W*0.30,hz+96,0.14,false,0.4,0.06,'96,78,40');
       }
     }
@@ -6703,6 +7359,9 @@ function hdVista(opts){
     dg2.addColorStop(0,'rgba(40,30,70,0.30)');dg2.addColorStop(0.5,'rgba(180,90,50,0.14)');dg2.addColorStop(1,'rgba(20,16,40,0.28)');
     g.fillStyle=dg2;g.fillRect(0,0,W,H);
   }
+  if(opts.wb) _hdBiomeDress(g, opts, seed, hz, W, H);
+  if(opts.evt) _hdWxEvent(g, opts.evt, seed, hz, W, H, opts.pal==='night'||opts.nightize);
+  if(opts.titan) _hdTitan(g, sea?'sea':'land', seed, hz, W, H, opts.pal==='night'||opts.nightize);
   g.fillStyle=desert?'#1c1006':(ember?'#120605':(sea?'#140f08':(opts.pal==='snow'?'#0e141c':'#071108')));
   g.beginPath();g.moveTo(0,H);
   for(let x2=0;x2<=W;x2+=6)g.lineTo(x2,H-8-_hdFbm(x2*0.02,3,seed+41,3)*16);
@@ -6720,8 +7379,11 @@ function hdVista(opts){
    longer see-once: the last landing's args are cached so the surface
    card can reopen it (graphics overhaul B1) */
 const vistaBox=document.createElement('div');vistaBox.id='vistabox';document.body.appendChild(vistaBox);
-let _lastVista=null, _vistaHideT=0;
+let _lastVista=null, _vistaHideT=0, _vistaShowSeq=0;
 vistaBox.addEventListener('click', ()=>{
+  /* a show's fade-in rides a queued animation frame — bump the sequence so
+     a lightning-fast tap can't lose the race and strand the view open */
+  _vistaShowSeq++;
   vistaBox.classList.remove('on');
   clearTimeout(_vistaHideT);
   _vistaHideT=setTimeout(()=>{ if(!vistaBox.classList.contains('on')) vistaBox.style.display='none'; }, 460);
@@ -6752,6 +7414,15 @@ function savePostcard(){
   toast('⇪ Postcard saved','The view and its share code are baked into the image — send it to a friend.');
 }
 function _vistaExtras(){
+  /* the corner ✕ — same language as every card and panel (v1.3.5).
+     No handler of its own: the tap bubbles to the vistabox dismiss.
+     Hidden during training, where the view is the lesson. */
+  if(tutDone){
+    const x=document.createElement('button');
+    x.className='vxc'; x.type='button'; x.textContent='✕';
+    x.setAttribute('data-tip','Close this view — tapping anywhere works too');
+    vistaBox.appendChild(x);
+  }
   const pc=document.createElement('div');pc.className='vpc';
   pc.setAttribute('role','button');pc.tabIndex=0;
   pc.textContent='⇪ Save postcard';
@@ -6771,11 +7442,173 @@ function reshowVista(){
     _vistaExtras();
     clearTimeout(_vistaHideT);
     vistaBox.style.display='flex';
-    requestAnimationFrame(()=>vistaBox.classList.add('on'));
+    { const my=++_vistaShowSeq;
+      requestAnimationFrame(()=>{ if(my===_vistaShowSeq) vistaBox.classList.add('on'); }); }
     return;
   }
   const v=_lastVista;
   showVistaBox(v.P, v.tod, v.wx, v.era, v.genes, v.aurora, v.flora, v.climSnow, v.water, v.xtra);
+}
+/* the CLOUD DECK — a gas giant's landing view (v1.3.5, Batch 3: every
+   world has a vista). There is no ground; you hold station in the high
+   deck. Everything here is the card's: band hue family (P.hue), the
+   great spot (P.spot/P.spotHue), ring (P.ring), moons, the immense
+   magnetic field's polar auroras, and aerial fauna where the Life row
+   grants them. Ammonia lightning lights the deeps from below — the
+   Weather row promised continent-sized storms since launch. */
+function _hdDeckScene(o){
+  const W=960,H=430,cv=document.createElement('canvas');cv.width=W;cv.height=H;
+  const g=cv.getContext('2d'), r=mulberry32((o.seed^0xDEC)>>>0);
+  const night=o.tod==='night', dusk=o.tod==='twilight';
+  /* the giant's biome tunes the deck: an Ember giant glows its own sullen
+     red; Pastel-Ammonia decks lift pale; a Storm-Eye giant is dominated
+     by the one great storm */
+  const hue=o.wb==='hotglow' ? 8 : (o.hue==null?30:o.hue);
+  const hsl=(h,s,l,a)=>'hsla('+(((h%360)+360)%360)+','+s+'%,'+l+'%,'+(a==null?1:a)+')';
+  const hz=H*(0.56+r()*0.08);
+  /* upper haze — the same band family, thinned by altitude */
+  const sky=g.createLinearGradient(0,0,0,hz);
+  sky.addColorStop(0, hsl(hue, 38, night?6:(dusk?16:34)));
+  sky.addColorStop(0.7, hsl(hue+10, 44, night?10:(dusk?26:52)));
+  sky.addColorStop(1, hsl(hue+16, 50, night?14:(dusk?38:66)));
+  g.fillStyle=sky; g.fillRect(0,0,W,hz+2);
+  /* high shelf-bands riding the jet streams — blurred into the air, an
+     atmosphere is weather, not linework (Nick's coherence call) */
+  try{ g.filter='blur(5px)'; }catch(_){ }
+  for(let i=0;i<5;i++){
+    const y=hz*(0.12+i*0.17)+(r()-0.5)*10, th=6+r()*14, ph=r()*TAU;
+    g.fillStyle=hsl(hue+(r()-0.5)*24, 40, (night?12:(dusk?30:58))+(r()-0.5)*8, 0.20+r()*0.15);
+    g.beginPath(); g.moveTo(0,y);
+    for(let x2=0;x2<=W;x2+=60) g.lineTo(x2, y+Math.sin(x2*0.004+ph)*8);
+    g.lineTo(W,y+th);
+    for(let x3=W;x3>=0;x3-=60) g.lineTo(x3, y+th+Math.sin(x3*0.004+ph)*8);
+    g.closePath(); g.fill();
+  }
+  try{ g.filter='none'; }catch(_){ }
+  if(night){
+    for(let i=0;i<90;i++){
+      g.fillStyle='rgba(255,255,255,'+(0.22+r()*0.5).toFixed(2)+')';
+      g.fillRect(r()*W, r()*hz*0.85, 1.3, 1.3);
+    }
+  } else {
+    const sx2=W*(0.2+r()*0.6), sy2=hz*(dusk?0.62:0.3);
+    const sg=g.createRadialGradient(sx2,sy2,0,sx2,sy2,60);
+    sg.addColorStop(0,'rgba(255,246,225,'+(dusk?0.5:0.75)+')'); sg.addColorStop(1,'rgba(255,246,225,0)');
+    g.fillStyle=sg; g.beginPath(); g.arc(sx2,sy2,60,0,TAU); g.fill();
+  }
+  /* the card's ring, seen edge-on from inside — a lit band + its shadow line */
+  if(o.ring){
+    g.save(); g.translate(W*0.5, hz*0.55); g.rotate(-0.18);
+    try{ g.filter='blur(1.5px)'; }catch(_){ }
+    const rg2=g.createLinearGradient(-W*0.6,0,W*0.6,0);
+    rg2.addColorStop(0,'rgba(230,225,210,0)');
+    rg2.addColorStop(0.5,'rgba(230,225,210,'+(night?0.30:0.38)+')');
+    rg2.addColorStop(1,'rgba(230,225,210,0)');
+    g.fillStyle=rg2; g.fillRect(-W*0.6,-2.2,W*1.2,4.4);
+    g.fillStyle='rgba(20,16,28,'+(night?0.35:0.20)+')'; g.fillRect(-W*0.6,2.2,W*1.2,1.4);
+    g.restore();
+  }
+  /* moons from the card, small and high (max 3 drawn) */
+  for(let i=0;i<Math.min(3,o.moons|0);i++){
+    const mx=W*(0.12+r()*0.76), my2=hz*(0.10+r()*0.38), mr=3.5+r()*6;
+    g.fillStyle='rgba(228,232,240,'+(night?0.85:0.5)+')';
+    g.beginPath(); g.arc(mx,my2,mr,0,TAU); g.fill();
+  }
+  /* polar auroras — the immense field's crown, faint curtains at the rims */
+  if(o.aurora){
+    try{ g.filter='blur(8px)'; }catch(_){ }
+    for(const side of [0.10,0.90]){
+      for(let i=0;i<3;i++){
+        const ax=W*side+(r()-0.5)*90, aw=30+r()*50;
+        const ag=g.createLinearGradient(ax,0,ax,hz*0.5);
+        ag.addColorStop(0,hsl(140,80,60,0));
+        ag.addColorStop(0.35,hsl(i%2?280:140,80,62,night?0.20:0.10));
+        ag.addColorStop(1,hsl(280,80,60,0));
+        g.fillStyle=ag; g.fillRect(ax-aw/2,0,aw,hz*0.5);
+      }
+    }
+    try{ g.filter='none'; }catch(_){ }
+  }
+  /* THE DECK — cloud-top floor rolling away to the horizon */
+  const deck=g.createLinearGradient(0,hz,0,H);
+  deck.addColorStop(0, hsl(hue+8, 46, night?16:(dusk?34:62)));
+  deck.addColorStop(0.5, hsl(hue-6, 42, night?10:(dusk?24:46)));
+  deck.addColorStop(1, hsl(hue-14, 38, night?6:(dusk?14:30)));
+  g.fillStyle=deck; g.fillRect(0,hz,W,H-hz);
+  /* broad rolling swells first — the deck is weather, not dots */
+  try{ g.filter='blur(7px)'; }catch(_){ }
+  for(let sw=0;sw<3;sw++){
+    const y=hz+(H-hz)*(0.22+sw*0.28), ph=r()*TAU, amp=8+sw*10;
+    g.fillStyle=hsl(hue+(r()-0.5)*14, 44, (night?15:(dusk?32:60))+sw*3, 0.28);
+    g.beginPath(); g.moveTo(0,y);
+    for(let x4=0;x4<=W;x4+=48) g.lineTo(x4, y+Math.sin(x4*0.006+ph)*amp);
+    g.lineTo(W,H); g.lineTo(0,H); g.closePath(); g.fill();
+  }
+  try{ g.filter='none'; }catch(_){ }
+  for(let row=0;row<4;row++){
+    const y=hz+(H-hz)*(0.16+row*0.24), sc=0.5+row*0.45;
+    for(let i=0;i<10;i++){
+      const x2=((i+(row%2?0.5:0))/10)*W+(r()-0.5)*40, br=(16+r()*26)*sc;
+      const pg=g.createRadialGradient(x2,y,0,x2,y,br);
+      pg.addColorStop(0, hsl(hue+(r()-0.5)*18, 44, (night?18:(dusk?38:68))+r()*8, 0.3));
+      pg.addColorStop(1, hsl(hue, 44, night?12:40, 0));
+      g.fillStyle=pg; g.beginPath(); g.arc(x2,y,br,0,TAU); g.fill();
+    }
+  }
+  /* the great storm, if the card carries one — a vast oval on the horizon
+     (on a Storm-Eye giant it IS the horizon) */
+  if(o.spot || o.wb==='stormeye'){
+    const eye=o.wb==='stormeye';
+    const sx3=W*(0.25+r()*0.5), sy3=hz+(H-hz)*0.18, rw=(90+r()*70)*(eye?2.2:1);
+    g.save(); g.translate(sx3,sy3); g.scale(1,0.36);
+    const eyeBoost=o.wb==='stormeye'?1.5:1;
+    const spg=g.createRadialGradient(0,0,0,0,0,rw);
+    spg.addColorStop(0,hsl(o.spotHue||hue,60,night?22:48,0.55*eyeBoost));
+    spg.addColorStop(0.55,hsl((o.spotHue||hue)+14,55,night?15:38,0.32*eyeBoost));
+    spg.addColorStop(1,hsl(o.spotHue||hue,50,40,0));
+    g.fillStyle=spg; g.beginPath(); g.arc(0,0,rw,0,TAU); g.fill(); g.restore();
+  }
+  /* ammonia lightning lighting the deeps from below */
+  const nl=(night?4:2)+((r()<0.5)?1:0);
+  for(let i=0;i<nl;i++){
+    const lx=r()*W, ly=hz+(H-hz)*(0.3+r()*0.6), lr=20+r()*36;
+    const lg2=g.createRadialGradient(lx,ly,0,lx,ly,lr);
+    lg2.addColorStop(0,'rgba(200,220,255,'+(night?0.5:0.28)+')');
+    lg2.addColorStop(1,'rgba(200,220,255,0)');
+    g.fillStyle=lg2; g.beginPath(); g.arc(lx,ly,lr,0,TAU); g.fill();
+  }
+  /* aerial drifters — only when the card's Life row grants them */
+  if(o.air>0){
+    for(let i=0;i<Math.min(4,o.air+1);i++){
+      const fx=W*(0.15+r()*0.7), fy=hz*(0.45+r()*0.4), fs=6+r()*10;
+      g.fillStyle='rgba('+(night?'12,16,26':'30,26,40')+','+(0.28+r()*0.16).toFixed(2)+')';
+      g.beginPath(); g.ellipse(fx,fy,fs,fs*0.62,0,0,TAU); g.fill();
+      g.lineWidth=1.1; g.strokeStyle='rgba(20,18,30,0.3)';
+      for(let t2=0;t2<3;t2++){
+        const tx=fx-fs*0.4+t2*fs*0.4;
+        g.beginPath(); g.moveTo(tx,fy+fs*0.5);
+        g.quadraticCurveTo(tx+(r()-0.5)*6, fy+fs*1.6, tx+(r()-0.5)*10, fy+fs*(2.2+r()));
+        g.stroke();
+      }
+    }
+  }
+  /* the breath of haze where deck meets sky */
+  const hzg=g.createLinearGradient(0,hz-30,0,hz+50);
+  hzg.addColorStop(0,'rgba(255,255,255,0)');
+  hzg.addColorStop(0.5,hsl(hue+16,50,night?18:70,0.16));
+  hzg.addColorStop(1,'rgba(255,255,255,0)');
+  g.fillStyle=hzg; g.fillRect(0,hz-30,W,80);
+  if(o.wb==='hotglow'){
+    /* the night side is a furnace — the deck lights itself from below */
+    const fg=g.createLinearGradient(0,H,0,hz);
+    fg.addColorStop(0,'rgba(255,90,30,0.30)'); fg.addColorStop(1,'rgba(255,90,30,0)');
+    g.fillStyle=fg; g.fillRect(0,hz,W,H-hz);
+  } else if(o.wb==='ammonia'){
+    g.fillStyle='rgba(240,238,246,0.10)'; g.fillRect(0,0,W,H);   /* the pastel lift */
+  }
+  if(o.evt) _hdWxEvent(g, o.evt, o.seed, hz, W, H, night);
+  if(o.titan) _hdTitan(g, 'deck', o.seed, hz, W, H, night);
+  return cv;
 }
 function showVistaBox(P, tod, wx, era, genes, aurora, flora, climSnow, water, xtra){
   /* the card drives the picture: type → scene, ACTIVE weather token →
@@ -6785,7 +7618,31 @@ function showVistaBox(P, tod, wx, era, genes, aurora, flora, climSnow, water, xt
      auroras (never through a precipitating deck), Life row → flora,
      Water row → the river (liquid/frozen/none) */
   const type=P.type;
-  if(type==='gas') return;                       /* no ground to stand on */
+  if(type==='gas'){
+    /* no ground to stand on — so the vista is the DECK, not a wall
+       (Nick, 2026-07-18: all worlds land, gas giants included) */
+    let wbG=null;
+    try{ wbG=biomeFor(P, climateBand(P, st.sys, (st.planet&&st.planet.orb)||100)); }catch(_){ }
+    const evtG=wxEventFor(P, wbG?wbG.k:null, null);
+    const cvG=_hdDeckScene({seed:P.seed, hue:P.hue, spot:!!P.spot, spotHue:P.spotHue,
+      ring:!!P.ring, moons:P.moons||0, tod:tod, aurora:!!aurora,
+      air:(xtra&&xtra.air)||0, wb:wbG?wbG.k:null,
+      evt:evtG, titan:!!(xtra&&xtra.titan)});
+    vistaBox.innerHTML='<div class="vh">Cloud deck — '+((wbG&&wbG.n)||TYPE_LABEL[type]||'Gas giant')+'</div>';
+    vistaBox.appendChild(cvG);
+    const vtG=document.createElement('div');vtG.className='vt';
+    vtG.textContent='local '+tod+' — tap to continue';
+    vistaBox.appendChild(vtG);
+    _lastVista={P:P, tod:tod, wx:wx, era:era, genes:genes, aurora:aurora,
+      flora:flora, climSnow:climSnow, water:water, xtra:xtra,
+      cv:cvG, head:'Cloud deck — '+((wbG&&wbG.n)||TYPE_LABEL[type]||'Gas giant'), vtTxt:vtG.textContent};
+    _vistaExtras();
+    clearTimeout(_vistaHideT);
+    vistaBox.style.display='flex';
+    { const my=++_vistaShowSeq;
+      requestAnimationFrame(()=>{ if(my===_vistaShowSeq) vistaBox.classList.add('on'); }); }
+    return;
+  }
   let pal='day', biome='land', nightize=false, duskize=false;
   if(type==='ice') pal='ice';
   else if(type==='rocky') pal='grey';
@@ -6803,25 +7660,52 @@ function showVistaBox(P, tod, wx, era, genes, aurora, flora, climSnow, water, xt
     if(tod==='night') nightize=true;
     else if(tod==='twilight') duskize=true;
   }
+  /* the world's biome dresses the scene (v1.3.5 Batch 5b) — same law,
+     finer grain: the Biome row's words become the picture's features */
+  let wb5=null;
+  try{ const b5=biomeFor(P, climateBand(P, st.sys, (st.planet&&st.planet.orb)||100)); if(b5) wb5=b5; }catch(_){ }
+  const evt5=wxEventFor(P, wb5?wb5.k:null, wx);
+  /* the Abyssal world goes BENEATH the waves — the first sub-surface
+     vantage (5b-ii); no sky, no weather, biolume for light */
+  if(wb5 && wb5.k==='abyssal'){
+    const cvA=_hdAbyssScene({seed:P.seed, aqua:(xtra&&xtra.aqua)||0});
+    vistaBox.innerHTML='<div class="vh">The deep — '+wb5.n+'</div>';
+    vistaBox.appendChild(cvA);
+    const vtA=document.createElement('div');vtA.className='vt';
+    vtA.textContent='beneath the surface — tap to continue';
+    vistaBox.appendChild(vtA);
+    _lastVista={P:P, tod:tod, wx:wx, era:era, genes:genes, aurora:aurora,
+      flora:flora, climSnow:climSnow, water:water, xtra:xtra,
+      cv:cvA, head:'The deep — '+wb5.n, vtTxt:vtA.textContent};
+    _vistaExtras();
+    clearTimeout(_vistaHideT);
+    vistaBox.style.display='flex';
+    { const my=++_vistaShowSeq;
+      requestAnimationFrame(()=>{ if(my===_vistaShowSeq) vistaBox.classList.add('on'); }); }
+    return;
+  }
   const cv=hdVista({seed:P.seed, era:era, pal:pal, biome:biome, wx:wx,
     moons:P.moons||0, aurora:!!aurora&&wx!=='rain'&&wx!=='snow',
     nightize:nightize, duskize:duskize, flora:flora!==false,
     water:water||'liquid', genes:genes&&genes.length?genes:null,
     ring:!!(xtra&&xtra.ring), stc:(xtra&&xtra.stc)||null, herd:(xtra&&xtra.herd)||0,
-    aqua:(xtra&&xtra.aqua)||0, air:(xtra&&xtra.air)||0});
-  vistaBox.innerHTML='<div class="vh">Planetfall — '+(TYPE_LABEL[type]||'World')+'</div>';
+    aqua:(xtra&&xtra.aqua)||0, air:(xtra&&xtra.air)||0, wb:wb5?wb5.k:null,
+    evt:evt5, titan:!!(xtra&&xtra.titan)});
+  vistaBox.innerHTML='<div class="vh">Planetfall — '+((wb5&&wb5.n)||TYPE_LABEL[type]||'World')+'</div>';
   vistaBox.appendChild(cv);
   const WXW={rain:'rain',snow:'snowfall',dust:'dust storm',ash:'ashfall',haze:'haze'};
   const vt=document.createElement('div');vt.className='vt';
-  vt.textContent='local '+tod+(wx?' · '+(WXW[wx]||wx):'')+' — tap to continue';
+  vt.textContent='local '+tod+(wx?' · '+(WXW[wx]||wx):'')+
+    (evt5?' · '+WX_EVENT_WORD[evt5]:'')+' — tap to continue';
   vistaBox.appendChild(vt);
   _lastVista={P:P, tod:tod, wx:wx, era:era, genes:genes, aurora:aurora,
     flora:flora, climSnow:climSnow, water:water, xtra:xtra,
-    cv:cv, head:'Planetfall — '+(TYPE_LABEL[type]||'World'), vtTxt:vt.textContent};
+    cv:cv, head:'Planetfall — '+((wb5&&wb5.n)||TYPE_LABEL[type]||'World'), vtTxt:vt.textContent};
   _vistaExtras();
   clearTimeout(_vistaHideT);
   vistaBox.style.display='flex';
-  requestAnimationFrame(()=>vistaBox.classList.add('on'));
+  { const my=++_vistaShowSeq;
+    requestAnimationFrame(()=>{ if(my===_vistaShowSeq) vistaBox.classList.add('on'); }); }
 }
 /* ----------------------------------------------------------------
    @section ui-panel [app] — survey-card panel — render, lock, bookmark row, actions
@@ -6914,15 +7798,236 @@ function noteLanding(seed){
   }
   queueSave();
 }
+/* ----------------------------------------------------------------
+   @section biomes [app] — every world wears a biome (v1.3.5 Batch 5a)
+   Owns: BIOME_SETS, biomeFor, descentTierFromPct
+   ----------------------------------------------------------------
+   A pure, deterministic layer INSIDE each of the 8 frozen types —
+   seeded from its own hash stream (hashInt ^0xB10E), so no existing
+   world changes type and the fingerprint stays untouched. Candidates
+   are CONDITIONED on the climate band, so a biome can never contradict
+   the card ("Mostly evaporated" hot terrans roll Salt Flats, never
+   Marsh). Common biomes are common; the alien ones are wonder-class
+   rare. Each carries its landing rung (Nick's ladder) and the flavor
+   line the card's Biome row speaks. Deferred with a note: the Eyeball
+   World (tidally-locked red-dwarf terran) — honest tidal lock needs a
+   Seasons-row domain change, a Nick decision. */
+const BIOME_SETS={
+ terran:[
+  {k:'temperate',n:'Temperate world', w:24, land:100, bands:['temperate'], f:'meadows, forests and slow rivers under a kind sun'},
+  {k:'savanna',  n:'Savanna world',   w:12, land:100, bands:['temperate','hot'], f:'gold grass to the horizon, herds moving like weather'},
+  {k:'jungle',   n:'Jungle world',    w:10, land:85,  bands:['temperate'], f:'canopy over canopy — the ground is a rumor'},
+  {k:'marsh',    n:'Marsh world',     w:8,  land:90,  bands:['temperate'], f:'reed flats and braided channels, loud with small lives'},
+  {k:'swamp',    n:'Swamp world',     w:7,  land:80,  bands:['temperate'], f:'blackwater fens under hanging moss'},
+  {k:'mangrove', n:'Mangrove world',  w:5,  land:90,  bands:['temperate'], f:'tangled roots walking out into a warm sea'},
+  {k:'tundra',   n:'Tundra world',    w:12, land:90,  bands:['cold'], f:'permafrost moss and a low, reluctant sun'},
+  {k:'karst',    n:'Karst world',     w:5,  land:80,  bands:['temperate','cold','hot'], f:'sinkholes and cave mouths — the ground is hollow'},
+  {k:'saltflat', n:'Salt-Flat world', w:8,  land:85,  bands:['hot'], f:'blinding white pans where the water used to be'},
+  {k:'fungal',   n:'Fungal world',    w:1.6,land:85,  bands:['temperate','cold'], rare:1, f:'spore towers and gill canopies — a forest with no trees'},
+  {k:'crystalsteppe',n:'Crystal Steppe world',w:1.4,land:85, bands:['temperate','cold','hot'], rare:1, f:'mineral spires standing in the grass like a frozen chord'},
+ ],
+ ocean:[
+  {k:'opensea',  n:'Open-Sea world',  w:20, land:90, f:'water to every horizon, weather its only geography'},
+  {k:'archipelago',n:'Archipelago world',w:14, land:95, f:'island chains scattered like a flung handful of green'},
+  {k:'coral',    n:'Coral-Shallows world',w:10, land:100, bands:['temperate'], f:'turquoise reef flats you can read from orbit'},
+  {k:'stormsea', n:'Storm-Sea world', w:8,  land:60, f:'squall lines stacked to the edge of sight'},
+  {k:'volcisle', n:'Volcanic-Archipelago world', w:5, land:70, f:'young fire building new land out of the sea'},
+  {k:'abyssal',  n:'Abyssal world',   w:7,  land:75, f:'no islands, no shallows — a lightless deep that goes down and down'},
+  {k:'milksea',  n:'Milk-Sea world',  w:1.4,land:90, rare:1, f:'bioluminescent blooms wide enough to glow at the horizon'},
+ ],
+ ice:[
+  {k:'glacier',  n:'Glacier world',   w:18, land:90, f:'rivers of old ice grinding to a frozen sea'},
+  {k:'packice',  n:'Pack-Ice world',  w:12, land:85, f:'a frozen ocean ridged where the floes shoulder each other'},
+  {k:'cryogeyser',n:'Cryogeyser world',w:8, land:70, f:'plumes of buried sea breaking through the crust'},
+  {k:'blueice',  n:'Blue-Ice world',  w:2,  land:55, rare:1, f:'canyons of old blue ice, lit from within'},
+ ],
+ desert:[
+  {k:'dunesea',  n:'Dune-Sea world',  w:18, land:90, f:'sand in slow waves the size of hills'},
+  {k:'canyon',   n:'Canyon world',    w:10, land:85, f:'slot canyons and strata — a history book split open'},
+  {k:'saltpan',  n:'Salt-Pan world',  w:8,  land:85, bands:['hot'], f:'mirage shimmer over crusted brine pans'},
+  {k:'oxide',    n:'Oxide-Waste world',w:10,land:75, f:'rust plains walked by dust devils'},
+  {k:'glass',    n:'Glass-Desert world',w:1.6,land:50, rare:1, f:'sand fused to glass by old lightning, sharp as a warning'},
+ ],
+ rocky:[
+  {k:'cratered', n:'Cratered world',  w:18, land:95, f:'a face that remembers every impact'},
+  {k:'boulder',  n:'Boulder-Field world',w:10,land:90, f:'regolith plains strewn with stones the size of houses'},
+  {k:'graben',   n:'Graben-Canyon world',w:8,land:85, f:'the crust pulled apart into long shadowed trenches'},
+  {k:'geode',    n:'Geode world',     w:2.4,land:80, rare:1, f:'gashes of amethyst where the ground split and grew jewels'},
+  {k:'carbon',   n:'Carbon world',    w:1.6,land:60, rare:1, f:'graphite-black plains that glint, here and there, like diamond'},
+ ],
+ venus:[
+  {k:'sulfurdeck',n:'Sulfur-Storm world',w:10,land:30, f:'storm decks of sulfur, gold-green and furious'},
+  {k:'acidhaze', n:'Acid-Haze world', w:12, land:25, f:'a crushing haze that eats light and metal alike'},
+  {k:'abyssgreen',n:'Greenhouse-Abyss world',w:4,land:10, f:'the bottom of an atmosphere like an ocean — gloom, heat, and lightning'},
+ ],
+ lava:[
+  {k:'ashwaste', n:'Ash-Waste world', w:10, land:35, f:'cooling fields under a slow gray snowfall of ash'},
+  {k:'emberfield',n:'Ember-Field world',w:10,land:25, f:'ground that glows through its own cracks'},
+  {k:'obsidian', n:'Obsidian world',  w:7,  land:20, f:'black glass plains veined with fire'},
+  {k:'magmasea', n:'Magma-Sea world', w:4,  land:10, f:'a shoreline where the ocean is molten rock'},
+ ],
+ gas:[
+  {k:'banded',   n:'Banded giant',    w:16, land:65, f:'storm bands running unbroken around the world'},
+  {k:'ammonia',  n:'Pastel-Ammonia giant',w:8,land:75, f:'soft pale decks, deceptively calm'},
+  {k:'stormeye', n:'Storm-Eye giant', w:4,  land:30, f:'one storm older than nations, wider than worlds'},
+  {k:'hotglow',  n:'Ember giant',     w:3,  land:15, rare:1, f:'a giant that glows its own sullen red — the night side is a furnace'},
+ ],
+};
+function biomeFor(P, band){
+  const set=BIOME_SETS[P.type]; if(!set) return null;
+  const bd=band==='frozen'?'cold':band;   /* remnant-orbit worlds read as cold country */
+  const cands=set.filter(b=>!b.bands || b.bands.includes(bd));
+  const pool=cands.length?cands:set;
+  const r=mulberry32(hashInt(P.seed, 0xB10E, 7)>>>0);
+  let total=0; for(const b of pool) total+=b.w;
+  let v=r()*total;
+  for(const b of pool){ v-=b.w; if(v<=0) return b; }
+  return pool[pool.length-1];
+}
+function descentTierFromPct(p){
+  return p>=90?{lo:2,hi:2}:p>=75?{lo:3,hi:4}:p>=55?{lo:4,hi:6}:p>=30?{lo:5,hi:7}:{lo:6,hi:8};
+}
+/* ----------------------------------------------------------------
+   @section descent [app] — the landing ladder (v1.3.5 Batch 4)
+   Owns: DESCENT_TIERS, _waveOffs, descentFor, descentSafe, _descWx,
+         descentBonus, _descRoll, openDescentBox, _descStay
+   ----------------------------------------------------------------
+   Landing carries the world's risk (Nick's design): every type sits on
+   a success ladder — friendly worlds are a formality, a magma world is
+   a 1-in-5 dive. The roll is app-layer random (first-contact precedent);
+   the ODDS are pure card facts. FAIL-SOFT RULES: a wave-off costs a
+   scrape and never kills; each wave-off on the same world adds +20%
+   (the pilot learns the approach — saved, so a reload never steals it);
+   grounded worlds are forever 100% and skip every prompt; Earth and
+   training are exempt. Manual zoom ASKS first (the flat tiles never
+   show uninvited); the Land button IS the intent and auto-dives.
+   v1.4 hook: descentBonus() is where crafted landing gear plugs in.
+   Biomes (Batch 5) refine these tiers per-biome. */
+const DESCENT_TIERS={
+  terran:{p:95,lo:2,hi:2}, ocean:{p:90,lo:2,hi:2}, rocky:{p:90,lo:2,hi:2},
+  ice:{p:85,lo:3,hi:4}, desert:{p:85,lo:3,hi:4}, gas:{p:65,lo:4,hi:6},
+  venus:{p:25,lo:5,hi:7}, lava:{p:20,lo:6,hi:8}};
+const _waveOffs=new Map();          /* planetSeed → consecutive wave-offs (save field wvo) */
+let _descCleared=null, _descDeclined=null, _descOpenFor=null;
+function descentBonus(){ return 0; }   /* v1.4: crafted landing gear raises this */
+function descentTierLabel(p){
+  return p>=100?'Calm approach':p>=90?'Steady approach':p>=75?'Rough descent'
+       :p>=55?'Hazardous descent':p>=30?'Extreme descent':'Hostile descent';
+}
+function _descWx(pl){
+  /* the same seeded ~90s weather spell the surface and vista share —
+     an ACTIVE storm makes any approach a little worse (−5, small by
+     design; gas storm bands are already priced into the tier) */
+  const P=pl.P;
+  if(P.type==='rocky'||P.type==='gas') return null;
+  const band=climateBand(P, st.sys, pl.orb||100);
+  let wx=null;
+  if(P.type==='terran') wx=band==='temperate'?'rain':(band==='hot'?'haze':'snow');
+  else if(P.type==='ocean') wx='rain';
+  else if(P.type==='ice') wx='snow';
+  else if(P.type==='desert') wx='dust';
+  else if(P.type==='lava') wx='ash';
+  else if(P.type==='venus') wx='haze';
+  if(!wx) return null;
+  const WX_ODDS={rain:0.42,snow:0.58,dust:0.48,ash:0.68,haze:0.88};
+  const now=mulberry32((P.seed^0x77EA^Math.floor(perfTime()/90))>>>0)() < (WX_ODDS[wx]||1);
+  return now?wx:null;
+}
+function descentFor(pl){
+  /* the BIOME sets the rung (Batch 5a); the type table is the fallback */
+  const P=pl.P;
+  const band=climateBand(P, st.sys, pl.orb||100);
+  const bio=biomeFor(P, band);
+  const base=bio?bio.land:(DESCENT_TIERS[P.type]||DESCENT_TIERS.terran).p;
+  const t=descentTierFromPct(base);
+  const wx=_descWx(pl);
+  let p=base;
+  if(wx) p = p>=90 ? Math.max(90, p-5) : Math.max(5, p-5);
+  p=Math.min(100, p + 20*(_waveOffs.get(P.seed)||0) + descentBonus());
+  return {pct:p, lo:t.lo, hi:t.hi, wx:wx, biome:bio};
+}
+function descentSafe(seed){
+  return !tutDone || seed===133 || landed.has(seed) || _descCleared===seed;
+}
+function _descRoll(pl){
+  const d=descentFor(pl);
+  if(Math.random()*100 < d.pct){
+    _descCleared=pl.P.seed;
+    _waveOffs.delete(pl.P.seed);
+    if(d.biome && d.biome.land<=30 && !landed.has(pl.P.seed))
+      toast('🏆 Through the fire', (pl.name||'A hostile world')+' let you in — few explorers ever stand here.');
+    queueSave();
+    return true;
+  }
+  const n=(_waveOffs.get(pl.P.seed)||0)+1;
+  _waveOffs.set(pl.P.seed, n);
+  let dmg=d.lo+Math.floor(Math.random()*(d.hi-d.lo+1));
+  try{ if(techOwned.has('hull1') && dmg>1) dmg-=1; }catch(_){ }   /* reinforced hulls scrape lighter */
+  dmg=Math.min(dmg, Math.max(0, hp-1));          /* a wave-off never kills */
+  if(dmg>0){ hp-=dmg; renderHP(); }
+  playFailTone(); fxShake();
+  const nxt=Math.min(100, descentFor(pl).pct);
+  toast('🛬 Wave-off', 'The descent went sour and you pulled back to orbit'+
+    (dmg>0?' with a scrape — 🩸 −'+dmg+' HP':'')+
+    '. The approach is learned now: next attempt '+nxt+'%.');
+  queueSave();
+  return false;
+}
+const _descBoxEl=()=>document.getElementById('descbox');
+function openDescentBox(pl){
+  const b=_descBoxEl(); if(!b) return;
+  _descOpenFor=pl.P.seed;
+  const d=descentFor(pl);
+  document.getElementById('desc-title').textContent='Begin descent — '+(pl.name||'this world')+'?';
+  const ev7=wxEventFor(pl.P, d.biome&&d.biome.k, d.wx);
+  document.getElementById('desc-risk').innerHTML=
+    (d.biome?d.biome.n+' — ':'')+'<span class="dtier">'+descentTierLabel(d.pct)+'</span> · '+d.pct+'% success'+
+    (d.wx?'<br><span class="dwx">storm in progress −5</span>':'')+
+    (ev7?'<br><span class="dwx">'+WX_EVENT_WORD[ev7]+'</span>':'')+
+    (d.pct<100?'<br><span class="dhp">a wave-off costs '+d.lo+'–'+d.hi+' HP — and teaches the approach (+20% next try)</span>':'');
+  b.style.display='flex';
+}
+function _descStay(){
+  const b=_descBoxEl(); if(b) b.style.display='none';
+  if(_descOpenFor!=null) _descDeclined=_descOpenFor;
+  _descOpenFor=null;
+}
+function _descAbort(){
+  /* leaving the system (zoom-out, Atlas travel) closes a stale confirm
+     without marking the world declined (pre-ship review catch) */
+  const b=_descBoxEl(); if(b) b.style.display='none';
+  _descOpenFor=null;
+}
+(function(){
+  const go=document.getElementById('desc-go'), stay=document.getElementById('desc-stay');
+  if(go) go.addEventListener('click', ()=>{
+    const b=_descBoxEl(); if(b) b.style.display='none';
+    const seed=_descOpenFor; _descOpenFor=null;
+    if(seed==null || st.mode!=='system' || !st.sys) return;
+    const pl=st.sys.planets.find(x=>x.P && x.P.seed===seed);
+    if(!pl) return;
+    if(_descRoll(pl)){
+      const tNow=perfTime();
+      const ang=pl.orb*0.13 + tNow*0.05/(pl.orb*0.012);
+      st.scam.x=Math.cos(ang)*pl.orb; st.scam.y=Math.sin(ang)*pl.orb;
+      st.scam.z=(0.41*minWH)/(6*(pl.P.sizeMul||1));
+    } else {
+      st.scam.z*=0.55;                            /* bounced back to orbit */
+    }
+  });
+  if(stay) stay.addEventListener('click', _descStay);
+})();
 /* the LAND button's engine: place the system camera on the planet at
    landing zoom — the very next frame of the zoom handler performs the real
    planetfall (whoosh, noteLanding, surface). On phones the locked card
-   covers the planet, so pinch-to-land needed a button (review catch). */
+   covers the planet, so pinch-to-land needed a button (review catch).
+   v1.3.5: pressing Land IS the intent — no confirm, straight to the roll. */
 function flyDown(pseed){
   if(st.mode!=='system' || !st.star || pseed==null) return false;
   const sys = st.sys || (st.sys=systemFor(st.star.seed));
   const pl = sys.planets.find(x=>x.P && x.P.seed===pseed);
   if(!pl) return false;
+  if(!descentSafe(pseed) && !_descRoll(pl)) return true;   /* wave-off — handled */
   const tNow=perfTime();
   const ang = pl.orb*0.13 + tNow*0.05/(pl.orb*0.012);
   st.scam.x=Math.cos(ang)*pl.orb;
@@ -7026,6 +8131,15 @@ function renderPanel(p, isLocked){
          grandfather rule; review catch) */
       grounded = d.planetSeed===133 || landed.has(d.planetSeed) || conquered.has(d.planetSeed) ||
         (st.mode==='surface' && st.planet && st.planet.P && st.planet.P.seed===d.planetSeed);
+      /* the world's BIOME (v1.3.5) — the sub-label wears it, a row speaks
+         it. Only where the true climate band is knowable (in-system);
+         pure per seed, so every explorer reads the same biome. */
+      var biome5=null;
+      try{
+        const _pl5=st.sys&&st.sys.planets?st.sys.planets.find(x=>x.P&&x.P.seed===d.planetSeed):null;
+        const _P5=_pl5?_pl5.P:(st.mode==='surface'&&st.planet&&st.planet.P.seed===d.planetSeed?st.planet.P:null);
+        if(_P5) biome5=biomeFor(_P5, climateBand(_P5, st.sys, (_pl5&&_pl5.orb)||(st.planet&&st.planet.orb)||100));
+      }catch(_){ biome5=null; }
       /* the census needs more than boots — it needs a SUCCESSFUL first
          contact (or a flag planted, or home) */
       var known = d.planetSeed===133 || conquered.has(d.planetSeed) || contacted.has(d.planetSeed);
@@ -7039,8 +8153,18 @@ function renderPanel(p, isLocked){
         else if(CIV_K[row[0]]) civDet.push(row);
         else if(row[0]==='Civilization') civHead=row;
         else if(row[0]==='⟁ Signal') sigRow=row;
-        else if(!glance) rows+=rowHtml(row);             /* Spectral class, Life, Earth's Flora/Fauna */
-        else if(row[2]==='grade') rows+=rowHtml(row);    /* the glance still shows the color language */
+        else if(!glance){
+          rows+=rowHtml(row);                            /* Spectral class, Life, Earth's Flora/Fauna */
+          if(row[2]==='grade' && biome5)
+            rows+='<div class="row"><span class="k">Biome</span><span class="v"'+
+              (biome5.rare?' style="color:#d6a0ff"':'')+'>'+biome5.f+(biome5.rare?' — a rare kind of world':'')+'</span></div>';
+        }
+        else if(row[2]==='grade'){
+          rows+=rowHtml(row);                            /* the glance still shows the color language */
+          if(biome5)
+            rows+='<div class="row"><span class="k">Biome</span><span class="v"'+
+              (biome5.rare?' style="color:#d6a0ff"':'')+'>'+biome5.n+'</span></div>';
+        }
       }
       if(glance){
         /* tier 0: what a telescope sees — coarse reads, no census, no roster */
@@ -7053,7 +8177,8 @@ function renderPanel(p, isLocked){
            signals violet — matching the card's own row language */
         if(_val('Atmosphere') && !/^None/i.test(_val('Atmosphere'))) reads.push('<span style="color:#9fdfe8">atmosphere</span>');
         if(/liquid|ocean|river/i.test(_val('Water'))) reads.push('<span style="color:#6fd3ff">liquid-water signature</span>');
-        if(_val('Life') && !/^No known life/i.test(_val('Life'))) reads.push('<span style="color:#7fe6a0">biosignatures</span>');
+        if(/^Extremophile/i.test(_val('Life'))) reads.push('<span style="color:#d6a0ff">impossible biosignatures</span>');
+        else if(_val('Life') && !/^No known life/i.test(_val('Life'))) reads.push('<span style="color:#7fe6a0">biosignatures</span>');
         if((civHead && !/^None/.test(civHead[1])) || sigRow) reads.push('<span style="color:#cdbcff">⟁ structured signals</span>');
         rows+='<div class="row"><span class="k">Long-range</span><span class="v">'+
           (reads.length?reads.join(' · '):'a quiet, dark world')+'</span></div>';
@@ -7194,7 +8319,8 @@ function renderPanel(p, isLocked){
     const closeX=(isLocked && st.mode!=='surface' && tutDone)
       ? '<button class="pxc" data-act="close" data-tip="Close this card — tapping empty space works too">✕</button>' : '';
     panelEl.innerHTML =
-      '<div class="head">'+thumb+'<div class="htxt"><h3>'+d.title+'</h3><div class="sub">'+d.sub+'</div></div>'+closeX+'</div>'+
+      '<div class="head">'+thumb+'<div class="htxt"><h3>'+d.title+'</h3><div class="sub">'+
+      ((typeof biome5!=='undefined'&&biome5)?biome5.n:d.sub)+'</div></div>'+closeX+'</div>'+
       '<div class="body">'+(btn?btn+'<div class="bdiv"></div>':'')+rows+
       '<span class="tag">'+(st.mode==='surface'?'You are here':(glance?'Long-range glance':(d.planetSeed!=null&&landed.has(d.planetSeed)?'Ground-surveyed':'Procedural survey')))+'</span></div>';
     /* the rarity color language: tint the whole card border by spectral designation */
@@ -7325,7 +8451,7 @@ panelEl.addEventListener('click', e=>{
     /* the button LANDS — the toast is only the fallback when the planet
        isn't in the current system view (e.g. a card left locked mid-travel) */
     if(_lastDesc.planetSeed!=null && flyDown(_lastDesc.planetSeed)) return;
-    toast('Landing','Zoom all the way into this world — planetfall turns your orbital survey into a ground survey.');
+    toast('Landing','Dive toward this world and confirm the descent — planetfall turns your orbital survey into a ground survey.');
     return;
   }
   if(b.dataset.act==='share'){ shareWhere(_lastDesc); return; }
@@ -7379,7 +8505,17 @@ function atlasThumb(it){
 }
 function addToLog(d){
   if(!d.logId || logMap.has(d.logId)) return;
-  logMap.set(d.logId, {id:d.logId, title:d.title, sub:d.sub,
+  /* planets bookmark under their BIOME name (v1.3.5) — "swamp" and
+     "carbon" become searchable, and Atlas rows say what kind of world
+     you saved. Off-system the band is unknowable; the type label stands. */
+  let sub9=d.sub;
+  try{
+    if(d.planetSeed!=null && st.sys && st.sys.planets){
+      const pl9=st.sys.planets.find(x=>x.P&&x.P.seed===d.planetSeed);
+      if(pl9){ const b9=biomeFor(pl9.P, climateBand(pl9.P, st.sys, pl9.orb||100)); if(b9) sub9=b9.n; }
+    }
+  }catch(_){ }
+  logMap.set(d.logId, {id:d.logId, title:d.title, sub:sub9,
     thumb:(d.planetSeed!=null?null:d.thumb),   /* planets: live via atlasThumb */
     sq:d.thumbSq,
     badge:d.badge, star:(d.grade?d.grade.star:''), where:d.where, t:Date.now()});
@@ -7470,7 +8606,7 @@ logEl.addEventListener('click', e=>{
 logBtn.addEventListener('click', ()=>{
   logOpen=!logOpen;
   logEl.style.display=logOpen?'block':'none';
-  if(logOpen){ codexOpen=false; codexEl.style.display='none'; renderLog(); }
+  if(logOpen){ closePanels('log'); renderLog(); }
   gameEvent('atlas-open', {open:logOpen});
 });
 
@@ -7848,7 +8984,7 @@ codexEl.addEventListener('click', e=>{
 codexBtn.addEventListener('click', ()=>{
   codexOpen=!codexOpen;
   codexEl.style.display=codexOpen?'block':'none';
-  if(codexOpen){ logOpen=false; logEl.style.display='none'; renderCodex(); }
+  if(codexOpen){ closePanels('codex'); renderCodex(); }
   gameEvent('codex-open', {open:codexOpen});
 });
 
@@ -7914,6 +9050,7 @@ const BINDER_SETS=[
  {id:'themes',   name:'Master of Arts',     d:'Own a beast of every ability theme', sd:80, prog:o=>o.themes.size+' / '+Object.keys(ABILITY_THEMES).length, done:o=>o.themes.size>=Object.keys(ABILITY_THEMES).length},
  {id:'bodies',   name:'The Bestiary',       d:'Own every fauna body plan', sd:80, prog:o=>o.bodies.size+' / '+FA_BODY.length, done:o=>o.bodies.size>=FA_BODY.length},
  {id:'realms',   name:'Warden of Realms',   d:'Own a species from every realm', sd:100, prog:o=>o.realms.size+' / '+REALM_ORDER.length, done:o=>o.realms.size>=REALM_ORDER.length},
+ {id:'xeno',     name:'Against All Odds',   d:'Catalogue an extremophile — life that should not be possible', sd:60, prog:o=>(o.xeno?'1':'0')+' / 1', done:o=>!!o.xeno},
  {id:'court',    name:'The Apex Court',     d:'Claim a guardian of each summit grade', sd:150, prog:()=>_courtN()+' / 3', done:()=>_courtN()>=3},
  {id:'para10',   name:'Seeker of Legends',  d:'Find 10 of the Fifty Paragons', sd:120, prog:()=>paragonsOwned()+' / 10', done:()=>paragonsOwned()>=10},
 ];
@@ -7923,13 +9060,13 @@ function _codexTabs(){
     '<span class="cvt'+(codexView==='binder'?' on':'')+'" data-cvw="binder" role="button" tabindex="0">🗂 Binder</span></div>';
 }
 function renderBinder(){
-  const own={tiers:new Set(), realms:new Set(), bodies:new Set(), themes:new Set(), flavors:new Set(), kinds:new Set(), sizes:new Set()};
+  const own={tiers:new Set(), realms:new Set(), bodies:new Set(), themes:new Set(), flavors:new Set(), kinds:new Set(), sizes:new Set(), xeno:false};
   for(const e of codex.values()){
     if(e.grade) own.tiers.add(e.grade.tier);
     if(e.realm) own.realms.add(e.realm);
     if(e.kind) own.kinds.add(e.kind);
     const g=e.genome||{};
-    if(e.kind==='Fauna'){ own.bodies.add((g.body||0)%FA_BODY.length); own.themes.add(abilityTheme(g)); own.sizes.add((g.size||0)%FA_SIZE.length); }
+    if(e.kind==='Fauna'){ own.bodies.add((g.body||0)%FA_BODY.length); own.themes.add(abilityTheme(g)); own.sizes.add((g.size||0)%FA_SIZE.length); if(g.x) own.xeno=true; }
     if(e.kind==='Flora') own.flavors.add(floraStat(g));
   }
   const pages=[
@@ -8054,6 +9191,7 @@ function _destSeed(w){
   return h;
 }
 function travelTo(w){
+  try{ _descAbort(); }catch(_){ }       /* a stale descent ask never rides along */
   if(!w || !w.gal || !fxOn || !motionOK() || _trav){ goTo(w); return; }
   /* distance matters — and your drive answers it. Duration scales with the
      gulf you're crossing ÷ drive tier, CAPPED so travel is flavor, never
@@ -8210,7 +9348,7 @@ function _trainingUp(){
    at-a-glance layer, never the only one. */
 function evClass(tt){
   const t=String(tt);
-  if(/☠|🩸|⚠|lost|wounded|badly|Failed|stands down|Toxic|Poisoned/i.test(t)) return 'harm';
+  if(/☠|🩸|⚠|lost|wounded|badly|Failed|stands down|Toxic|Poisoned|Wave-off/i.test(t)) return 'harm';
   if(/Charter complete|Achievement|Rank Up|🏆|👑|✦|🤝|🎉|Bloodline|Rare Find|First contact/i.test(t)) return 'gold';
   if(/⛏|☄|⛳|Harvest|Mined|Deposits|samples|Ground survey|Cargo/i.test(t)) return 'gain';
   return 'info';
@@ -8284,7 +9422,7 @@ function renderTray(){
 bellEl.addEventListener('click', ()=>{
   trayOpen=!trayOpen;
   trayEl.style.display=trayOpen?'block':'none';
-  if(trayOpen) renderTray();
+  if(trayOpen){ closePanels('tray'); renderTray(); }
   gameEvent('tray', {open:trayOpen});
 });
 trayList.addEventListener('click', e=>{
@@ -8302,7 +9440,7 @@ document.getElementById('trayclear').addEventListener('click', ()=>{
   renderBell(); renderTray(); queueSave();
 });
 document.addEventListener('pointerdown', e=>{
-  if(trayOpen && !e.target.closest('#bellwrap')){ trayOpen=false; trayEl.style.display='none'; }
+  /* tray outside-close now lives in the panel manager (v1.3.5) */
 });
 
 /* ---- rarity sting: a chime that climbs with the tier (WebAudio, no assets) ---- */
@@ -8685,6 +9823,7 @@ function doSave(){
         for(const k of mined.keys()) _l.add(k);
         return [..._l].slice(-4000); })(),
       scout:scoutId, landings:stats.landings||0,
+      wvo:[..._waveOffs].slice(-400),
       cont:[...contacted].slice(-4000),
       chs:[...chDone], chw:chWeek, chp:chProg, charters:stats.charters||0,
       notifs:notifications.slice(0,50),
@@ -8823,6 +9962,16 @@ function loadSave(){
       for(const s of landed) contacted.add(s);
       for(const k of conquered.keys()) contacted.add(k);
     }
+    /* the descent's pity ramp (v1.3.5): wave-off progress survives a
+       reload — losing 5 climbs on a 10% world to a refresh would be
+       rage-quit fuel. Absent ⇒ empty, capped, clamped. */
+    if(Array.isArray(data.wvo)){
+      for(const e2 of data.wvo.slice(-400)){
+        if(!Array.isArray(e2)) continue;
+        const s2=+e2[0], n2=Math.max(0, Math.min(5, (+e2[1])|0));
+        if(Number.isFinite(s2) && n2>0) _waveOffs.set(s2, n2);
+      }
+    }
     if(data.prime && typeof data.prime==='object'){ for(const k in data.prime) if(SIG_IDS.includes(k)) primeFill[k]=data.prime[k]; }
     frontierUnlocked=!!data.frontier; frontierEnding=data.ending||null;
     seenGuide=!!data.guide;
@@ -8860,6 +10009,7 @@ function resetMemoryState(){
     if(typeof notifications!=='undefined' && notifications.length) notifications.length=0;
     for(const k in primeFill) delete primeFill[k];
     homeId=null; frontierUnlocked=false; frontierEnding=null; seenGuide=false; tutDone=false; _rnSeen=GAME_VERSION;
+    _waveOffs.clear(); _descCleared=null; _descDeclined=null; _descOpenFor=null;
     scoutId=null; _pendingSample=null;
     contacted.clear(); _pendingContact=null;
     chDone.clear(); chProg={}; chWeek=-1;
@@ -10395,11 +11545,13 @@ let seenGuide=false, _nameInitial=false;
 const GUIDE=[
 {icon:'🚀', cat:'Getting Around', blurb:'Zoom, survey, search, share, travel', topics:[
  {id:'zoom', t:'Flying the universe', k:'zoom pan pinch scroll drag modes universe galaxy system surface navigate controls', body:
-  '<p>The whole cosmos is one continuous view. <b>Pinch or scroll to zoom, drag to pan.</b> Zooming dives through four scales: <em>universe → galaxy → star system → planet surface</em> — and zooming out climbs back up. Everything you can see, you can visit.</p><ul><li>Tap any object to open its <b>survey card</b>; tap it again (or tap elsewhere) to release.</li><li>When a planet fills the view but sits off-center, keep zooming — the camera glides the rest of the way down and lands. Panning and pinching are never hijacked.</li><li>On a surface, you walk the world itself — the survey card stays pinned.</li><li>Travel beyond your charted frontier is gated — see <span data-gt="regions">Frontier regions</span>.</li></ul>'},
+  '<p>The whole cosmos is one continuous view. <b>Pinch or scroll to zoom, drag to pan.</b> Zooming dives through four scales: <em>universe → galaxy → star system → planet surface</em> — and zooming out climbs back up. Everything you can see, you can visit.</p><ul><li>Tap any object to open its <b>survey card</b>; tap it again (or tap elsewhere) to release.</li><li>When a planet fills the view but sits off-center, keep zooming — the camera glides the rest of the way in. On a world you&#8217;ve never stood on, the dive stops at approach altitude and asks before you commit — see <span data-gt="landing">Landing</span>. Panning and pinching are never hijacked.</li><li>On a surface, you walk the world itself — the survey card stays pinned.</li><li>Travel beyond your charted frontier is gated — see <span data-gt="regions">Frontier regions</span>.</li></ul>'},
  {id:'survey', t:'Survey cards', k:'survey card panel tap inspect atmosphere climate water gravity descriptor lock pin land contact census glance ground', body:
-  '<p>Knowing a world comes in three acts. <b>Glance</b>: on a computer, hovering shows the long-range reads — color class, atmosphere, water signatures, whispers of life (on a phone your tap goes straight to the survey). <b>Orbital survey</b>: tap to lock the card and the instruments speak — environment, biosphere, signals. <b>Ground survey</b>: <b>land</b> — press the card&#8217;s Land button or zoom all the way in; planetfall opens the census of any civilization and the mineral veins of dead worlds. Every line is generated from the object’s seed, so your survey matches every other explorer’s.</p><ul><li>Tapping locks the card in place so you can press its buttons while the object drifts.</li><li>A planet&#8217;s card leads with its actions and headlines; the <b>Environment</b> row&#8217;s <b>expand</b> pill unfolds the full readings, and a civilization&#8217;s headline unfolds its census. Cards remember whether you like them open or folded — the ⟁ Signal row never hides, and a world you&#8217;ve stood on wears a <b>Ground-surveyed</b> tag.</li><li>An organized world announces itself from orbit as <b>⟁ signals</b> — land to attempt <b>first contact</b>. Most receptions are warm; a wary one wounds you (a named Field Scout takes the hit instead), and the census stays sealed until a landing goes well. Conquest never needs to ask.</li><li>Worlds with a biosphere show <b>Discover Life</b> — see <span data-gt="discover">Discovering life</span>.</li><li>The bookmark row saves the place — see <span data-gt="atlas">The Star Atlas</span>.</li></ul>'},
+  '<p>Knowing a world comes in three acts. <b>Glance</b>: on a computer, hovering shows the long-range reads — color class, atmosphere, water signatures, whispers of life (on a phone your tap goes straight to the survey). <b>Orbital survey</b>: tap to lock the card and the instruments speak — environment, biosphere, signals. <b>Ground survey</b>: <b>land</b> — press the card&#8217;s Land button, or dive toward the world and confirm the descent (see <span data-gt="landing">Landing</span>); planetfall opens the census of any civilization and the mineral veins of dead worlds. Every line is generated from the object’s seed, so your survey matches every other explorer’s.</p><ul><li>Tapping locks the card in place so you can press its buttons while the object drifts.</li><li>A planet&#8217;s card leads with its actions and headlines; the <b>Environment</b> row&#8217;s <b>expand</b> pill unfolds the full readings, and a civilization&#8217;s headline unfolds its census. Cards remember whether you like them open or folded — the ⟁ Signal row never hides, and a world you&#8217;ve stood on wears a <b>Ground-surveyed</b> tag.</li><li>An organized world announces itself from orbit as <b>⟁ signals</b> — land to attempt <b>first contact</b>. Most receptions are warm; a wary one wounds you (a named Field Scout takes the hit instead), and the census stays sealed until a landing goes well. Conquest never needs to ask.</li><li>Worlds with a biosphere show <b>Discover Life</b> — see <span data-gt="discover">Discovering life</span>.</li><li>The bookmark row saves the place — see <span data-gt="atlas">The Star Atlas</span>.</li><li>Every planet&#8217;s card names its <b>biome</b> — swamp world, carbon world, magma sea — and the rare kinds announce themselves in violet. A glance that whispers <b>impossible biosignatures</b> means something is alive where nothing should be.</li></ul>'},
+ {id:'landing', t:'Landing', k:'landing descent land wave-off risk success approach orbit scrape pity ramp weather storm', body:
+  '<p>Setting down is the one moment the frontier pushes back. Every world sits somewhere on a ladder, from a calm approach that always works to a hostile dive that mostly doesn&#8217;t — the odds come from what the world is, and a storm blowing right now shaves a little more off. You see the number before you commit.</p><ul><li>Zooming into an unvisited world stops at approach altitude and asks. The <b>Land</b> button on a survey card skips the question — pressing it is the answer.</li><li>A failed descent is a wave-off: you&#8217;re bounced back to orbit with a scrape, never worse. It cannot kill you.</li><li>Every wave-off teaches the approach — your next try on that world is a fair bit better, and the lesson is remembered even between sessions.</li><li>Once you&#8217;ve stood on a world it is yours: return landings always succeed, no questions asked.</li><li>Earth is home. Home never waves you off.</li></ul>'},
  {id:'search', t:'Search', k:'search box find discoveries paste code lookup', body:
-  '<p>The search box (top bar) hunts across everything you’ve already discovered: Atlas places, Compendium species, even cosmic events you’ve witnessed. It also accepts pasted codes:</p><ul><li><b>CF1-…</b> world codes — jump straight to a friend’s discovery.</li><li><b>CFB-…</b> creature codes — load a friend’s creature for a duel.</li></ul><p>See <span data-gt="codes">Share codes</span>.</p>'},
+  '<p>The search box (top bar) hunts across everything you’ve already discovered: Atlas places, Compendium species, even cosmic events you’ve witnessed. It also accepts pasted codes:</p><ul><li><b>CF1-…</b> world codes — jump straight to a friend’s discovery.</li><li><b>CFB-…</b> creature codes — load a friend’s creature for a duel.</li><li>Worlds bookmark under their biome — searching <b>swamp</b> or <b>carbon</b> finds every one you&#8217;ve saved since v1.3.5.</li></ul><p>See <span data-gt="codes">Share codes</span>.</p>'},
  {id:'codes', t:'Share codes (CF1 / CFB)', k:'share code link friend cf1 cfb copy multiplayer social', body:
   '<p>There is no server — the universe is mathematics, identical on every device. A share code is just an address into that shared math:</p><ul><li><b>⇪ Share this discovery</b> on a survey card copies a <b>CF1-</b> code/link. Anyone who opens it lands on the exact same world, with your name for it attached.</li><li><b>⇪ Code</b> on a creature card copies a <b>CFB-</b> code carrying the full genome — the identical creature, stats and all, appears on your friend’s device for a duel.</li></ul><p>Codes are sanitized on arrival; a tampered code can’t hurt your save.</p>'},
  {id:'charters', t:'Expedition Charters', k:'charter charters hunt board weekly goals task starter reward stardust', body:
@@ -10407,15 +11559,15 @@ const GUIDE=[
  {id:'beacon', t:'Traveler’s Beacon', k:'beacon daily random destination five minutes', body:
   '<p>The <b>Traveler’s Beacon</b> (left rail) offers a fresh destination every <b>5 minutes</b> — somewhere notable, picked deterministically, so every explorer’s beacon points at the same place at the same moment. An easy way to see something new when the infinite feels too big.</p>'},
  {id:'atlas', t:'The Star Atlas', k:'atlas bookmark favorite home save place travel star log', body:
-  '<p>Your personal map of the infinite. On any survey card:</p><ul><li><b>+ Add to Star Atlas</b> bookmarks the place.</li><li><b>☆ Favorite</b> marks your best finds (and auto-saves them).</li><li><b>⌂ Home</b> marks one place as home — yours to change anytime.</li></ul><p>Open the <b>Star Atlas</b> (right rail) and tap any entry to ride the <b>hyperlane</b> there — the camera dives out, the sky stretches into a streak tunnel tinted by your destination’s light, and you ease in on arrival (tap to skip; obeys your effects and Motion settings). The Atlas keeps your most recent ~120 places.</p>'},
+  '<p>Your personal map of the infinite. On any survey card:</p><ul><li><b>+ Add to Star Atlas</b> bookmarks the place.</li><li><b>☆ Favorite</b> marks your best finds (and auto-saves them).</li><li><b>⌂ Home</b> marks one place as home — yours to change anytime.</li><li>The weekly pool now includes <b>Down the hard way</b> — land on a gas giant, a hothouse or a molten world. The descent will fight you; that&#8217;s the point.</li></ul><p>Open the <b>Star Atlas</b> (right rail) and tap any entry to ride the <b>hyperlane</b> there — the camera dives out, the sky stretches into a streak tunnel tinted by your destination’s light, and you ease in on arrival (tap to skip; obeys your effects and Motion settings). The Atlas keeps your most recent ~120 places.</p>'},
  {id:'colors', t:'The color language', k:'color colors tint meaning legend cyan gold red green ember violet lime chronicle toast tray mud', body:
-  '<p>The expedition speaks in color, old-school MUD style — a tint means the same thing everywhere, and the words always carry the meaning too, so nothing is lost if you read past the color.</p><ul><li>Pop-ups and the <b>🔔 tray</b> tint by event: red for harm and loss, gold for milestones and first contact, green for harvests, samples and mined hauls, calm blue for everything else.</li><li>In <b>the Chronicle</b>, your champion reads cyan and the foe ember on every line; damage is yellow, criticals gold, misses dim, staggers flash, burns glow orange, mending green, lifesteal violet, thorns lime — a felled combatant falls in red, and the verdict wears its outcome: victory gold, defeat red.</li><li>A world&#8217;s long-range glance tints each reading by family — water cyan, life green, signals violet.</li><li>Elsewhere the language holds: the <b>Compendium</b> marks your <b>Field Scout</b> in cyan, the <b>Star Atlas</b> tints its badges, <b>Cosmic Events</b> wear their nature&#8217;s color, and a creature&#8217;s condition runs green → yellow → red as wounds deepen.</li></ul>'},
+  '<p>The expedition speaks in color, old-school MUD style — a tint means the same thing everywhere, and the words always carry the meaning too, so nothing is lost if you read past the color.</p><ul><li>Pop-ups and the <b>🔔 tray</b> tint by event: red for harm and loss, gold for milestones and first contact, green for harvests, samples and mined hauls, calm blue for everything else.</li><li>In <b>the Chronicle</b>, your champion reads cyan and the foe ember on every line; damage is yellow, criticals gold, misses dim, staggers flash, burns glow orange, mending green, lifesteal violet, thorns lime — a felled combatant falls in red, and the verdict wears its outcome: victory gold, defeat red.</li><li>A world&#8217;s long-range glance tints each reading by family — water cyan, life green, signals violet.</li><li>Elsewhere the language holds: the <b>Compendium</b> marks your <b>Field Scout</b> in cyan, the <b>Star Atlas</b> tints its badges, <b>Cosmic Events</b> wear their nature&#8217;s color, and a creature&#8217;s condition runs green → yellow → red as wounds deepen.</li><li>A <b>wave-off</b> lands in harm red — a scrape, never a death. Field samples and touchdowns keep their gain green, and a landing that beats a hostile world arrives in milestone gold.</li></ul>'},
 ]},
 {icon:'🧬', cat:'Life & the Compendium', blurb:'Kingdoms, discovery, rarity, specimen cards', topics:[
  {id:'discover', t:'Discovering life', k:'discover life scan bioscan species danger wound hp catalogue', body:
-  '<p>Living worlds show <b>Discover Life</b> on their survey card. Scanning is a deliberate act — and on hostile worlds it has teeth: the danger percentage shown is your chance of being wounded by wildlife mid-scan (fiercer apex fauna and furnace worlds are deadlier). The scan always completes — you earned it.</p><ul><li>Every species found lands in your <b>Compendium</b> automatically.</li><li>Or send a beast ahead: press <b>Scout</b> on any of your fauna&#8217;s cards to name it your <b>Field Scout</b> — it takes the hit in your place, wounds and all, mended the usual way with ♥ loved flora. A scout with nothing left is lost forever.</li><li>A fresh scan can spark a spontaneous <b>auto-hybrid</b> with your existing collection.</li><li>Conquered worlds scan safely — see <span data-gt="conquest">Conquest</span>.</li></ul>'},
+  '<p>Living worlds show <b>Discover Life</b> on their survey card. Scanning is a deliberate act — and on hostile worlds it has teeth: the danger percentage shown is your chance of being wounded by wildlife mid-scan (fiercer apex fauna and furnace worlds are deadlier). The scan always completes — you earned it.</p><ul><li>Every species found lands in your <b>Compendium</b> automatically.</li><li>Or send a beast ahead: press <b>Scout</b> on any of your fauna&#8217;s cards to name it your <b>Field Scout</b> — it takes the hit in your place, wounds and all, mended the usual way with ♥ loved flora. A scout with nothing left is lost forever.</li><li>A fresh scan can spark a spontaneous <b>auto-hybrid</b> with your existing collection.</li><li>Conquered worlds scan safely — see <span data-gt="conquest">Conquest</span>.</li><li>A thin slice of hostile worlds — molten, frozen, crushing — carries actual creatures, not just microbes. The odds run from about 1-in-70 on the friendliest extremes to 1-in-10,000 on the magma seas: the hardest landings hide the strangest finds.</li></ul>'},
  {id:'kingdoms', t:'The four kingdoms', k:'kingdom microbe flora fauna fungi realm biome classification', body:
-  '<p>All life belongs to one of four kingdoms — <b>🦠 Microbe, 🌿 Flora, 🍄 Fungi, 🐾 Fauna</b> — and is shelved in the Compendium by realm (Land Fauna, Aquatic Fauna, Colonial Life…). Kingdom decides what a creature can do:</p><ul><li><b>Fauna</b> fight duels, defend worlds, and can be fed.</li><li><b>Flora</b> are medicine and meals — eaten by you or fed to beasts.</li><li>All kingdoms can breed within their own kind.</li></ul>'},
+  '<p>All life belongs to one of four kingdoms — <b>🦠 Microbe, 🌿 Flora, 🍄 Fungi, 🐾 Fauna</b> — and is shelved in the Compendium by realm (Land Fauna, Aquatic Fauna, Colonial Life…). Kingdom decides what a creature can do:</p><ul><li><b>Fauna</b> fight duels, defend worlds, and can be fed.</li><li><b>Flora</b> are medicine and meals — eaten by you or fed to beasts.</li><li>All kingdoms can breed within their own kind.</li><li>The sea grows kelp towers, reef-builders and sargassum rafts now; aerial-life worlds fly drifting veils. Extremophiles come with their own ways of living — vent-clingers, magma-swimmers, storm-riders — and worlds whose roster runs titanic sometimes show it breaking the horizon.</li></ul>'},
  {id:'rarity', t:'Rarity & grades', k:'rarity grade tier common uncommon notable rare exotic legendary anomalous unique mythic celestial primordial transcendent empyrean eternal omnipotent deep spectrum summit color', body:
   '<p>Every species rolls one of 15 grades. The first eight — Common, Uncommon, Notable, Rare, Exotic, <b>Legendary, Anomalous, Unique</b> — cover all most expeditions will ever see. Beyond them lies the <b>deep spectrum</b>: <b>Mythic, Celestial, Primordial</b> and <b>Transcendent</b> — a literal one-in-a-million roll. Past even that wait the three <b>summit grades</b> — <b>Empyrean, Eternal, Omnipotent</b> — all but unrollable, belonging to master bloodlines and to <span data-gt="guardians">Apex Guardians</span>. Rarity tints the card, pitches the discovery chime, and matters mechanically:</p><ul><li>Rarer flora heal more — and poison more. Rarer pairs are harder to breed but forge stronger bloodlines.</li><li>Finding a Legendary-or-better species pays a ☄ Stardust bonus (first discovery only).</li><li>Stars and worlds carry rarity too — their <em>spectral designation</em> — and rare worlds yield richer conquest spoils.</li><li>Hunting the deep spectrum? Size, glow, wild apex blood and deep hybrid generations all push a creature’s grade upward — a master bloodline can climb far past what nature rolls.</li></ul>'},
  {id:'specimen', t:'Reading a specimen card', k:'specimen card stats power ability bloodline brood fed gen hybrid tastes', body:
@@ -10427,7 +11579,7 @@ const GUIDE=[
 ]},
 {icon:'🌿', cat:'Breeding & Feeding', blurb:'Bloodlines, meals, medicine', topics:[
  {id:'breeding', t:'Breeding', k:'breed pair parents consumed odds hybrid bloodline stardust boost union', body:
-  '<p>Pick a specimen, press <b>Breed</b>, choose a same-kingdom mate. Both parents are consumed by the union — win or lose.</p><ul><li>The odds shown depend on the pair’s rarity — rare pairs are long shots.</li><li>☄ Stardust you’ve earned passively boosts odds (up to +15%) — see <span data-gt="stardust">Stardust</span>.</li><li>Success forges a <b>new bloodline</b>: a hybrid child with boosted stats (+1 brood). Chain generations for monsters.</li><li>Failure loses both parents. Breed your spares, not your champions.</li></ul>'},
+  '<p>Pick a specimen, press <b>Breed</b>, choose a same-kingdom mate. Both parents are consumed by the union — win or lose.</p><ul><li>The odds shown depend on the pair’s rarity — rare pairs are long shots.</li><li>☄ Stardust you’ve earned passively boosts odds (up to +15%) — see <span data-gt="stardust">Stardust</span>.</li><li>Success forges a <b>new bloodline</b>: a hybrid child with boosted stats (+1 brood). Chain generations for monsters.</li><li>Failure loses both parents. Breed your spares, not your champions.</li><li>Two extremophile parents breed a true extremophile; a mixed pair breeds back toward ordinary stock. A creature&#8217;s two-tone hide follows its accent gene, so children visibly carry their parents&#8217; colors.</li></ul>'},
  {id:'feeding', t:'Feeding beasts', k:'feed flora meal tastes loved disliked poison toxic dead bloodline fed mend medicine', body:
   '<p>Fauna can be fed flora from your Compendium (<b>Feed</b> on their card). The plant is always consumed. Every beast has <b>tastes</b> — two stat-flavours it loves, one it dislikes (shown on its card):</p><ul><li>A loved meal grows its <b>fed bloodline</b> — permanent strength.</li><li>Feeding is also medicine: a welcome meal mends a wounded beast, and loved flavours mend most. A disliked meal that goes badly can wound it further — see <span data-gt="injuries">Injuries &amp; recovery</span>.</li><li>Every meal carries a <b>poison chance</b> (worse for rare flora and disliked tastes) — a toxic roll poisons the beast, biting off a chunk of its condition; rarer flora bite far deeper. Only a beast whose strength is already spent dies of it — at zero, it’s gone. The Iron Gut ability shrugs toxins off.</li></ul>'},
  {id:'injuries', t:'Injuries & recovery', k:'injury wound hurt condition bruised critical mend recover heal scars medicine', body:
@@ -10465,7 +11617,7 @@ const GUIDE=[
  {id:'harvest', t:'Harvesting', k:'harvest hourly cooldown settled world replenish stardust', body:
   '<p>Every settled world can be harvested for Stardust once per hour (rarer worlds yield more). The button lives on the world’s survey card — “Settled — replenishing” means come back later. An empire of settled worlds is a steady Stardust income; visit your conquests.</p>'},
  {id:'mining', t:'Mining & the Cargo hold', k:'mine mining elements minerals deposits cargo hold dead lifeless world vein iron gold prismatium samples field landing inventory icons', body:
-  '<p>Dead worlds carry the elements. Every lifeless planet has a deterministic mineral profile by type — iron and titanium in rock, ices and helium-3 on frozen worlds, hydrogen in the gas giants, precious metals in metal worlds — and rarer worlds hide richer veins, up to exotics like Voidglass and Prismatium.</p><ul><li><b>Landing pays.</b> Your first footfall on any world (home aside) collects <b>field samples</b> — a pinch of up to two of its elements and a few ☄ Stardust, richer on rarer worlds. Exploration stocks the hold all by itself.</li><li>Prospecting takes boots on the ground: press a lifeless world&#8217;s <b>Land</b> button (or zoom all the way in) — planetfall is a <b>ground survey</b>, and the Mine Deposits button opens with it. (🛰 Deep Scanners read the veins from orbit, but the drills still need a surface under them.)</li><li>Mining is hourly per world, like harvests.</li><li>Everything lands in your <b>🧰 Cargo hold</b> (right rail — it appears with your first cargo). Its <b>Inventory</b> tab is a grid of item tiles — ingots for metals, shards for ices, flasks for gases, cut gems for the exotics — and the <b>Research Bench</b> tab spends them, with the same icons in every recipe — see <span data-gt="research">Research &amp; ships</span>.</li></ul>'},
+  '<p>Dead worlds carry the elements. Every lifeless planet has a deterministic mineral profile by type — iron and titanium in rock, ices and helium-3 on frozen worlds, hydrogen in the gas giants, precious metals in metal worlds — and rarer worlds hide richer veins, up to exotics like Voidglass and Prismatium.</p><ul><li><b>Landing pays.</b> Your first footfall on any world (home aside) collects <b>field samples</b> — a pinch of up to two of its elements and a few ☄ Stardust, richer on rarer worlds. Exploration stocks the hold all by itself.</li><li>Prospecting takes boots on the ground: press a lifeless world&#8217;s <b>Land</b> button, or dive in and confirm the descent — planetfall is a <b>ground survey</b>, and the Mine Deposits button opens with it. (Gas giants, hothouses and molten worlds will fight the landing — see <span data-gt="landing">Landing</span>.) (🛰 Deep Scanners read the veins from orbit, but the drills still need a surface under them.)</li><li>Mining is hourly per world, like harvests.</li><li>Everything lands in your <b>🧰 Cargo hold</b> (right rail — it appears with your first cargo). Its <b>Inventory</b> tab is a grid of item tiles — ingots for metals, shards for ices, flasks for gases, cut gems for the exotics — and the <b>Research Bench</b> tab spends them, with the same icons in every recipe — see <span data-gt="research">Research &amp; ships</span>.</li></ul>'},
  {id:'research', t:'Research & ships', k:'research tech technology bench drive ship hull scanner lab fusion antimatter warp travel distance', body:
   '<p>The engineer’s track, parallel to the Prime Codex: the Prime Codex is your legend, the Research Bench is your capability. Research costs mined elements + ☄ Stardust:</p><ul><li><b>🛰 Deep Scanners</b> — survey cards reveal mineral veins from orbit.</li><li><b>🛡 Reinforced Hull</b> — hostile bioscans wound you 25% lighter.</li><li><b>🧪 Xenobotany Lab</b> — flora meals nourish one extra stat point.</li><li><b>The drive ladder</b> — 🚀 Fusion → ⚛ Antimatter → 🌀 Warp Fold. Hyperlane travel scales with real distance; each drive cuts it, and Warp Fold makes every jump arrive in a breath. Distance is never a wall — only a wait, and only ever a short one.</li></ul>'},
 ]},
@@ -10533,6 +11685,7 @@ function _guideSearch(q){
 }
 function openGuide(){
   const g=document.getElementById('guidebox'); if(!g) return;
+  closePanels('guide');
   const s=document.getElementById('guidesearch'); if(s) s.value='';
   _guideMenu();
   g.style.display='flex';
@@ -10540,6 +11693,7 @@ function openGuide(){
 /* deep link straight to one topic — used by tooltips and the tutorial */
 function openGuideTopic(id){
   const g=document.getElementById('guidebox'); if(!g) return;
+  closePanels('guide');
   const s=document.getElementById('guidesearch'); if(s) s.value='';
   _guideShow(id);
   g.style.display='flex';
@@ -10687,10 +11841,40 @@ document.addEventListener('focusout', ()=>{ if(_tipFor) hideTip(); });
    @section release-notes [app] — versioned release notes, update popup + history
    Owns: GAME_VERSION, RELEASES, _rnSeen, openReleaseNotes
    ---------------------------------------------------------------- */
-const GAME_VERSION='1.3';
-const BUILD_ID='b79de67';   /* replaced with the git sha at deploy time */
+const GAME_VERSION='1.3.5';
+const BUILD_ID='bc70152';   /* replaced with the git sha at deploy time */
 /* newest first; categories appear in the order listed */
 const RELEASES=[
+{v:'1.3.5', title:'Soft Landings', date:'July 2026', sections:[
+ ['✨ New Features & Systems', [
+  'Every world now wears a biome. Swamp worlds, coral shallows, glass deserts, magma seas, carbon worlds, storm-eye giants — around thirty-five kinds in all, written on the survey card and painted into the landing view. The rare ones announce themselves in violet.',
+  'Landing is a real decision now. Every world sits on a success ladder — a meadow world is a formality, a magma sea is a one-in-ten dive — and the odds are shown before you commit. A failed descent bounces you back to orbit with a scrape, never worse, and every attempt teaches the approach: your next try on that world is better. Worlds you&#8217;ve stood on are yours forever — return landings never ask.',
+  'Diving into an unvisited world by hand now stops at approach altitude and asks before you commit. The Land button on a survey card skips the question — pressing it is the answer.',
+  'Gas giants finally have somewhere to land: the high cloud deck. Storm bands to the horizon, the great spot if the card carries one, your ring overhead, lightning in the deeps, and drifting aerial life where the card grants it.',
+  'The weather got teeth. Tornadoes on the horizon, hurricane walls at sea, sand walls rolling over the dunes, ice storms, erupting cryogeysers, acid rain that dies mid-air over Venus-likes, volcanic lightning, fire whirls, iron rain on ember giants — all called out on the surface readout, in the landing view, and on the descent ask, so you can see the storm from orbit and dare it anyway.',
+  'Life turned up where it has no business being. A thin slice of hostile worlds — molten, frozen, crushing, airless-adjacent — carries actual creatures now, not just microbes. The orbital glance hints at them in violet: impossible biosignatures. The hardest landings hide the strangest finds.',
+  'Some worlds keep leviathans. When a world&#8217;s own roster carries a titanic creature, you may catch it breaking the horizon at full scale. The card always said titanic; now the ground shakes like it.',
+  'Abyssal ocean worlds take the landing view beneath the waves — dying shafts of light, glowing plankton, vent fire far below, and deep-sea hunters with lures where the card grants them.',
+  'The sea grows things now. Ocean worlds gained kelp towers, seagrass meadows, reef-builders and sargassum rafts; aerial-life worlds gained drifting veils. Extremophile creatures come with their own ways of living — vent-clingers, magma-swimmers, storm-riders, winged hunters.'],
+ ],
+ ['🖱 UI Enhancements', [
+  'One panel at a time. Opening the Atlas closes the Compendium, opening Charters closes the Atlas — on phone and desktop alike — and every panel wears a corner ✕. Tapping empty space closes whatever&#8217;s open. Duels, reveals and dialogs are safe: a stray tap never eats a fight.',
+  'The landing view has a ✕ too, and a quick tap right after reopening it can no longer strand it open.',
+  'Orbit matches the ground now: carbon worlds look graphite-dark from space, obsidian worlds near-black, magma seas glow warm, blue-ice worlds run cold, ember giants burn sullen red.'],
+ ],
+ ['⚖ Balancing', [
+  'An active storm makes any landing a little harder — five points, never enough to trouble a friendly world.',
+  'A new weekly charter, Down the hard way, pays 35 ☄ for landing on a gas giant, a hothouse or a molten world. Adding it reshuffles the weekly board once at the next rollover.'],
+ ],
+ ['🐛 Bug Fixes', [
+  'The little dashes around supernova remnants and the drawn circles around cosmic deaths are gone — everything that dies in space dies as a cloud now.',
+  'Gas giant surfaces no longer claim to be airless with no weather. They have rather a lot of both.'],
+ ],
+ ['🔧 Under the Hood', [
+  'The galaxy view stopped allocating gradients every frame for remnants and mergers — they&#8217;re baked once now, which is kinder to phone batteries.',
+  'Wave-off progress on hard worlds is saved with the expedition, so a reload never steals a climb.'],
+ ],
+]},
 {v:'1.3', title:'The HD Frontier', date:'July 2026', sections:[
  ['✨ New Features & Systems', [
   'Landing on a world now opens a painted view of where you&#8217;re standing. Everything in it comes from the survey card: the terrain, the weather, the time of day, who lives there, and what&#8217;s grazing nearby. Tap the card&#8217;s Landing vista button any time to look again.',
@@ -10926,7 +12110,7 @@ if(BUILD_ID!=='dev'){
 /* ---- Prime Codex wiring ---- */
 (function(){
   const pb=document.getElementById('primebox'), eb=document.getElementById('endingbox');
-  const open=()=>{ renderPrime(); pb.style.display='flex'; };
+  const open=()=>{ closePanels('prime'); renderPrime(); pb.style.display='flex'; };
   const pBtn=document.getElementById('pcdxbtn');
   if(pBtn){ pBtn.addEventListener('click', open);
     pBtn.addEventListener('keydown', e=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); open(); } }); }
@@ -11359,7 +12543,7 @@ if(cargoBtn){
   cargoBtn.addEventListener('click', ()=>{
     cargoOpen=!cargoOpen;
     cargoEl.style.display=cargoOpen?'block':'none';
-    if(cargoOpen) renderCargo();
+    if(cargoOpen){ closePanels('cargo'); renderCargo(); }
   });
 }
 if(cargoEl){
@@ -11660,7 +12844,7 @@ let _tutHook=null, _tutStep=-1, _tutSnap=null, _tutPreIds=null, _tutTimer=0;
    Owns: CHARTER_STARTERS, CHARTER_POOL, chDone, chWeek, chProg, chOpen, charterEvent, renderCharters
    ---------------------------------------------------------------- */
 const CHARTER_STARTERS=[
- {id:'st-land',  ev:'landfall',  n:1, t:'Make planetfall',      d:'Land on any world — press Land on its survey card, or zoom all the way in. A first footfall pays field samples.', sd:10},
+ {id:'st-land',  ev:'landfall',  n:1, t:'Make planetfall',      d:'Land on any world — press Land on its survey card, or dive in and confirm the descent. A first footfall pays field samples.', sd:10},
  {id:'st-mine',  ev:'mined',     n:1, t:'Prospect a dead world', d:'Land on a lifeless world and press Mine Deposits — the elements stock your Cargo hold for research.', sd:15},
  {id:'st-scan',  ev:'bioscan',   n:1, t:'Discover life',         d:'Find a living world and press Discover Life on its card — mind the danger percentage, or send a scout.', sd:15},
  {id:'st-scout', ev:'scout-set', n:1, t:'Name a Field Scout',    d:'Open one of your fauna in the Compendium and press Scout — it takes the hit when a bioscan turns hostile.', sd:15},
@@ -11674,6 +12858,10 @@ const CHARTER_POOL=[
  {id:'wk-conq',  ev:'conquest', n:1, t:'Raise a flag',          d:'Conquer a world.', sd:30},
  {id:'wk-feed',  ev:'fed',  filt:x=>x&&x.ok, n:3, t:'Keeper of beasts', d:'Feed your fauna 3 welcome meals.', sd:20},
  {id:'wk-breed', ev:'bred', filt:x=>x&&x.ok, n:1, t:'A new bloodline',  d:'Breed any pair into a hybrid.', sd:30},
+ /* v1.3.5: the descent ladder gets its hunt. Pool growth rolls the weekly
+    board once at the next rollover (selection indexes the pool) — noted
+    in the release bullets. */
+ {id:'wk-hostile', ev:'landfall', filt:x=>{ try{ const t=planetParams(x.planetSeed).type; return t==='venus'||t==='lava'||t==='gas'; }catch(_){ return false; } }, n:1, t:'Down the hard way', d:'Land on a gas giant, a hothouse or a molten world — the descent will fight you.', sd:35},
 ];
 const chDone=new Set();        /* completed starter ids — permanent (save chs) */
 let chWeek=-1;                 /* rotation week (save chw) */
@@ -11742,7 +12930,7 @@ function renderCharters(){
 if(chBtn) chBtn.addEventListener('click', ()=>{
   chOpen=!chOpen;
   chPanel.style.display=chOpen?'block':'none';
-  if(chOpen) renderCharters();
+  if(chOpen){ closePanels('charters'); renderCharters(); }
 });
 function gameEvent(type, detail){
   try{ if(_tutHook) _tutHook(type, detail||{}); }catch(_){}
@@ -11756,7 +12944,7 @@ const TUT_STEPS=[
   text:()=>'First, find home. <b>Drag and zoom to Earth</b> — the blue world, third from the Sun — and <b>tap it</b> to open its survey card.',
   when:(t,d)=>t==='survey'&&d.planetSeed===133},
  {id:'survey-tour', spot:'#panel', btn:'Got It', allow:['#panel'],
-  text:()=>'This is a <b>survey card</b> — every world, star and galaxy has one: atmosphere, climate, life, hazards. The universe is generated, so every explorer sees this exact card at Earth. A card is only the view from orbit — <b>zoom all the way into a world to land on it</b> and the ground survey opens the rest.'},
+  text:()=>'This is a <b>survey card</b> — every world, star and galaxy has one: atmosphere, climate, life, hazards. The universe is generated, so every explorer sees this exact card at Earth. A card is only the view from orbit — dive toward a world and confirm the descent to land, and the ground survey opens the rest.'},
  {id:'atlas-add', spot:'#panel [data-act="add"]', allow:['#panel'],
   text:()=>'Chart it. Tap <b>+ Add to Star Atlas</b> on Earth’s card — the Atlas is how you find your way back across the infinite.',
   when:(t,d)=>t==='atlas-add'&&d.id==='p133'},
@@ -11764,13 +12952,13 @@ const TUT_STEPS=[
   text:()=>'Earth is charted — your Atlas’s first entry. Open the <b>Star Atlas</b> (right rail). Tapping any entry travels there instantly; ☆ favorites and the ⌂ home mark live there too.',
   when:(t,d)=>t==='atlas-open'&&!!d.open},
  {id:'cache', spot:'#codexbtn', allow:['#codexbtn'], enter:()=>_tutGrant(),
-  text:()=>'A <b>training cache</b> just arrived: three Earth beasts and three Earth flora, on loan from the order. Open your <b>Compendium</b> to meet them.',
+  text:()=>'A training cache just arrived: three Earth beasts and three Earth flora, on loan from the order. Open your <b>Compendium</b> to meet them.',
   when:(t,d)=>t==='codex-open'&&!!d.open},
  {id:'specimen', spot:'#codex', allow:['#codex'],
   text:()=>'Fighters, breeders and medicine all live here, shelved by realm. <b>Tap any specimen</b> to open its card.',
   when:(t)=>t==='specimen'},
  {id:'card-tour', spot:'#reveal .card', btn:'Got It',
-  text:()=>'Read it like a Pathfinder: <b>five stat bars</b> and total Power; its <b>✧ ability</b>; its <b>rarity grade</b> tinting the card. Rarer life fights harder, breeds stronger, heals — or poisons — more. Beasts also list flora flavours they <b>♥ love</b> and <b>⊘ dislike</b>.'},
+  text:()=>'Read it like a Pathfinder: five stat bars and total Power; its ✧ ability; the rarity grade tinting the card. Rarer life fights harder, breeds stronger, heals — or poisons — more. Beasts also list the flora flavours they ♥ love and ⊘ dislike.'},
  {id:'feed', allow:['#codex','#codexbtn'], enter:()=>{ _tutRig={feed:0.62}; },
   text:()=>'Time for a meal. Open a 🐾 beast in the Compendium, tap <b>Feed</b>, and pick a plant. The plant is always consumed — a welcome meal grows the beast’s bloodline permanently.',
   when:(t)=>t==='fed'},
@@ -11796,9 +12984,9 @@ const TUT_STEPS=[
   text:()=>'One last thing: <b>tap your nameplate</b> to open your character sheet — your five stats, rank, expedition statistics and achievements.',
   when:(t,d)=>t==='stats-open'&&!!d.open},
  {id:'horizon', spot:'#pcdxbtn', btn:'Got It',
-  text:()=>'You’re ready. Scan living worlds (mind the danger %), <b>⚔ conquer</b> the ones worth keeping — fight yourself or send a beast as champion — and collect ☄ <b>Stardust harvests</b> every hour. The nine <b>✦ Signatures</b> of the Prime Codex are the long road. The <b>? Guide</b> (bottom right) explains every system, any time.'},
+  text:()=>'You’re ready. Scan living worlds (mind the danger %), ⚔ conquer the ones worth keeping — fight yourself or send a beast as champion — and collect ☄ Stardust every hour. The nine ✦ Signatures of the Prime Codex are the long road. The <b>? Guide</b> (bottom right) explains every system, any time.'},
  {id:'finale', btn:'✦ Begin the Expedition', enter:()=>_tutCleanup(),
-  text:()=>'Field training complete, <b>'+(explorerName||'Explorer')+'</b>. The training cache goes back to the order — your Compendium is empty again, your wounds are mended, and Earth shines in your Star Atlas. The rest counts. Good hunting.'},
+  text:()=>'Field training complete, '+(explorerName||'Explorer')+'. The cache goes back to the order — your Compendium is empty again, your wounds are mended, and Earth shines in your Star Atlas. From here on, everything counts. Good hunting.'},
 ];
 
 const tutEl=document.createElement('div'); tutEl.id='tutbox'; document.body.appendChild(tutEl);
@@ -12059,7 +13247,7 @@ function resetSettingsView(){
 }
 document.getElementById('setbtn').addEventListener('click', ()=>{
   const opening = setPanel.style.display!=='block';
-  if(opening) resetSettingsView();
+  if(opening){ resetSettingsView(); closePanels('set'); }
   setPanel.style.display = opening ? 'block' : 'none';
   applyFs(); applyTone(); applyFont();
   const so=document.getElementById('sndopt');
@@ -12283,7 +13471,7 @@ eventsBtn.addEventListener('click', ()=>{
   eventsEl.style.display=eventsOpen?'block':'none';
   clearInterval(_evTimer);
   if(eventsOpen){
-    statsOpen=false; statsEl.style.display='none';
+    closePanels('events');
     renderEvents();
     _evTimer=setInterval(()=>{ if(eventsOpen) renderEvents(); }, 1000);
   }
@@ -12304,17 +13492,74 @@ eventsEl.addEventListener('click', e=>{
   toast(def.ic+' '+def.title, def.desc+'. Every explorer watching right now is being sent to this same place.');
   eventsOpen=false; eventsEl.style.display='none'; clearInterval(_evTimer);
 });
+/* ----------------------------------------------------------------
+   @section panel-manager [app] — one panel at a time (v1.3.5)
+   Owns: PANELS, MODAL_SEL, closePanels
+   ----------------------------------------------------------------
+   Nick's live pass (2026-07-18): panels stacked into an unplayable
+   pile on the phone. One rule everywhere now — opening a panel closes
+   the rest, a corner ✕ closes it, and a tap on empty space closes it
+   too. True modals (duel, reveal, name prompts, death, ending) stand
+   apart: a stray tap must never eat a fight. Hidden hand during
+   training — the tutorial keeps its own locks. */
+const PANELS=[
+  {id:'log',      el:()=>logEl,    btn:'#logbtn',    x:1, open:()=>logOpen,    close:()=>{ logOpen=false;    logEl.style.display='none'; }},
+  {id:'codex',    el:()=>codexEl,  btn:'#codexbtn',  x:1, open:()=>codexOpen,  close:()=>{ codexOpen=false;  codexEl.style.display='none'; }},
+  {id:'cargo',    el:()=>cargoEl,  btn:'#cargobtn',  x:1, open:()=>cargoOpen,  close:()=>{ cargoOpen=false;  cargoEl.style.display='none'; }},
+  {id:'charters', el:()=>chPanel,  btn:'#chbtn',     x:1, open:()=>chOpen,     close:()=>{ chOpen=false;     chPanel.style.display='none'; }},
+  {id:'events',   el:()=>eventsEl, btn:'#eventsbtn', x:1, open:()=>eventsOpen, close:()=>{ eventsOpen=false; eventsEl.style.display='none'; clearInterval(_evTimer); }},
+  {id:'stats',    el:()=>statsEl,  btn:'#rank',      x:1, open:()=>statsOpen,  close:()=>{ statsOpen=false;  statsEl.style.display='none'; }},
+  {id:'tray',     el:()=>trayEl,   btn:'#bellwrap',  x:0, open:()=>trayOpen,   close:()=>{ trayOpen=false;   trayEl.style.display='none'; }},
+  {id:'set',      el:()=>setPanel, btn:'#setbtn',    x:0, open:()=>setPanel.style.display==='block', close:()=>{ setPanel.style.display='none'; }},
+  {id:'guide',    el:()=>document.getElementById('guidebox'), btn:'#helpbtn', x:0,
+    open:()=>{ const g=document.getElementById('guidebox'); return !!(g && g.style.display && g.style.display!=='none'); },
+    close:()=>{ const g=document.getElementById('guidebox'); if(g) g.style.display='none';
+                try{ if(!seenGuide){ seenGuide=true; queueSave(); } }catch(_){ } }},
+  {id:'prime',    el:()=>document.getElementById('primebox'), btn:'#pcdxbtn', x:0,
+    open:()=>{ const p=document.getElementById('primebox'); return !!(p && p.style.display && p.style.display!=='none'); },
+    close:()=>{ const p=document.getElementById('primebox'); if(p) p.style.display='none'; }},
+];
+function closePanels(except){
+  for(const p of PANELS){ try{ if(p.id!==except && p.open()) p.close(); }catch(_){ } }
+}
+/* modals keep their own explicit buttons — the manager never touches them */
+const MODAL_SEL='#reveal,#pickbox,#duelbox,#sharebox,#namebox,#deathbox,#endingbox,#relbox,#tutbox,#helppop,#vistabox,#toasts,#descbox';
 document.addEventListener('pointerdown', e=>{
-  if(eventsOpen && !e.target.closest('#events') && !e.target.closest('#eventsbtn')){
-    eventsOpen=false; eventsEl.style.display='none'; clearInterval(_evTimer);
-  }
-  if(codexOpen && !e.target.closest('#codex') && !e.target.closest('#codexbtn') && !e.target.closest('#reveal') && !e.target.closest('#pickbox')){
-    codexOpen=false; codexEl.style.display='none';
-  }
-  if(logOpen && !e.target.closest('#log') && !e.target.closest('#logbtn') && !e.target.closest('#reveal')){
-    logOpen=false; logEl.style.display='none';
+  if(!tutDone) return;                     /* training keeps its own locks */
+  const t=e.target;
+  if(!t || !t.closest) return;
+  if(t.closest(MODAL_SEL)) return;
+  for(const p of PANELS){
+    try{
+      if(!p.open()) continue;
+      const el=p.el();
+      if(t.closest(p.btn) || (el && el.contains(t))) continue;
+      p.close();
+    }catch(_){ }
   }
 });
+/* the corner ✕ — one delegated handler for every panel, injected or static */
+document.addEventListener('click', e=>{
+  const x=e.target && e.target.closest && e.target.closest('[data-pnx]');
+  if(!x) return;
+  const p=PANELS.find(q=>q.id===x.dataset.pnx);
+  if(p){ try{ if(p.open()) p.close(); }catch(_){ } e.stopPropagation(); }
+});
+/* rendered panels wipe their innerHTML on every render — a MutationObserver
+   re-seats the ✕ so no render function needs to know about it */
+function _mkPnx(id){
+  const b=document.createElement('button');
+  b.className='pnx'; b.dataset.pnx=id; b.type='button';
+  b.textContent='✕'; b.setAttribute('data-tip','Close');
+  return b;
+}
+for(const p of PANELS){
+  if(!p.x) continue;
+  const el=p.el && p.el(); if(!el) continue;
+  const seat=()=>{ if(tutDone && !el.querySelector('[data-pnx]')) el.appendChild(_mkPnx(p.id)); };
+  new MutationObserver(seat).observe(el, {childList:true});
+  seat();
+}
 
 /* ---- expedition stats panel (tap your rank) ---- */
 /* ----------------------------------------------------------------
@@ -12411,16 +13656,12 @@ rankEl.addEventListener('click', ()=>{
   statsOpen=!statsOpen;
   statsEl.style.display=statsOpen?'block':'none';
   if(statsOpen){
+    closePanels('stats');
     renderStats();
-    eventsOpen=false; eventsEl.style.display='none'; clearInterval(_evTimer);
   }
   gameEvent('stats-open', {open:statsOpen});
 });
-document.addEventListener('pointerdown', e=>{
-  if(statsOpen && !e.target.closest('#stats') && !e.target.closest('#rank')){
-    statsOpen=false; statsEl.style.display='none';
-  }
-});
+/* stats outside-close now lives in the panel manager (v1.3.5) */
 
 /* ---- view persistence: a browser tab-discard or reload returns you
         exactly where you were instead of dumping you at the universe view ---- */
