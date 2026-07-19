@@ -262,18 +262,63 @@
   #searchres .none{padding:13px;font-size:11px;color:var(--faint);text-align:center;line-height:1.55}
 
   /* ---- daily anomaly + expedition stats (left rail) ---- */
-  #dailybtn{position:fixed;top:calc(var(--topbar-h,100px) + 8px);left:18px;z-index:8;pointer-events:auto;cursor:pointer;
+  /* v1.5: the Traveler's Beacon is HIDDEN for rework — engine dormant */
+  #dailybtn{display:none !important;position:fixed;top:calc(var(--topbar-h,100px) + 8px);left:18px;z-index:8;pointer-events:auto;cursor:pointer;
     font-family:var(--ui);font-size:11px;letter-spacing:.08em;color:var(--dim);
     background:var(--glass);border:1px solid var(--glass-brd);border-radius:999px;padding:7px 14px;
     backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);display:flex;align-items:center;gap:7px;
     transition:color .2s,border-color .2s}
   #dailybtn:hover{color:var(--ink);border-color:rgba(176,108,255,0.5)}
   #dailybtn .dot{width:6px;height:6px;border-radius:50%;background:#b06cff;box-shadow:0 0 8px #b06cff}
-  #stats{position:fixed;top:calc(var(--row1-h,58px) + 6px);left:18px;z-index:22;width:302px;max-height:min(74vh,640px);overflow-y:auto;display:none;
-    background:var(--glass);border:1px solid var(--glass-brd);border-radius:15px;padding:13px;
-    backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);box-shadow:0 18px 50px rgba(0,0,0,0.55)}
-  #stats{scrollbar-color:rgba(255,207,138,0.5) rgba(150,162,210,0.12)}
-  #stats::-webkit-scrollbar{width:8px} #stats::-webkit-scrollbar-thumb{background:rgba(255,207,138,0.5);border-radius:8px}
+  /* ---- v1.5 THE CHARACTER SCREEN: the centered home for the explorer.
+     #stats and #cargo became REGIONS inside #sheetcard — same render
+     functions, new address. Desktop: stats left, paperdoll center,
+     cargo full-width beneath. Phones: doll first, stats, then cargo. ---- */
+  #sheet{position:fixed;inset:0;z-index:24;display:none;align-items:center;justify-content:center;
+    background:rgba(4,6,13,0.62);backdrop-filter:blur(5px);-webkit-backdrop-filter:blur(5px)}
+  #sheetcard{position:relative;width:min(880px,calc(100vw - 20px));max-height:calc(100dvh - 26px);overflow-y:auto;
+    display:grid;grid-template-columns:288px 1fr;grid-template-areas:"stats doll" "cargo cargo";gap:12px;
+    background:linear-gradient(175deg,rgba(19,23,42,0.97),rgba(8,10,20,0.98));
+    border:1px solid rgba(255,207,138,0.28);border-radius:18px;padding:14px;
+    box-shadow:0 26px 90px rgba(0,0,0,0.7),0 0 30px rgba(255,207,138,0.06)}
+  #sheetcard{scrollbar-color:rgba(255,207,138,0.5) rgba(150,162,210,0.12)}
+  #sheetcard::-webkit-scrollbar{width:8px} #sheetcard::-webkit-scrollbar-thumb{background:rgba(255,207,138,0.5);border-radius:8px}
+  #sheetstats{grid-area:stats;min-width:0}
+  #doll{grid-area:doll;min-width:0}
+  #sheetcargo{grid-area:cargo;min-width:0;border-top:1px solid rgba(150,162,210,0.18);padding-top:10px}
+  #stats{display:none;background:none;border:0;padding:0}
+  /* the doll: the figure fills the region; sockets pin to the body */
+  #doll .dollwrap{position:relative;margin:0 auto;width:min(100%,340px)}
+  #doll .dollwrap img.dollimg{display:block;width:100%;border-radius:14px;
+    border:1px solid rgba(150,162,210,0.22);background:#04050b}
+  #doll .dsock{position:absolute;transform:translate(-50%,-50%);width:48px;height:48px;border-radius:12px;cursor:pointer;
+    display:flex;align-items:center;justify-content:center;
+    border:1px solid rgba(150,162,210,0.45);
+    background:radial-gradient(130% 105% at 50% 0%,rgba(24,30,54,0.55),rgba(5,7,14,0.64));
+    box-shadow:inset 0 1px 0 rgba(255,255,255,0.10),0 3px 9px rgba(0,0,0,0.55)}
+  #doll .dsock:hover{border-color:rgba(255,207,138,0.6)}
+  #doll .dsock.sel{border-color:#ffcf8a;box-shadow:0 0 12px rgba(255,207,138,0.35)}
+  #doll .dsock img{width:78%;height:78%;filter:drop-shadow(0 3px 4px rgba(0,0,0,0.6))}
+  #doll .dsock .eqph{font-size:17px;opacity:0.55}
+  #doll .dsock.filled.t1{border-color:rgba(159,182,214,0.7)}
+  #doll .dsock.filled.t2{border-color:rgba(255,217,106,0.75);box-shadow:0 0 10px rgba(255,217,106,0.22)}
+  #doll .dsock.filled.t3{border-color:rgba(255,122,232,0.8);box-shadow:0 0 12px rgba(255,122,232,0.3)}
+  #doll .dship{position:absolute;transform:translate(-50%,-50%);width:96px;border-radius:9px;
+    border:1px solid rgba(127,208,255,0.35);background:#05060d;opacity:0.96}
+  #doll .dname{font:700 15px var(--ui);letter-spacing:.03em;color:var(--ink);text-align:center;margin:2px 0 8px}
+  #doll .dname .drank{display:block;font:600 9.5px var(--ui);letter-spacing:.16em;text-transform:uppercase;color:#f0cf8a;margin-top:3px}
+  #doll .eqfx{font-size:10px;line-height:1.6;color:#bfe6c8;border:1px solid rgba(127,230,160,0.25);
+    border-radius:9px;padding:6px 9px;margin:8px auto 0;max-width:min(100%,340px);background:rgba(127,230,160,0.05)}
+  #doll .eqpick{border:1px solid rgba(255,207,138,0.3);border-radius:10px;padding:4px;margin:8px auto 0;max-width:min(100%,340px);background:rgba(6,8,16,0.72)}
+  #doll .eqcand{display:flex;align-items:center;gap:8px;padding:5px 6px;border-radius:8px;cursor:pointer}
+  #doll .eqcand:hover{background:rgba(150,162,210,0.12)}
+  #doll .eqcand.on{background:rgba(255,207,138,0.10)}
+  #doll .eqcand img{width:26px;height:26px;flex:none}
+  #doll .eqcand .eqph{width:26px;text-align:center;font-size:14px;opacity:0.6;flex:none}
+  #doll .eqcand .nm{font:600 11px var(--ui);color:var(--ink)}
+  #doll .eqcand .ds{font-size:9.5px;color:var(--dim);line-height:1.35}
+  #doll .shipcap{font-size:9.5px;color:var(--plasma);letter-spacing:.06em;text-transform:uppercase;
+    text-align:center;margin:6px 0 0}
   #stats h4{font:600 10px var(--ui);letter-spacing:.13em;text-transform:uppercase;color:var(--plasma);margin:12px 0 6px}
   #stats h4:first-child{margin-top:0}
   #stats .srow{display:flex;justify-content:space-between;gap:8px;font-size:11.5px;color:#e2e7f8;margin:4px 0}
@@ -422,7 +467,8 @@
   #sharebox .note{font-size:10.5px;color:var(--faint);line-height:1.5;margin:10px 0 0}
 
   /* ---- cosmic events: the universe lives on every timescale ---- */
-  #eventsbtn{position:fixed;top:calc(var(--topbar-h,100px) + 44px);left:18px;z-index:8;pointer-events:auto;cursor:pointer;
+  /* v1.5: Cosmic Events are HIDDEN for rework — engine dormant */
+  #eventsbtn{display:none !important;position:fixed;top:calc(var(--topbar-h,100px) + 44px);left:18px;z-index:8;pointer-events:auto;cursor:pointer;
     font-family:var(--ui);font-size:11px;letter-spacing:.08em;color:var(--dim);
     background:var(--glass);border:1px solid var(--glass-brd);border-radius:999px;padding:7px 14px;
     backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);display:flex;align-items:center;gap:7px;
@@ -430,15 +476,18 @@
   #eventsbtn:hover{color:var(--ink);border-color:rgba(255,170,90,0.55)}
   #eventsbtn .dot{width:6px;height:6px;border-radius:50%;background:#ff9a4c;box-shadow:0 0 8px #ff9a4c;animation:evpulse 2.4s infinite}
   @keyframes evpulse{0%,100%{opacity:1}50%{opacity:0.35}}
-  /* ---- expedition charters: the hunt board ---- */
-  #chbtn{position:fixed;top:calc(var(--topbar-h,100px) + 80px);left:18px;z-index:8;pointer-events:auto;cursor:pointer;
-    font-family:var(--ui);font-size:11px;letter-spacing:.08em;color:var(--dim);
-    background:var(--glass);border:1px solid var(--glass-brd);border-radius:999px;padding:7px 14px;
-    backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);display:flex;align-items:center;gap:7px;
-    transition:color .2s,border-color .2s}
-  #chbtn:hover{color:var(--ink);border-color:rgba(255,217,106,0.55)}
+  /* ---- expedition charters: the hunt board ----
+     v1.5 UI SWAP (Nick): charters/the Ascent are the daily driver — they
+     wear the PRIME SLOT (top right, the old Prime Codex position) */
+  #chbtn{position:fixed;top:calc(var(--row1-h,58px) + 10px);right:18px;z-index:9;pointer-events:auto;cursor:pointer;
+    font-family:var(--ui);font-size:11px;font-weight:600;letter-spacing:.06em;color:#ffe1a1;
+    background:linear-gradient(135deg,rgba(60,50,18,0.62),rgba(30,25,12,0.55));
+    border:1px solid rgba(255,217,106,0.35);border-radius:999px;padding:7px 13px;box-shadow:0 0 18px rgba(255,217,106,0.1);
+    backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);display:flex;align-items:center;gap:7px;
+    transition:color .2s,border-color .2s,box-shadow .15s}
+  #chbtn:hover{color:var(--ink);border-color:rgba(255,217,106,0.6);box-shadow:0 0 22px rgba(255,217,106,0.22)}
   #chbtn .dot{width:6px;height:6px;border-radius:50%;background:#ffd96a;box-shadow:0 0 8px #ffd96a;animation:evpulse 2.4s infinite}
-  #chpanel{position:fixed;top:calc(var(--topbar-h,100px) + 116px);left:18px;z-index:12;width:318px;max-height:min(60vh,520px);overflow-y:auto;display:none;
+  #chpanel{position:fixed;top:calc(var(--row1-h,58px) + 52px);right:18px;z-index:12;width:318px;max-height:min(60vh,520px);overflow-y:auto;display:none;
     background:var(--glass);border:1px solid var(--glass-brd);border-radius:15px;padding:11px;
     backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);box-shadow:0 18px 50px rgba(0,0,0,0.55)}
   #chpanel .ehead{font:600 10px var(--ui);letter-spacing:.13em;text-transform:uppercase;color:#ffd96a;margin:0 0 8px}
@@ -787,47 +836,18 @@
   #stats .pframe .pmeta{min-width:0;flex:1}
   #stats .pframe .pname{font:600 13px var(--ui);letter-spacing:.04em;color:var(--ink)}
   #stats .pframe .prank{font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:#f0cf8a;margin-top:3px}
-  /* ---- v1.4 EQUIPMENT on the character sheet: nine sockets, ARPG-style ---- */
-  #stats .eqrow{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin:2px 0 6px}
-  #stats .eqslot{position:relative;aspect-ratio:0.86;border:1px solid rgba(150,162,210,0.28);border-radius:10px;cursor:pointer;
-    background:radial-gradient(130% 105% at 50% 0%,rgba(150,162,210,0.14),rgba(5,7,14,0.66));
-    display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;padding:3px 2px;
-    box-shadow:inset 0 1px 0 rgba(255,255,255,0.09),inset 0 -7px 12px rgba(0,0,0,0.45),0 1px 0 rgba(0,0,0,0.55)}
-  #stats .eqslot img{filter:drop-shadow(0 3px 4px rgba(0,0,0,0.55))}
-  #stats .eqslot:hover{border-color:rgba(150,162,210,0.55)}
-  #stats .eqslot.sel{border-color:#ffcf8a;box-shadow:0 0 10px rgba(255,207,138,0.25)}
-  #stats .eqslot.filled.t1{border-color:rgba(159,182,214,0.55)}
-  #stats .eqslot.filled.t2{border-color:rgba(255,217,106,0.6);box-shadow:0 0 10px rgba(255,217,106,0.16)}
-  #stats .eqslot.filled.t3{border-color:rgba(255,122,232,0.65);box-shadow:0 0 12px rgba(255,122,232,0.22)}
-  #stats .eqslot img{width:58%;height:58%}
-  #stats .eqslot .eqph{font-size:16px;opacity:0.5}
-  #stats .eqslot .eqname{font:600 7.5px var(--ui);letter-spacing:.02em;color:var(--dim);text-align:center;
-    max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-  #stats .eqslot.filled .eqname{color:var(--ink)}
-  #stats .eqpick{border:1px solid rgba(255,207,138,0.3);border-radius:10px;padding:4px;margin:0 0 6px;background:rgba(6,8,16,0.5)}
-  #stats .eqcand{display:flex;align-items:center;gap:8px;padding:5px 6px;border-radius:8px;cursor:pointer}
-  #stats .eqcand:hover{background:rgba(150,162,210,0.12)}
-  #stats .eqcand.on{background:rgba(255,207,138,0.10)}
-  #stats .eqcand img{width:26px;height:26px;flex:none}
-  #stats .eqcand .eqph{width:26px;text-align:center;font-size:14px;opacity:0.6;flex:none}
-  #stats .eqcand .nm{font:600 11px var(--ui);color:var(--ink)}
-  #stats .eqcand .ds{font-size:9.5px;color:var(--dim);line-height:1.35}
-  #stats .eqfx{font-size:10px;line-height:1.6;color:#bfe6c8;border:1px solid rgba(127,230,160,0.25);
-    border-radius:9px;padding:6px 9px;margin:0 0 4px;background:rgba(127,230,160,0.05)}
-  /* the Shipyard: your ship, gaining modules as systems come online */
-  #stats .shipimg{width:100%;border-radius:10px;border:1px solid var(--glass-brd);background:#06070f;display:block}
-  #stats .shipcap{font-size:9.5px;color:var(--plasma);letter-spacing:.06em;text-transform:uppercase;
-    text-align:center;margin:4px 0 2px}
-  #cargo{position:fixed;top:calc(var(--row1-h,58px) + 170px);right:18px;z-index:12;width:320px;max-height:min(56vh,500px);overflow-y:auto;
-    background:var(--glass);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
-    border:1px solid rgba(150,162,210,0.2);border-radius:15px;padding:6px;display:none;
-    box-shadow:0 18px 50px rgba(0,0,0,0.5)}
+  /* (v1.5: the nine equipment sockets + Shipyard moved onto the paperdoll —
+     their styles live under #doll now) */
+  /* v1.5: the cargo panel folded INTO the character screen — a region now */
+  #cargo{display:none;background:none;border:0;padding:0}
   #cargo .empty{padding:18px 14px;font-size:11.5px;color:var(--faint);text-align:center;line-height:1.55}
   #cargo .chead{padding:9px 11px 7px;font-family:var(--ui);font-size:10px;letter-spacing:.12em;
     text-transform:uppercase;color:var(--faint)}
   #cargo .bset{margin:0 6px 6px}
-  /* ---- Prime Codex button ---- */
-  #pcdxbtn{cursor:pointer;flex:none;position:fixed;top:calc(var(--row1-h,58px) + 10px);right:18px;z-index:9;
+  /* ---- Prime Codex button ----
+     v1.5 UI SWAP (Nick): the Codex is endgame now — it keeps its gold but
+     moves to the left rail (the charters' old home) */
+  #pcdxbtn{cursor:pointer;flex:none;position:fixed;top:calc(var(--topbar-h,100px) + 8px);left:18px;right:auto;z-index:8;
     display:flex;align-items:center;gap:7px;padding:7px 13px;border-radius:999px;
     font-family:var(--ui);font-size:11px;font-weight:600;letter-spacing:.06em;color:#f0cf8a;
     background:linear-gradient(135deg,rgba(60,46,18,0.62),rgba(30,24,12,0.55));
@@ -1028,7 +1048,22 @@
   @keyframes pop{from{transform:scale(.7);opacity:0}to{transform:scale(1);opacity:1}}
   #reveal .rt{font-family:var(--ui);font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:#7fe6a0;margin-bottom:10px}
   #reveal img{width:240px;height:240px;border-radius:18px;object-fit:contain;background:radial-gradient(circle at 50% 38%,#10131e,#05060c);box-shadow:0 0 0 1px rgba(127,230,160,0.25),0 0 50px rgba(127,230,160,0.14)}
-  #rev-info{margin:10px auto 0;max-width:330px;text-align:left}
+  /* v1.5 specimen condense: the field-notes fold (world-card language) */
+  #reveal .rgrp{margin:10px auto 0;max-width:330px;text-align:left}
+  #reveal .rghead{display:flex;align-items:center;gap:8px;cursor:pointer;border-radius:8px;padding:5px 6px;
+    border:1px solid rgba(150,162,210,0.18);background:rgba(150,162,210,0.05)}
+  #reveal .rghead .k{flex:none;font:600 9.5px var(--ui);letter-spacing:.09em;text-transform:uppercase;color:var(--plasma)}
+  #reveal .rghead .v{flex:1;min-width:0;font-size:10.5px;color:var(--dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  #reveal .rghead:hover .k{color:var(--ink)}
+  #reveal .rghead .chev{flex:none;font:600 8.5px var(--ui);letter-spacing:.08em;text-transform:uppercase;
+    color:var(--faint);border:1px solid rgba(150,162,210,0.25);border-radius:999px;padding:2px 8px}
+  #reveal .rghead:hover .chev{color:var(--ink)}
+  #reveal .rghead .chev::after{content:'expand'}
+  #reveal .rgrp.open .rghead .chev::after{content:'close'}
+  #reveal .rgbody{display:none;padding-left:8px;border-left:1px solid rgba(150,162,210,0.2);margin:4px 0 2px 2px}
+  #reveal .rgrp.open .rgbody{display:block}
+  #reveal .rgrp.open .rghead .v{opacity:0.35}
+  #rev-info{margin:6px auto 0;max-width:330px;text-align:left}
   #rev-info .ir{display:flex;gap:10px;font-size:11.5px;line-height:1.5;margin:3px 0}
   #rev-info .ir .k{flex:none;width:96px;font:600 9.5px var(--ui);letter-spacing:.07em;text-transform:uppercase;color:var(--faint);padding-top:2px}
   #rev-info .ir .v{color:#cfd6f2}
@@ -1041,7 +1076,9 @@
   #codex .sp .nm{font-family:var(--ui);font-size:12.5px;font-weight:500;color:#d6f2de}
   #codex .sp .rar{font-size:9px;letter-spacing:.05em;vertical-align:middle}
   #codex .sp .rlabel{font-weight:600}
-  #codex .sp .ds{font-size:10.5px;color:var(--dim);line-height:1.4;margin-top:1px}
+  /* v1.5 condense: shelf rows read at a glance — the card holds the prose */
+  #codex .sp .ds{font-size:10.5px;color:var(--dim);line-height:1.4;margin-top:1px;
+    display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
   #codex .cfrom{color:#9fc2ff;cursor:pointer;text-decoration:underline dotted rgba(159,194,255,0.5);text-underline-offset:2px}
   #codex .cfrom:hover{color:#cfe2ff}
   #codex .sp .gen{font-size:8.5px;letter-spacing:.08em;text-transform:uppercase;color:#7fe6a0;
@@ -1154,17 +1191,21 @@
     body.fs-lg #bell{font-size:13px}
     body.fs-xl #bell{font-size:14px}
     #hpbar{width:clamp(110px,33vw,188px);height:12px} #hptext{font-size:9px} #hpheart{font-size:14px}
-    #pcdxbtn{right:14px;padding:6px 9px;font-size:10.5px;gap:5px} #pcdxbtn .lbl{display:inline}
-    #codexbtn,#logbtn,#codex,#log,#cargobtn,#cargo{right:14px}
-    #cargo{width:min(300px,calc(100vw - 20px))}
+    #pcdxbtn{left:14px;right:auto;padding:6px 9px;font-size:10.5px;gap:5px} #pcdxbtn .lbl{display:inline}
+    #codexbtn,#logbtn,#codex,#log,#cargobtn{right:14px}
     /* side buttons + panels sit BELOW the two-row topbar — never overlapping it */
     /* float the side rails just below the header, however many rows it wraps to */
-    #dailybtn{top:calc(var(--topbar-h,118px) + 8px);font-size:10px;padding:6px 11px}  #stats{top:calc(var(--row1-h,58px) + 6px)}
-    #eventsbtn{top:calc(var(--topbar-h,118px) + 44px);font-size:10px;padding:6px 11px} #events{top:calc(var(--topbar-h,118px) + 80px)}
-    #chbtn{top:calc(var(--topbar-h,118px) + 80px);font-size:10px;padding:6px 11px} #chpanel{top:calc(var(--topbar-h,118px) + 116px)}
+    /* v1.5 swap: Prime Codex leads the left rail; charters wear the prime slot */
+    #pcdxbtn{top:calc(var(--topbar-h,118px) + 8px)}
+    #chbtn{top:calc(var(--row1-h,58px) + 8px);right:14px;font-size:10px;padding:6px 10px}
+    #chpanel{top:calc(var(--row1-h,58px) + 46px);right:14px;left:auto;width:min(312px,calc(100vw - 20px))}
     #panel{width:min(300px,calc(100vw - 20px))}
     #codex,#log{width:min(300px,calc(100vw - 20px))}
-    #stats,#events{width:min(312px,calc(100vw - 20px))}
+    #events{width:min(312px,calc(100vw - 20px))}
+    /* v1.5 character screen stacks on phones: paperdoll first, stats fold,
+       inventory below — sockets stay finger-sized (48px) */
+    #sheetcard{grid-template-columns:1fr;grid-template-areas:"doll" "stats" "cargo";padding:10px;gap:10px}
+    #sheetstats{border-top:1px solid rgba(150,162,210,0.18);padding-top:10px}
     #tray{width:min(290px,calc(100vw - 20px));right:-6px}
     #primebox .card,#endingbox .card,#guidebox .card{padding:18px 14px}
     #context{bottom:calc(96px + env(safe-area-inset-bottom,0px));font-size:11.5px}
@@ -1421,7 +1462,16 @@
 </div>
 
 <div id="dailybtn" role="button" tabindex="0" data-tip="A fresh destination inside your charter every 5 minutes — the same beacon for every explorer on your ring." data-guide="beacon"><span class="dot"></span>Traveler’s Beacon</div>
-<div id="stats"></div>
+<!-- v1.5 THE CHARACTER SCREEN: one centered home for the whole explorer —
+     stats left, full-body paperdoll center, cargo/fabricator underneath.
+     The old #stats and #cargo panels live INSIDE it now, as regions. -->
+<div id="sheet">
+  <div id="sheetcard">
+    <div id="doll"></div>
+    <div id="sheetstats"><div id="stats"></div></div>
+    <div id="sheetcargo"><div id="cargo"></div></div>
+  </div>
+</div>
 <div id="toast"></div>
 <div id="eventsbtn" role="button" tabindex="0" data-tip="Live cosmic events — every explorer sees the same sky at the same moment." data-guide="events"><span class="dot"></span>Cosmic Events</div>
 <div id="chbtn" role="button" tabindex="0" data-tip="Expedition Charters — your hunt board. Starters teach the expedition&#8217;s trades; then three fresh charters a week, the same for every explorer." data-guide="charters"><span class="dot"></span>Charters</div>
@@ -1529,12 +1579,11 @@
 <div id="log"></div>
 <div id="codexbtn" role="button" tabindex="0" data-tip="Every species you have catalogued — your fighters, breeders and medicine." data-guide="kingdoms"><span class="dot bio"></span>Compendium <span class="n" id="codexcount">0</span></div>
 <div id="codex"></div>
-<div id="cargobtn" role="button" tabindex="0" style="display:none" data-tip="Mined elements and the research bench — the engineer’s track." data-guide="mining"><span class="dot crg"></span>Cargo <span class="n" id="cargocount">0</span></div>
-<div id="cargo"></div>
+<div id="cargobtn" role="button" tabindex="0" style="display:none" data-tip="Your hold and workbench — opens the character screen on its inventory." data-guide="mining"><span class="dot crg"></span>Cargo <span class="n" id="cargocount">0</span></div>
 <div id="primebox"><div class="card">
   <button id="primeclose" class="pxclose" type="button">&times;</button>
   <div class="ph"><div class="pt">✦ The Prime Codex</div>
-    <div class="psubt">The Pathfinders’ unfinished master survey. Document one worthy example of each legendary Signature — finish what they began, and the Celestial Frontier will reveal itself.</div></div>
+    <div class="psubt">The Pathfinders’ Trail — the endgame arc that begins where the Ascent ends. Nine lost beacons, nine Signatures: walk their trail, recover each beacon’s relic blueprint, and finish the master survey they died one discovery short of. Complete it, and the Celestial Frontier reveals itself.</div></div>
   <div class="pmeter-wrap"><div class="pmeter"><i id="prime-meter"></i></div>
     <div class="pmeta"><span id="prime-count">0 / 9</span><span id="prime-rank">Wanderer</span></div></div>
   <div id="prime-grid" class="pgrid"></div>
@@ -1567,15 +1616,24 @@
   <button id="guideok" type="button">Continue</button>
   <div class="gcredit" id="gcredit" data-tip="Tap for the release notes — everything that has changed, version by version.">Celestial Frontier &middot; v1.1 &middot; Developed by Dakk</div>
 </div></div>
+<!-- v1.5 specimen condense (Nick: "same as the world cards"): identity +
+     stats up top, the field-notes wall folded behind a remembered group -->
 <div id="reveal"><div class="card">
   <div class="rt" id="rev-t">New species discovered</div>
   <img id="rev-img" alt="">
   <div class="rn" id="rev-name"></div>
   <div class="rk" id="rev-kind"></div>
-  <div class="rd" id="rev-detail"></div>
-  <div id="rev-info"></div>
-  <div class="rmeta" id="rev-meta"></div>
   <div id="rev-stats"></div>
+  <div class="rgrp" id="rev-fold">
+    <div class="rghead" id="rev-fold-head" role="button" tabindex="0" data-tip="The full field notes — anatomy, behavior, habitat and lineage">
+      <span class="k">Field notes</span><span class="v" id="rev-fold-dig"></span><span class="chev"></span>
+    </div>
+    <div class="rgbody">
+      <div class="rd" id="rev-detail"></div>
+      <div id="rev-info"></div>
+    </div>
+  </div>
+  <div class="rmeta" id="rev-meta"></div>
   <div class="ractions"></div>
   <div class="rx" id="rev-x">tap to continue</div>
 </div></div>
@@ -1942,9 +2000,6 @@ function _cardFactsSet(seed, v){
   if(CARD_FACTS.size>6000){ CARD_FACTS.delete(CARD_FACTS.keys().next().value); }
   CARD_FACTS.set(seed, v);
 }
-/* surface tile fallback color, side-cached (was P._fb — a field on a
-   fingerprint-serialized domain object; round-2 audit) */
-const _FB_CACHE=new Map();
 
 /* ================================================================
    @module ThumbArt [app] — canvas sprites & thumbnails for planets, stars, moons, comets
@@ -4183,77 +4238,6 @@ const {galaxyStats, fmtBig, roman, describePick, slimGal, starDescriptor, planet
 /* @end Descriptors */
 
 
-/* ----------------------------------------------------------------
-   @section art-tiles [app] — surface-mode terrain tile cache (per-frame render budget)
-   Owns: tileCache, tileBudget, getTile
-   ---------------------------------------------------------------- */
-const tileCache=new Map();
-let tileBudget=0;
-function getTile(P, fbm, L, tx, ty){
-  const key=P.seed+'_'+L+'_'+tx+'_'+ty;
-  const hit=tileCache.get(key);
-  if(hit) return hit;
-  if(tileBudget<=0) return null;
-  tileBudget--;
-  const T=128;
-  const c=document.createElement('canvas'); c.width=c.height=T;
-  const g=c.getContext('2d');
-  const img=g.createImageData(T,T);
-  const d=img.data;
-  const pow=Math.pow(2,L);
-  const relief = P.type!=='gas' && P.type!=='venus';
-  const gasLike = P.type==='gas' || P.type==='venus';
-  /* zoom depth 0..1 — deeper zoom reveals progressively finer ground detail */
-  const depth=clamp((L+1)/8, 0, 1);
-  for(let y=0;y<T;y++){
-    for(let x=0;x<T;x++){
-      const wx=(tx*T+x)/pow, wy=(ty*T+y)/pow;
-      /* latitude turns over a full 14,000px world — no more mirror-repeat every screen */
-      const u=wx*0.02, lat=Math.sin(wy*TAU/14000);
-      /* domain warp: bend the sampling space so coastlines, bands and biomes
-         meander organically instead of echoing the noise lattice */
-      const wAmp = gasLike ? 0.22 : 0.85;
-      const qx=fbm(u*0.55+37.2, lat*1.4+91.7, 3);
-      const qy=fbm(u*0.55+11.9, lat*1.4+57.3, 3);
-      const u2=u+(qx-0.5)*wAmp, lat2=lat+(qy-0.5)*wAmp*0.4;
-      let col=surfaceColor(P,u2,lat2,fbm,CARD_FACTS.get(P.seed)||null);
-      const isWater=col[2]>col[0]+26 && col[2]>col[1]+8;
-      if(relief){
-        /* true 2-axis hillshade, lit from the northwest */
-        const e0=fbm(u2*1.8+10, lat2*1.8+5, 4);
-        const ex=fbm(u2*1.8+10+0.012, lat2*1.8+5, 4);
-        const ey=fbm(u2*1.8+10, lat2*1.8+5+0.012, 4);
-        const sh=1+(ex-e0)*5.2+(ey-e0)*3.4;
-        col=[col[0]*sh, col[1]*sh, col[2]*sh];
-        /* the closer you fly, the more the ground itself resolves:
-           rock grain, dunes, pack-ice fractures, canopy texture */
-        if(depth>0.18){
-          const m=(fbm(wx*0.085+3, wy*0.085+8, 3)-0.5);
-          const f=(fbm(wx*0.31+17, wy*0.31+4, 2)-0.5);
-          const amp=isWater?0.05:0.16;
-          const k=1+(m*0.6+f*0.4)*amp*2*depth;
-          col=[col[0]*k, col[1]*k, col[2]*k];
-        }
-        /* gentle wave shimmer keeps oceans alive without faking land */
-        if(isWater && depth>0.3){
-          const wv=fbm(wx*0.05+91, wy*0.18+13, 2);
-          if(wv>0.62) col=[col[0]+10, col[1]+14, col[2]+16];
-        }
-        col=[clamp(col[0],0,255),clamp(col[1],0,255),clamp(col[2],0,255)];
-      } else if(depth>0.25){
-        /* even gas giants churn when you dive close */
-        const sw=(fbm(wx*0.06+5, wy*0.06+44, 3)-0.5)*0.12*depth;
-        col=[clamp(col[0]*(1+sw),0,255),clamp(col[1]*(1+sw),0,255),clamp(col[2]*(1+sw),0,255)];
-      }
-      const i=(y*T+x)*4;
-      d[i]=col[0]; d[i+1]=col[1]; d[i+2]=col[2]; d[i+3]=255;
-    }
-  }
-  g.putImageData(img,0,0);
-  if(tileCache.size>180){ const k=tileCache.keys().next().value; tileCache.delete(k); }
-  tileCache.set(key,c);
-  return c;
-}
 
 /* ---------------- state ---------------- */
 /* ----------------------------------------------------------------
@@ -4297,7 +4281,7 @@ window.addEventListener('pointermove', e=>{
   mouse.x=e.clientX; mouse.y=e.clientY;
   /* hovering over an open panel must never survey what's behind it */
   mouseOverUI = !!(e.target && e.target.closest &&
-    e.target.closest('#codex,#log,#stats,#events,#searchwrap,#topbar,#dailybtn,#eventsbtn,#logbtn,#codexbtn,#pcdxbtn,#primebox,#endingbox,#guidebox,#helpbtn,#sharebox,#duelbox,#pickbox,#reveal,#setpanel,#setbtn,#namebox,#deathbox,#descbox'));
+    e.target.closest('#codex,#log,#sheet,#events,#searchwrap,#topbar,#chbtn,#chpanel,#cargobtn,#logbtn,#codexbtn,#pcdxbtn,#primebox,#endingbox,#guidebox,#helpbtn,#sharebox,#duelbox,#pickbox,#reveal,#setpanel,#setbtn,#namebox,#deathbox,#descbox,#farewellbox'));
 });
 cv.addEventListener('pointermove', e=>{
   if(!dragging || pinching || activeTouches>=2) return;   /* two fingers down = zoom only, never pan-fight */
@@ -4435,6 +4419,8 @@ document.addEventListener('keydown', e=>{
         return;
       }
     }
+    /* the character screen (v1.5) is keyboard-openable — Escape closes it too */
+    try{ if(typeof sheetOpen!=='undefined' && sheetOpen){ closeSheet(); return; } }catch(_){ }
   }
 });
 
@@ -4598,23 +4584,13 @@ function checkTransitions(){
         c.y = assist.py;
       }
     }
-  } else if(st.mode==='surface'){
-    if(st.pcam.z<=0.46){
-      st.mode='system'; st.fade=1;
-      st.scam.z = (0.40*minWH/(6*st.planet.P.sizeMul))*0.7;
-      const tNow=perfTime();
-      const pl=st.planet;
-      const ang = pl.orb*0.13 + tNow*0.05/(pl.orb*0.012);
-      st.scam.x=Math.cos(ang)*pl.orb; st.scam.y=Math.sin(ang)*pl.orb;
-      st.planet=null;
-    }
   }
 }
 
 /* ================================================================
    @module Renderer [app] — the four zoom-mode draw passes + backdrop
    Deps: Rand, ui-dom, viewport, state-camera, WorldConfig, ui-hud, WorldGen, GalaxyArt, Naming, prime, compendium, Descriptors, ThumbArt, StarCatalog, art-tiles, PlanetGen, SurveyPhrases
-   API:  perfTime, t0, drawUniverse, drawGalaxy, drawSystem, drawSurface
+   API:  perfTime, t0, drawUniverse, drawGalaxy, drawSystem
    ================================================================ */
 const Renderer=(()=>{
 /* ---------------- drawing ---------------- */
@@ -5945,261 +5921,9 @@ function drawSystem(time){
     : desc+extra+' — no planets here; zoom out and try another star');
 }
 
-function drawSurface(time){
-  const c=st.pcam;
-  const P=st.planet.P;
-  /* the tiles must know the card's band/life before the FIRST tile is
-     cut, or a hot world's first frames bake temperate oceans (V1) */
-  ensureCardFacts(P, st.sys, st.planet.orb);
-  ctx.fillStyle='#000'; ctx.fillRect(0,0,W,H);
-  const L=clamp(Math.floor(Math.log2(c.z*Math.min(DPR,2))), -1, 10);
-  const pow=Math.pow(2,L);
-  const T=128;
-  const TW=T/pow;
-  tileBudget=3;
-  const x0=c.x-(W/2)/c.z, y0=c.y-(H/2)/c.z, x1=c.x+(W/2)/c.z, y1=c.y+(H/2)/c.z;
-  const tx0=Math.floor(x0/TW), ty0=Math.floor(y0/TW);
-  const tx1=Math.floor(x1/TW), ty1=Math.floor(y1/TW);
-  ctx.save(); ctx.translate(W/2,H/2); ctx.scale(c.z,c.z); ctx.translate(-c.x,-c.y);
-  ctx.imageSmoothingEnabled=true;
-  for(let tx=tx0;tx<=tx1;tx++)for(let ty=ty0;ty<=ty1;ty++){
-    const tile=getTile(P, st.pfbm, L, tx, ty);
-    if(tile) ctx.drawImage(tile, tx*TW, ty*TW, TW+0.5/c.z, TW+0.5/c.z);
-    else {
-      let _fb=_FB_CACHE.get(P.seed);
-      if(!_fb){ const fc=surfaceColor(P, 0.3, 0.25, st.pfbm, CARD_FACTS.get(P.seed)||null); _fb=`rgb(${fc[0]|0},${fc[1]|0},${fc[2]|0})`;
-        if(_FB_CACHE.size>512) _FB_CACHE.delete(_FB_CACHE.keys().next().value);
-        _FB_CACHE.set(P.seed,_fb); }
-      ctx.fillStyle=_fb;
-      ctx.fillRect(tx*TW,ty*TW,TW+0.5/c.z,TW+0.5/c.z);
-    }
-  }
-  ctx.restore();
-  /* ---------- a living world: day & night, seasons, weather ---------- */
-  const pl=st.planet, sys=st.sys;
-  if(!pl._env){
-    const er=mulberry32((P.seed^0xE57)>>>0);
-    const tilt=er()<0.8;
-    const band=climateBand(P, sys, pl.orb||100);
-    const hasAtmo = P.type!=='rocky';
-    const hasField = P.seed===133 || P.type==='gas' ||
-      ((P.type==='terran'||P.type==='ocean') && mulberry32((P.seed^0xBEEF)>>>0)()<0.8);
-    let wx=null;
-    if(P.type==='terran') wx = band==='temperate' ? 'rain' : (band==='hot' ? 'haze' : 'snow');
-    else if(P.type==='ocean') wx='rain';
-    else if(P.type==='ice') wx='snow';
-    else if(P.type==='desert') wx='dust';
-    else if(P.type==='lava') wx='ash';
-    else if(P.type==='venus') wx='haze';
-    pl._env={tilt, band, hasAtmo, hasField, wx, ph:er()*TAU, dayLen:70+er()*50, yearLen:320+er()*260};
-  }
-  const env=pl._env;
-  const m0=(v,n)=>((v%n)+n)%n;
-  /* seasons: a slow year turning beneath you */
-  let season=null, seasonT=0;
-  if(env.tilt && env.hasAtmo && P.type!=='gas' && P.type!=='venus'){
-    const yp=m0(time/env.yearLen + env.ph/TAU, 1);
-    seasonT=Math.sin(yp*TAU);
-    season=['spring','summer','autumn','winter'][Math.floor(yp*4)];
-  }
-  const effWx = (env.wx==='rain' && seasonT<-0.45) ? 'snow' : env.wx;
-  /* the card's Weather row is CLIMATE ("rain showers") — whether anything
-     falls RIGHT NOW is a seeded ~90s spell, same mechanism as the
-     lightning bursts below, so temperate worlds also get clear skies.
-     Surface and vista share this roll. */
-  const WX_ODDS={rain:0.42,snow:0.58,dust:0.48,ash:0.68,haze:0.88};
-  const wxNow = !!effWx && mulberry32((P.seed^0x77EA^Math.floor(time/90))>>>0)() < (WX_ODDS[effWx]||1);
-  /* drifting cloud shadows */
-  if(env.hasAtmo && P.type!=='venus' && P.type!=='gas'){
-    const span=5200;
-    for(let i=0;i<4;i++){
-      const wxs=m0((hashInt(P.seed,i,7)%span) + time*(14+i*5), span);
-      const wys=hashInt(P.seed,i,13)%span;
-      const rx=wxs + Math.round((c.x-wxs)/span)*span;
-      const ry=wys + Math.round((c.y-wys)/span)*span;
-      const sxp=(rx-c.x)*c.z+W/2, syp=(ry-c.y)*c.z+H/2;
-      const rad=(520+i*260)*c.z;
-      if(rad<26||rad>W*1.2) continue;
-      const sg2=ctx.createRadialGradient(sxp,syp,0,sxp,syp,rad);
-      sg2.addColorStop(0,'rgba(8,10,20,0.15)'); sg2.addColorStop(1,'transparent');
-      ctx.fillStyle=sg2; ctx.beginPath(); ctx.arc(sxp,syp,rad,0,TAU); ctx.fill();
-    }
-  }
-  /* weather particles */
-  if(wxNow && effWx!=='haze'){
-    if(effWx==='rain'){
-      ctx.strokeStyle='rgba(185,212,255,0.34)'; ctx.lineWidth=1.1;
-      ctx.beginPath();
-      for(let i=0;i<190;i++){
-        const px2=m0((hashInt(11,i,3)%997)/997*W - time*130, W);
-        const py2=m0((hashInt(13,i,5)%991)/991*H + time*760 + i*7, H);
-        ctx.moveTo(px2,py2); ctx.lineTo(px2-5,py2-15);
-      }
-      ctx.stroke();
-    } else if(effWx==='snow'){
-      ctx.fillStyle='rgba(240,247,255,0.55)';
-      for(let i=0;i<150;i++){
-        const py2=m0((hashInt(13,i,5)%991)/991*H + time*85 + i*5, H);
-        const px2=m0((hashInt(11,i,3)%997)/997*W + Math.sin(time*0.8+i)*16, W);
-        ctx.beginPath(); ctx.arc(px2,py2,0.9+(i%3)*0.6,0,TAU); ctx.fill();
-      }
-    } else if(effWx==='dust'){
-      ctx.strokeStyle='rgba(205,160,105,0.22)'; ctx.lineWidth=1.4;
-      ctx.beginPath();
-      for(let i=0;i<120;i++){
-        const px2=m0((hashInt(11,i,3)%997)/997*W - time*520, W);
-        const py2=m0((hashInt(13,i,5)%991)/991*H + Math.sin(time*1.3+i)*9, H);
-        ctx.moveTo(px2,py2); ctx.lineTo(px2+26,py2+2);
-      }
-      ctx.stroke();
-    } else if(effWx==='ash'){
-      for(let i=0;i<90;i++){
-        const py2=m0((hashInt(13,i,5)%991)/991*H - time*42 - i*3, H);
-        const px2=m0((hashInt(11,i,3)%997)/997*W + Math.sin(time*0.6+i*2)*10, W);
-        const fl=0.25+0.35*Math.abs(Math.sin(time*3+i));
-        ctx.fillStyle = i%4 ? `rgba(255,150,70,${fl.toFixed(2)})` : `rgba(120,116,120,0.3)`;
-        ctx.beginPath(); ctx.arc(px2,py2,0.8+(i%3)*0.7,0,TAU); ctx.fill();
-      }
-    }
-  }
-  if(wxNow && effWx==='haze'){
-    const hcol = P.type==='venus' ? '212,190,90' : '230,200,140';
-    ctx.fillStyle=`rgba(${hcol},${(0.10+0.05*Math.sin(time*0.4)).toFixed(3)})`;
-    ctx.fillRect(0,0,W,H);
-  }
-  /* the terminator: night sweeps across the landscape as the planet turns */
-  const dayPh = time/env.dayLen*TAU + env.ph;
-  const bright=(wxw)=>{ const a=Math.sin(wxw*0.00055 + dayPh); return 0.30+0.70*clamp(a*1.5+0.35,0,1); };
-  const g8=ctx.createLinearGradient(0,0,W,0);
-  let nightC=0;
-  for(let k=0;k<=8;k++){
-    const wxw=c.x+((k/8)*W-W/2)/c.z;
-    const B=bright(wxw);
-    if(k===4) nightC=1-B;
-    g8.addColorStop(k/8, `rgba(3,5,16,${(1-B).toFixed(3)})`);
-  }
-  ctx.fillStyle=g8; ctx.fillRect(0,0,W,H);
-  /* auroras crown magnetized worlds at night */
-  let auroraOn=false;
-  if(env.hasField && nightC>0.35 && P.type!=='gas'){
-    auroraOn=true;
-    const aA=(nightC-0.35);
-    for(const [hue,off,amp] of [[140,0,26],[280,42,38]]){
-      ctx.beginPath();
-      for(let sx2=0;sx2<=W;sx2+=24){
-        const y2=H*0.15+off+Math.sin(sx2*0.012+time*0.7)*amp+Math.sin(sx2*0.004-time*0.3)*amp*0.6;
-        sx2?ctx.lineTo(sx2,y2):ctx.moveTo(sx2,y2);
-      }
-      ctx.strokeStyle=`hsla(${hue},85%,62%,${(aA*0.30).toFixed(3)})`;
-      ctx.lineWidth=26; ctx.lineCap='round'; ctx.stroke();
-      ctx.strokeStyle=`hsla(${hue},90%,78%,${(aA*0.20).toFixed(3)})`;
-      ctx.lineWidth=9; ctx.stroke();
-    }
-  }
-  /* lightning during rainstorms */
-  if(wxNow && effWx==='rain'){
-    const lb=Math.floor(time/8.5);
-    const lr=mulberry32((P.seed^lb)>>>0);
-    if(lr()<0.45){
-      const phs=time-lb*8.5;
-      if(phs<0.22){
-        const a=(0.22-phs)/0.22;
-        ctx.fillStyle=`rgba(220,230,255,${(a*0.12).toFixed(3)})`;
-        ctx.fillRect(0,0,W,H);
-        let bx=lr()*W, by=0;
-        ctx.strokeStyle=`rgba(235,240,255,${(a*0.85).toFixed(3)})`; ctx.lineWidth=2;
-        ctx.beginPath(); ctx.moveTo(bx,by);
-        while(by<H*0.55){ bx+=(lr()-0.5)*46; by+=18+lr()*26; ctx.lineTo(bx,by); }
-        ctx.stroke();
-      }
-    }
-  }
-  /* a whisper of seasonal light */
-  if(seasonT<-0.2){ ctx.fillStyle=`rgba(120,150,235,${((-seasonT-0.2)*0.07).toFixed(3)})`; ctx.fillRect(0,0,W,H); }
-  else if(seasonT>0.2){ ctx.fillStyle=`rgba(255,200,120,${((seasonT-0.2)*0.05).toFixed(3)})`; ctx.fillRect(0,0,W,H); }
-  const TYPE_DESC={gas:'an endless sea of storm bands — no solid ground, only the high deck',
-    terran:'oceans, continents, deserts and ice — a living world',
-    ocean:'a global ocean broken by scattered islands',
-    ice:'a frozen shell scored with pressure cracks',
-    desert:'rust-colored plains and dark basalt',
-    rocky:'bare cratered rock',
-    venus:'thick toxic clouds hide the ground below',
-    lava:'a young molten world veined with glowing magma'};
-  setTrail([starName(st.star.seed), (st.planet.name||'Planet')]); setHint('surface');
-  const Bc=1-nightC;
-  const tod = Bc>0.72?'daytime':(Bc>0.42?'twilight':'night');
-  const WX_NAME={rain:'rain showers',snow:'snowfall',dust:'dust storms',ash:'ash and embers',haze:'thick haze'};
-  const parts=['local '+tod];
-  if(season) parts.push(season);
-  parts.push(env.wx ? (wxNow ? WX_NAME[effWx] : 'clear skies')
-    : (P.type==='gas' ? 'winds beyond any scale' : 'airless — no weather'));
-  /* the showpiece, when one is running (5b-ii) — the status line says so.
-     Cached on the planet's env: biome forever (it's deterministic), the
-     event per 90s spell bucket — this line runs every frame and the heat
-     rules forbid per-frame allocation (pre-ship review catch). */
-  try{
-    if(env._bio===undefined) env._bio=biomeFor(P, env.band)||null;
-    const _evKey=Math.floor(time/90)+'|'+(wxNow?effWx:'');
-    if(env._evKey!==_evKey){
-      env._evKey=_evKey;
-      env._ev=wxEventFor(P, env._bio&&env._bio.k, wxNow?effWx:null);
-    }
-    if(env._ev) parts.push(WX_EVENT_WORD[env._ev]);
-  }catch(_){ }
-  if(auroraOn) parts.push('auroras overhead');
-  setCtxText((TYPE_DESC[P.type]||'')+' · '+parts.join(' · '));
-  /* HD landing vista (v1.3, flag-gated): built here because this is where
-     the card's clock and weather are known; era + roster from the surface
-     descriptor once renderPanel has cached it */
-  if(_vistaPend && hdOn && _lastDesc && _lastDesc.planetSeed===P.seed){
-    _vistaPend=false;
-    try{
-      let era='none';
-      const cvRow=_lastDesc.rows&&_lastDesc.rows.find(rr=>rr[0]==='Civilization');
-      if(cvRow && !/^None/.test(cvRow[1])){
-        const teRow=_lastDesc.rows.find(rr=>rr[0]==='Tech era');
-        era=(teRow && /spacefar|interstellar|post/i.test(teRow[1]))?'space'
-          :((teRow && /industrial|modern/i.test(teRow[1]))?'town':'iron');   /* V6: no castles for railway ages */
-      }
-      /* only fauna that can STAND join the landing party — the card's own
-         locomotion/habitat words (swimmers of the open ocean, drifters of
-         the cloud decks) must never render as a legged beast on the shore */
-      /* the WHOLE roster reaches the scene now, each class in its element
-         (Nick: aerial + aquatic life, scene-appropriate): walkers stand,
-         swimmers break the water, fliers ride the sky */
-      const roster=(_lastDesc.species||[]).filter(gg=>gg.kingdom==='fauna');
-      const clsOf=gg=>{
-        const lc=locoOf(gg), hb=habOf(gg);
-        if(/swim|filter|current/.test(lc)||/open ocean|sea shallows|vent fields/.test(hb)) return 'aqua';   /* current-drifters swim, not fly */
-        if(/glider|floater|drift/.test(lc)||/cloud decks/.test(hb)) return 'air';
-        return 'land';
-      };
-      const standable=roster.filter(gg=>clsOf(gg)==='land');
-      const aquaN=roster.filter(gg=>clsOf(gg)==='aqua').length;
-      const airN=roster.filter(gg=>clsOf(gg)==='air').length;
-      const genes=standable.slice(0,3).map(hdGenesFor);
-      /* the Life row decides whether the vista grows anything at all;
-         the Water row decides the river */
-      const lifeRow=_lastDesc.rows&&_lastDesc.rows.find(rr=>rr[0]==='Life');
-      const floraOk=!lifeRow||!/^(No known life|Microbial|Subsurface|Airborne|Extremophile)/.test(lifeRow[1]);
-      const waterRow=_lastDesc.rows&&_lastDesc.rows.find(rr=>rr[0]==='Water');
-      const waterTxt=waterRow?String(waterRow[1]):'';
-      const waterV=/Liquid|rivers|ocean/i.test(waterTxt)?'liquid':(/Frozen/i.test(waterTxt)?'frozen':(waterRow?'none':'liquid'));
-      const todV=tod==='daytime'?'day':tod;
-      /* a colossal wanderer: the roster's own titanic creature, shown at
-         true scale on a rare roll (5b-ii — the card said titanic) */
-      const _tit=roster.some(gg=>(gg.size||0)>=5) && (mulberry32((P.seed^0x717B)>>>0)()<0.30);
-      showVistaBox(P, todV, (env.wx&&wxNow)?effWx:null, era, genes, env.hasField,
-        floraOk, env.wx&&effWx==='snow', waterV,
-        {ring:P.ring, stc:(st.star&&st.star.c)||null, herd:standable.length,
-         aqua:aquaN, air:airN, titan:_tit, title:_lastDesc.title||null, where:_lastDesc.where||null});
-    }catch(_){}
-  }
-  if(_vistaPend && !hdOn) _vistaPend=false;
-}
-return Object.freeze({perfTime, t0, drawUniverse, drawGalaxy, drawSystem, drawSurface});
+return Object.freeze({perfTime, t0, drawUniverse, drawGalaxy, drawSystem});
 })();
-const {perfTime, t0, drawUniverse, drawGalaxy, drawSystem, drawSurface}=Renderer;
+const {perfTime, t0, drawUniverse, drawGalaxy, drawSystem}=Renderer;
 /* @end Renderer */
 
 /* ================= HD ART (v1.3, iterating — flag-gated) =================
@@ -8228,9 +7952,7 @@ let _panelDirty=true, _panelVP='', _panelTopMin=64, _panelW=300, _panelH=200, _p
 /* v1.2 discovery arc: the worlds you've stood on. Planetfall turns an
    orbital survey into a GROUND survey — the census and mineral veins are
    read from the ground, never from orbit. Earth (133) is home: always
-   known, and landing there never announces itself. Save field `land`;
-   pre-1.2 saves are grandfathered in loadSave (a veteran's charted
-   universe must never re-hide). */
+   known, and landing there never announces itself. Save field `land`. */
 const landed=new Set();
 /* systems intertwining (v1.2): the first landing on a world PAYS — a small
    deterministic element + stardust trace (field samples), granted when the
@@ -8243,8 +7965,7 @@ let _pendingSample=null, scoutId=null;
    SUCCESSFUL contact. Landing attempts one automatically — succeed and
    the census is yours; fail and the wary locals wound you (the field
    scout takes the hit if one stands). Land again to retry. Conquest and
-   home never need to ask. Save `cont`; absent ⇒ grandfathered from
-   landed+conquered so nobody's known census re-hides. */
+   home never need to ask. Save `cont`. */
 const contacted=new Set();
 let _pendingContact=null;
 function routeHit(dmg, why){
@@ -8494,6 +8215,13 @@ function _descRoll(pl){
    samples and the vista - all without ever leaving the system view */
 function _performLanding(pl){
   noteLanding(pl.P.seed);
+  /* stood-on tracking (Groundfall/Trailblazer, the expedition stats row)
+     lived in the dead surface-mode frame loop since 1.3.8 and froze —
+     it rides the landing rite itself now (v1.5 catch). Training landings
+     stay sandboxed, home always counts. */
+  const _ps=pl.P.seed;
+  if(_ps===133) unlock('home');
+  if((tutDone||_ps===133) && !surfSeen.has(_ps)){ surfSeen.add(_ps); checkAch(); queueSave(); }
   _pendingContact=pl.P.seed;         /* inhabited worlds: contact rides the card render */
   if(hdOn){ try{ openLandingVista(pl); }catch(_){ } }
   playWhoosh();
@@ -8721,8 +8449,7 @@ function renderPanel(p, isLocked){
          GLANCE (hover) → ORBITAL SURVEY (tap/lock) → GROUND SURVEY (land).
          grounded gates the census and prospecting; Earth is home, always known. */
       /* conquered counts as grounded: you rule the world and harvest it —
-         its census was never going to hide from you (matches the veteran
-         grandfather rule; review catch) */
+         its census was never going to hide from you (review catch) */
       grounded = d.planetSeed===133 || landed.has(d.planetSeed) || conquered.has(d.planetSeed) ||
         (st.mode==='surface' && st.planet && st.planet.P && st.planet.P.seed===d.planetSeed);
       /* the world's BIOME (v1.3.5) — the sub-label wears it, a row speaks
@@ -9272,9 +8999,8 @@ function artOf(en){ return en.art||(en.art=en.genome?speciesPortrait(en.genome):
    summit. Distance = rarity, the same law as danger = rarity. App-layer
    only (genomes, combat power and portraits never change — POWER IS
    DECOUPLED FROM RARITY); guardians and Paragons keep their forced grades;
-   bred/imported creatures carry no origin and are never capped; and every
-   entry catalogued BEFORE this law (no rc marker in the save) keeps the
-   grade the player was shown — nothing ever downgrades in someone's hands. */
+   bred/imported creatures carry no origin and are never capped. Since the
+   v1.5 fresh start every catalogue lives under the law from its first entry. */
 const RING_SPECTRUM=[
   {cap:5,  n:'the Neighborhood',   note:'up to Legendary'},
   {cap:8,  n:'the home galaxy',    note:'up to Mythic'},
@@ -9302,10 +9028,8 @@ function ringGrade(g, grade, where){
   return colorGrade(dom, g.seed, {salt:0x10F, force:cap});
 }
 /* the ring spectrum for WORLDS AND STARS (Nick: "apply it across the whole
-   board"): spectral designations obey the same distance ladder — but ONLY
-   for expeditions begun under the law (save flag rsw). A veteran's card
-   that once read Prismatic must never re-read Deep (vague-never-wrong). */
-let _ringWorlds=false;
+   board"): spectral designations obey the same distance ladder. Since the
+   v1.5 fresh start every expedition lives under the law — no flag. */
 /* recover a designation's SPECTRA domain from its own label (survey BUG B:
    the first clamp spoke the creature language — every clamped world read
    "Gray-Gold". Worlds wear color, not stars; the label IS the domain). */
@@ -9335,7 +9059,7 @@ function ringDesignation(d){
   /* clamp a descriptor's designation in place, once, by where it lives —
      every downstream reader (card row, border tint, spoils, reserves,
      samples, signatures) then sees ONE coherent tier */
-  if(!_ringWorlds || !d || !d.designation || !d.where || d._ringed) return d;
+  if(!d || !d.designation || !d.where || d._ringed) return d;
   d._ringed=true;
   const cap=gradeCapAt(d.where);
   if(d.designation.tier>cap){
@@ -9349,15 +9073,14 @@ function ringDesignation(d){
   }
   return d;
 }
-function _storeSpecies(g, from, where, deferArt, capExempt){
+function _storeSpecies(g, from, where, deferArt){
   const id=codexId(g);
   if(codex.has(id)) return null;
   const d=describeSpecies(g);
   /* deferArt (save restore): don't paint 300 portraits synchronously at
      boot — consumers go through artOf() and pay per view (ship audit C2) */
   const entry={id, name:d.name, kind:d.kind, desc:d.desc, diet:d.diet||null,
-    detail:d.detail||'', art:deferArt?null:speciesPortrait(g), grade:capExempt?d.grade:ringGrade(g, d.grade, where||null),
-    rc:capExempt?0:1,   /* ring-capped era marker — persists so a veteran's pre-law grades never downgrade */
+    detail:d.detail||'', art:deferArt?null:speciesPortrait(g), grade:ringGrade(g, d.grade, where||null),
     gen:g.gen||0, genome:g, from:from||'Unknown world', where:where||null, hybrid:!!g.parents,
     realm:classifyRealm(g), role:ecologyRole(g), biome:realmBiome(g), mods:realmModifiers(g),
     sapient:sapienceTier(g)};
@@ -9522,12 +9245,30 @@ function showReveal(entry, isHybrid){
     (gr?'<span class="gbadge'+(gr.tier>=12?' irid':'')+'" style="color:'+gr.hex+'">'+gr.name+(gr.star?' '+gr.star:'')+'</span> · ':'') +
     (entry.hybrid?('Hybrid · generation '+entry.gen):((entry.realm||entry.kind)+' · '+entry.from));
   document.getElementById('rev-detail').textContent = entry.detail||'';
-  /* the field notes: every trait, readable, below the portrait */
+  /* v1.5 condense (Nick: "same as the world cards"): the field notes fold
+     behind a remembered group — identity and stats stay up top. The digest
+     keeps the specimen's character on the collapsed header. */
   const infoEl=document.getElementById('rev-info');
-  if(infoEl) infoEl.innerHTML = entry.genome
-    ? speciesDetails(entry.genome).map(r=>'<div class="ir"><span class="k">'+r[0]+'</span><span class="v">'+r[1]+'</span></div>').join('')
-    : '';
-  document.getElementById('rev-meta').textContent='';
+  const rows=entry.genome?speciesDetails(entry.genome):[];
+  if(infoEl) infoEl.innerHTML = rows.map(r=>'<div class="ir"><span class="k">'+r[0]+'</span><span class="v">'+r[1]+'</span></div>').join('');
+  try{
+    const fold=document.getElementById('rev-fold');
+    if(fold){
+      const has=!!((entry.detail||'').length || rows.length);
+      fold.style.display=has?'block':'none';
+      fold.classList.toggle('open', !!(cardExpand&4));
+      const dig=document.getElementById('rev-fold-dig');
+      if(dig){
+        const sz=rows.find(r2=>r2[0]==='Size'), hb=rows.find(r2=>r2[0]==='Habitat');
+        dig.textContent=[sz&&sz[1], hb&&hb[1]].filter(Boolean).join(' · ')
+          || (entry.detail||'').split(/[.—]/)[0].slice(0,60);
+      }
+    }
+    /* the ⟁-grade hook never folds: an extremophile is a discovery story */
+    const meta=document.getElementById('rev-meta');
+    if(meta) meta.innerHTML = (entry.genome && entry.genome.x)
+      ? '<span style="color:#c9a8ff">⟁ Extremophile — alive where nothing should survive</span>' : '';
+  }catch(_){ }
   const card=document.querySelector('#reveal .card')||revealEl.firstElementChild;
   if(card && gr){
     card.style.borderColor=gr.hex; card.style.boxShadow='0 0 0 1px '+gr.hex+', 0 0 '+(gr.tier>=5?90:40)+'px '+gr.hex+(gr.tier>=5?'88':'55');
@@ -9561,7 +9302,7 @@ function showReveal(entry, isHybrid){
         ((entry.genome.brood||entry.genome.fed)?'<br>♞ Bloodline: brood '+(entry.genome.brood||0)+' · fed '+(entry.genome.fed||0):'')+'</div>';
       if(entry.kind==='Fauna' && S.cls){
         const _xp=(+entry.genome.xp)||0, _lv=S.lvl;
-        const _lo=12*_lv*_lv, _hi=12*(_lv+1)*(_lv+1);
+        const _lo=6*_lv*_lv, _hi=6*(_lv+1)*(_lv+1);
         const _pct=_lv>=9?100:Math.round((_xp-_lo)/Math.max(1,_hi-_lo)*100);
         stEl.innerHTML+='<div class="abil"><b>'+S.cls+'</b> · Level '+_lv+(_lv>=9?' · MAX':'')+
           ' — innate arts, always on ('+(1+(_lv>=3?1:0)+(_lv>=6?1:0))+' of 3 awake)'+
@@ -9599,6 +9340,17 @@ revealEl.addEventListener('click', (e)=>{
     const s0=TUT_STEPS[_tutStep];
     const want='rev-'+((s0&&s0.rev)||'');
     if(e.target.id!==want) return;
+  }
+  /* v1.5 field-notes fold: the header toggles (remembered, cx bit 4);
+     reading inside the fold never dismisses the card */
+  if(e.target && e.target.closest && e.target.closest('#rev-fold')){
+    if(e.target.closest('#rev-fold-head')){
+      cardExpand^=4;
+      const g2=document.getElementById('rev-fold');
+      if(g2) g2.classList.toggle('open', !!(cardExpand&4));
+      queueSave();
+    }
+    return;
   }
   if(e.target && e.target.id==='rev-share' && _revEntry){ shareCreature(_revEntry); return; }
   if(e.target && e.target.id==='rev-duel' && _revEntry){ startDuelWithCode(_revEntry); return; }
@@ -9974,7 +9726,7 @@ function travelTo(w){
   const dist=Math.hypot((w.gal.x-st.ucam.x)||0, (w.gal.y-st.ucam.y)||0);
   const mult=(typeof driveMult==='function')?driveMult():1;
   const dur=clamp(800+(dist*3)/mult, 800, Math.max(1200, 8000/mult));
-  if(dist>1400 && mult===1) toast('🚀 Long Burn','The old fusion-chemical drive strains across '+Math.round(dist)+' u of void — research better drives at the Research Bench in your 🧰 Cargo hold.');
+  if(dist>1400 && mult===1) toast('🚀 Long Burn','The old fusion-chemical drive strains across '+Math.round(dist)+' u of void — research better drives on your character screen&#8217;s Research tab (🧰).');
   _trav={t0:performance.now(), dur, w, hex:'#cfe0ff', jumped:false, zEnd:0, seed:_destSeed(w)};
   playWhoosh();                        /* the lane opens */
 }
@@ -10047,7 +9799,6 @@ document.addEventListener('pointerdown', ()=>{       /* tap skips the lane */
    Owns: startNewGame
    ---------------------------------------------------------------- */
 function startNewGame(){
-  _ringWorlds=true;   /* a fresh expedition lives under the ring spectrum, worlds included */
   const solStar={x:SOL_POS.x, y:SOL_POS.y, c:'#fff4d8', s:1.1, seed:SOL_SEED, sol:true};
   const homeGal={x:HOME_POS.x, y:HOME_POS.y, size:78, sp:0, tilt:0.62, rot:0.5, seed:HOME_GAL_SEED, home:true};
   goTo({type:'star', gal:homeGal, star:solStar});
@@ -10582,13 +10333,50 @@ function onSpeciesStored(entry){
 }
 
 /* ================================================================
-   @module SaveSystem [app] — debounced save, hardened load, reset & wipe (cfcc_save_v1)
+   @module SaveSystem [app] — debounced save, hardened load, reset & wipe (cfcc_save_v2)
    Deps: player-state, atlas, compendium, bootstrap, player, settings, audio, notify, naming-ui, economy, events, prime, guide, Rand, ui-dom, progression, ui-stats, newgame
-   API:  queueSave, wipeSaveAndReload, loadSave, SAVE_KEY
+   API:  queueSave, wipeSaveAndReload, loadSave, SAVE_KEY, readLegacySave, legacyFarewell
    ================================================================ */
 const SaveSystem=(()=>{
 /* ---- save / load (local only — the universe needs no saving, it's math) ---- */
-const SAVE_KEY='cfcc_save_v1';
+/* v1.5 FRESH START: the frontier begins anew for everybody. The key bump
+   IS the wipe — cfcc_save_v1 is read once at boot for the farewell card
+   (the old expedition's rarest find gets its send-off), then removed.
+   No migration, nothing grandfathered; the Ascent is every explorer's
+   canon opening now. The universe itself never changed — same seeds,
+   same worlds, same share codes. */
+const SAVE_KEY='cfcc_save_v2';
+const LEGACY_SAVE_KEY='cfcc_save_v1';
+/* the farewell read: mine the OLD save for its rarest catalogued find so
+   the send-off card can honor it, then remove the key. One read, ever. */
+let _farewell=null;
+function readLegacySave(){
+  try{
+    const raw=localStorage.getItem(LEGACY_SAVE_KEY);
+    if(!raw) return;
+    try{
+      const od=JSON.parse(raw);
+      const nm=new Map();
+      for(const kv of (od.names||[])){ if(kv && typeof kv[0]==='string'){ const v=cleanName(kv[1]); if(v) nm.set(kv[0], v); } }
+      let best=null;
+      const list=Array.isArray(od.codex)?od.codex.slice(0,600):[];
+      for(const e of list){
+        if(!e || !e.g) continue;
+        try{
+          const d=describeSpecies(e.g);
+          if(!d || !d.grade) continue;
+          /* the grade the player actually saw: pre-law entries kept their
+             raw roll, post-law entries wore the ring clamp */
+          const grade=e.rc?ringGrade(e.g, d.grade, e.w||null):d.grade;
+          if(!best || grade.tier>best.grade.tier) best={g:e.g, name:nm.get('c'+codexId(e.g))||d.name, kind:d.kind, grade};
+        }catch(_){ }
+      }
+      _farewell={me:cleanName(od.me||'')||'', best, n:list.length};
+    }catch(_){ /* a corrupt legacy key earns no eulogy — just remove it */ }
+    localStorage.removeItem(LEGACY_SAVE_KEY);
+  }catch(_){ }
+}
+function legacyFarewell(){ return _farewell; }
 let _saveT=0, _wiping=false;
 let _saveFailWarned=false;
 function queueSave(){ if(_loading||_wiping) return; clearTimeout(_saveT); _saveT=setTimeout(doSave, 900); }
@@ -10626,7 +10414,6 @@ function doSave(){
          anyway, and any eviction silently refills a finite reserve —
          entries are two numbers, the cap bought nothing) */
       at:Date.now(),   /* wall-clock save stamp — anchors offline-accrual clamps on load */
-      rsw:_ringWorlds?1:0,   /* world designations obey the ring spectrum (post-law expeditions only) */
       cargo:[...cargo], minedw:[...mined], mx:[...mineX], tech:[...techOwned], mines:stats.mines||0,
       items:[...items], eq:equip, crafts:stats.crafts||0, minedout:stats.minedout||0,
       asc:ascCh, ascp:ascProg,
@@ -10642,7 +10429,7 @@ function doSave(){
       ach:[...unlocked],
       log, home:homeId,
       prime:primeFill, frontier:frontierUnlocked?1:0, ending:frontierEnding, guide:seenGuide?1:0, tut:tutDone?1:0, rn:_rnSeen,
-      codex:[...codex.values()].map(e=>({g:e.genome, f:e.from, w:e.where||null, rc:e.rc?1:0})),
+      codex:[...codex.values()].map(e=>({g:e.genome, f:e.from, w:e.where||null})),
     }));
   }catch(_){
     /* private mode or quota — session continues unsaved */
@@ -10688,9 +10475,9 @@ function loadSave(){
     const _atL=clamp(num(data.at, _nowL), 0, _nowL);
     const _minT=Math.max(0, _atL-30*6e5);
     for(const kv of (data.minedw||[])){ if(kv && kv[0]!=null) mined.set(kv[0], clamp(num(kv[1]), _minT, _nowL)); }
-    /* v1.4 finite reserves: mx = pulls taken per world. Absent (pre-1.4
-       save) ⇒ every previously-mined world counts one pull — a veteran's
-       reserves stand effectively full. */
+    /* v1.4 finite reserves: mx = pulls taken per world. Absent (edited or
+       truncated save) ⇒ every mined world counts one pull, so a finite
+       reserve can never silently refill. */
     if(Array.isArray(data.mx)){
       for(const kv of data.mx){ if(kv && kv[0]!=null) mineX.set(kv[0], clamp(num(kv[1]), 0, 1e7)|0); }
       /* review catch: mx is capped (deepest-mined kept) while minedw is
@@ -10713,15 +10500,12 @@ function loadSave(){
     }
     stats.crafts=num(data.crafts);
     stats.minedout=num(data.minedout);
-    _ringWorlds=data.rsw===1;   /* absent (pre-law save) ⇒ world cards keep the designations they always showed */
-    /* v1.4 THE ASCENT. asc ABSENT (pre-1.4 save) ⇒ the whole Ascent reads
-       complete — veterans already hold the sky; nothing may re-lock it. */
-    if(data.asc===undefined){ ascCh=ASC_CHAPTERS.length; }
-    else {
-      ascCh=clamp(num(data.asc), 0, ASC_CHAPTERS.length)|0;
-      if(data.ascp && typeof data.ascp==='object'){
-        for(const k in data.ascp){ const v=+data.ascp[k]; if(typeof k==='string' && k.length<24 && Number.isFinite(v) && v>=0) ascProg[k]=Math.min(v|0, 999); }
-      }
+    /* v1.4 THE ASCENT — every v2 expedition climbs it. asc absent (edited
+       save) ⇒ chapter 1: the safe default is the canon opening, and the
+       built ship systems still speak through ascStage either way. */
+    ascCh=clamp(num(data.asc), 0, ASC_CHAPTERS.length)|0;
+    if(data.ascp && typeof data.ascp==='object'){
+      for(const k in data.ascp){ const v=+data.ascp[k]; if(typeof k==='string' && k.length<24 && Number.isFinite(v) && v>=0) ascProg[k]=Math.min(v|0, 999); }
     }
     showCargoBtn();
     nameHue=Number.isFinite(+data.nh)?clamp((+data.nh)|0, -1, RANK_HUES.length-1):-1;
@@ -10748,8 +10532,9 @@ function loadSave(){
     const _rmv=num(data.rm,-1);
     motionMode=_rmv===1 ? 1 : (_rmv===0 ? 0 : -1);
     applyMotion();
-    /* cx absent (pre-1.1.2 save) ⇒ 0 = card detail groups collapsed */
-    cardExpand=clamp(num(data.cx), 0, 3)|0;
+    /* cx absent ⇒ 0 = card detail groups collapsed. Bits: 1 environment ·
+       2 census · 4 specimen field notes (v1.5) */
+    cardExpand=clamp(num(data.cx), 0, 7)|0;
     /* `hd` in old saves is IGNORED — HD is always on now (ship decision) */
     applyHd();
     for(const n of (data.notifs||[])){ if(n && n.tt!=null && notifications.length<60) notifications.push(n); }
@@ -10764,9 +10549,7 @@ function loadSave(){
     for(const s of (data.evts||[])) eventKeysSeen.add(s);
     for(const s of (data.evann||[])) _evAnnounced.add(s);
     for(const a of (data.ach||[])) unlocked.add(a);
-    /* ring-spectrum grandfather: entries saved WITHOUT the rc marker were
-       catalogued before the law — they keep the grade the player saw */
-    for(const e of (data.codex||[])){ if(e && e.g) _storeSpecies(e.g, e.f, e.w||null, true, !e.rc); }
+    for(const e of (data.codex||[])){ if(e && e.g) _storeSpecies(e.g, e.f, e.w||null, true); }
     /* the field scout must still exist in the Compendium (it may have been
        bred away, fed away, or lost) — a stale id silently stands down */
     scoutId=(typeof data.scout==='string' && codex.has(data.scout)) ? data.scout : null;
@@ -10779,27 +10562,8 @@ function loadSave(){
     }
     for(const it of (data.log||[])){ if(it && it.id){ it.star=''; logMap.set(it.id, it); } }
     homeId=(data.home && logMap.has(data.home))?data.home:null;
-    /* v1.2 discovery arc. land absent (pre-1.2 save) ⇒ grandfather: every
-       world the veteran has charted, settled or mined counts as ground-
-       surveyed — the arc must never re-hide a known universe. */
-    if(data.land){
-      for(const s of (data.land||[])){ const n=+s; if(Number.isFinite(n)) landed.add(n); }
-    } else {
-      for(const id of logMap.keys()){ if(typeof id==='string' && id[0]==='p'){ const n=+id.slice(1); if(Number.isFinite(n)) landed.add(n); } }
-      for(const k of conquered.keys()) landed.add(k);
-      for(const k of mined.keys()) landed.add(k);
-      /* bioscanned worlds too — the saved Atlas is capped at 120, but
-         surveyedSet is the veteran's real footprint (review catch) */
-      for(const s of surveyedSet) landed.add(s);
-    }
-    /* first contact (v1.2.2). cont absent (older save) ⇒ every world the
-       player has stood on or conquered keeps its census — no re-hiding */
-    if(data.cont){
-      for(const s of (data.cont||[])){ const n=+s; if(Number.isFinite(n)) contacted.add(n); }
-    } else {
-      for(const s of landed) contacted.add(s);
-      for(const k of conquered.keys()) contacted.add(k);
-    }
+    for(const s of (data.land||[])){ const n=+s; if(Number.isFinite(n)) landed.add(n); }
+    for(const s of (data.cont||[])){ const n=+s; if(Number.isFinite(n)) contacted.add(n); }
     /* the descent's pity ramp (v1.3.5): wave-off progress survives a
        reload — losing 5 climbs on a 10% world to a refresh would be
        rage-quit fuel. Absent ⇒ empty, capped, clamped. */
@@ -10810,21 +10574,25 @@ function loadSave(){
         if(Number.isFinite(s2) && n2>0) _waveOffs.set(s2, n2);
       }
     }
-    if(data.prime && typeof data.prime==='object'){ for(const k in data.prime) if(SIG_IDS.includes(k)) primeFill[k]=data.prime[k]; }
+    /* v1.5 hardening (review catch): relic blueprints hang off primeFill
+       now, so a loaded claim gets the same coerce/clamp treatment as every
+       other save field — strings stripped of markup, tier a finite number,
+       hex a real color or the default */
+    if(data.prime && typeof data.prime==='object'){
+      const _sanS=(v,n2)=>String(v==null?'':v).replace(/[<>&"']/g,'').slice(0,n2);
+      for(const k in data.prime){
+        if(!SIG_IDS.includes(k) || !data.prime[k] || typeof data.prime[k]!=='object') continue;
+        const f=data.prime[k];
+        primeFill[k]={title:_sanS(f.title,48)||'a lost record', sub:_sanS(f.sub,32),
+          tier:clamp(num(f.tier), 0, TIER_MAX)|0,
+          hex:/^#[0-9a-fA-F]{3,8}$/.test(String(f.hex||''))?String(f.hex):'#9fb6d6',
+          where:(f.where&&typeof f.where==='object')?f.where:null};
+      }
+    }
     frontierUnlocked=!!data.frontier; frontierEnding=data.ending||null;
     seenGuide=!!data.guide;
-    tutDone = data.tut===undefined ? true : !!data.tut;   /* pre-tutorial saves are veterans */
+    tutDone = data.tut===undefined ? true : !!data.tut;   /* tut absent (edited save) ⇒ done — never force training on a held run */
     _rnSeen = typeof data.rn==='string' ? data.rn.slice(0,12) : '0';   /* pre-notes saves get the debut bulletin once */
-    /* veterans: trades already proven complete their starter charters
-       quietly (no retroactive pay — starters are onboarding, not income) */
-    if(tutDone){
-      if(landed.size>0 || (stats.landings||0)>0) chDone.add('st-land');
-      if((stats.mines||0)>0) chDone.add('st-mine');
-      if(surveyedSet.size>0) chDone.add('st-scan');
-      if(scoutId) chDone.add('st-scout');
-      let _cq2=false; for(const k of conquered.keys()) if(k!==133){ _cq2=true; break; }
-      if(_cq2) chDone.add('st-conq');   /* Earth flies your flag from the start — it doesn't count */
-    }
     _chBadge();
     /* retroactive: signatures your existing Codex already deserves, claimed quietly */
     if(primeCount()<9) for(const e of codex.values()) primeCheckSpecies(e, true);
@@ -10856,7 +10624,6 @@ function resetMemoryState(){
     mined.clear(); mineX.clear(); cargo.clear(); techOwned.clear();
     items.clear(); for(const k in equip) delete equip[k]; _eqOpen=null;
     ascCh=0; ascProg={};   /* a fresh expedition climbs the Ascent again */
-    _ringWorlds=true;      /* and lives fully under the ring spectrum */
     /* post-deploy audit: the Binder economy survived a reset — claimed
        sets stayed "claimed ✓" into the new run, making their one-time
        bounties permanently unclaimable. Same family: beacon key, paragon
@@ -10866,7 +10633,7 @@ function resetMemoryState(){
     nameHue=-1;
     try{ _chBadge(); }catch(_){ }
     try{ showCargoBtn(); }catch(_){ }
-    try{ if(typeof cargoEl!=='undefined' && cargoEl){ cargoOpen=false; cargoEl.style.display='none'; } }catch(_){ }
+    try{ if(typeof closeSheet==='function') closeSheet(); }catch(_){ }
     try{ if(typeof chPanel!=='undefined' && chPanel){ chOpen=false; chPanel.style.display='none'; } }catch(_){ }
     _lastRankName=null; _lastRankFloor=-1;   /* a fresh Cadet is a beginning, not a promotion */
     explorerName=''; essence=0; pstats={vit:50,fer:50,res:50,agi:50,ins:50}; HP_MAX=hpMaxFromVit(); hp=HP_MAX;
@@ -10891,7 +10658,7 @@ function wipeSaveAndReload(){
     setPanel.style.display='none';
     codexOpen=false;  codexEl.style.display='none';
     logOpen=false;    logEl.style.display='none';
-    statsOpen=false;  statsEl.style.display='none';
+    try{ closeSheet(); }catch(_){ }
     eventsOpen=false; eventsEl.style.display='none'; clearInterval(_evTimer);
     /* post-deploy audit, HIGH: the DEATH overlay was never hidden by the
        in-place rebuild — "Begin a new expedition" left the fresh game
@@ -10910,9 +10677,9 @@ function wipeSaveAndReload(){
 window.addEventListener('beforeunload', doSave);
 window.addEventListener('pageshow', e=>{ if(e && e.persisted) location.reload(); });
 document.addEventListener('visibilitychange', ()=>{ if(document.visibilityState==='hidden') doSave(); });
-return Object.freeze({queueSave, wipeSaveAndReload, loadSave, SAVE_KEY});
+return Object.freeze({queueSave, wipeSaveAndReload, loadSave, SAVE_KEY, readLegacySave, legacyFarewell});
 })();
-const {queueSave, wipeSaveAndReload, loadSave, SAVE_KEY}=SaveSystem;
+const {queueSave, wipeSaveAndReload, loadSave, SAVE_KEY, readLegacySave, legacyFarewell}=SaveSystem;
 /* @end SaveSystem */
 
 /* ---- share codes: a pointer into the one shared universe ----
@@ -11142,6 +10909,7 @@ function dailyWhere(){
   return {key, where:{type:'galaxy', gal:slimGal(gal)}};
 }
 dailyBtn.addEventListener('click', ()=>{
+  if(EVENTS_DORMANT) return;   /* v1.5: beacon hidden for rework — engine dormant */
   const res=dailyWhere();
   if(!res || !res.where){ toast('Traveler\u2019s Beacon','The beacon is faint right now — try again.'); return; }
   /* v1.4: the beacon usually points far outside the Ascent's rings - no
@@ -11164,7 +10932,7 @@ dailyBtn.addEventListener('click', ()=>{
 /* ================================================================
    @module CombatCore [domain] — battle stats, biome abilities, deterministic duels & creature codes
    Deps: Rand, EncUtil, player, naming-ui, Genome, viewport, player-state
-   API:  abilityOf, battleStats, STAT_NAMES, STAT_HUES, runDuel, decodeCreature, encodeCreature, playerCombatant, playerAvatar, statBlockHTML, _statOpen, abilityTheme, normGenome, PLAYER_SEED, levelOf
+   API:  abilityOf, battleStats, STAT_NAMES, STAT_HUES, runDuel, decodeCreature, encodeCreature, playerCombatant, playerAvatar, paperdollAvatar, DOLL_ANCHORS, statBlockHTML, _statOpen, abilityTheme, normGenome, PLAYER_SEED, levelOf
    ================================================================ */
 const CombatCore=(()=>{
 const STAT_NAMES=['Vitality','Ferocity','Resilience','Agility','Instinct'];
@@ -11393,7 +11161,14 @@ function classOf(g){
 }
 /* levels: pure win-fed XP, quadratic thresholds (early levels land fast).
    Levels NEVER touch stats — they unlock innate slots at 3 and 6. */
-function levelOf(g){ return Math.min(9, Math.floor(Math.sqrt(Math.max(0,(+g.xp)||0)/12))); }
+/* v1.5 BALANCE (leveling sim tier, 240-run measurement): at 12·l² only 3%
+   of sessions ever woke the SECOND art (L3 at a median 504 actions) and
+   nobody living reached L6 — the class system was fiction past level 1.
+   6·l² pins the intent: L3 ≈ 7 victories (mid-session for a fighter),
+   L6 ≈ 27 (a multi-session arc), L9 ≈ 61 (the long chase — or guardians).
+   The award trio (duels +8 · conquests +20 · guardians +60) is unchanged
+   and stays true on every card. */
+function levelOf(g){ return Math.min(9, Math.floor(Math.sqrt(Math.max(0,(+g.xp)||0)/6))); }
 function classKit(g){
   const cls=classOf(g), lvl=levelOf(g);
   const n=1+(lvl>=3?1:0)+(lvl>=6?1:0);
@@ -11485,6 +11260,177 @@ function playerAvatar(){
   _playerAvatarURL=cv.toDataURL();
   return _playerAvatarURL;
 }
+/* THE PAPERDOLL (v1.5, Nick: "Diablo 2/3/4, PoE, classic WoW look and
+   feel"): the explorer at FULL LENGTH for the character screen — the same
+   gold suit and glass visor as the bust, painterly per the HD engine law,
+   rim-lit against the void. One master, cached; the equipment sockets
+   anchor to this figure via DOLL_ANCHORS (fractions of the canvas). */
+let _dollURL=null;
+function paperdollAvatar(){
+  if(_dollURL) return _dollURL;
+  const W2=360,H2=600,cv=document.createElement('canvas');cv.width=W2;cv.height=H2;
+  const g=cv.getContext('2d');
+  /* the void behind: deep radial night + a violet nebula breath + stars */
+  const bg=g.createRadialGradient(W2*0.5,H2*0.30,20,W2*0.5,H2*0.52,H2*0.72);
+  bg.addColorStop(0,'#191524');bg.addColorStop(1,'#04050b');
+  g.fillStyle=bg;g.fillRect(0,0,W2,H2);
+  const r=mulberry32(0x50A1E5);
+  const neb=g.createRadialGradient(W2*0.80,H2*0.20,8,W2*0.80,H2*0.20,W2*0.55);
+  neb.addColorStop(0,'rgba(96,72,170,0.17)');neb.addColorStop(1,'rgba(96,72,170,0)');
+  g.fillStyle=neb;g.fillRect(0,0,W2,H2);
+  const neb2=g.createRadialGradient(W2*0.14,H2*0.62,8,W2*0.14,H2*0.62,W2*0.4);
+  neb2.addColorStop(0,'rgba(46,110,150,0.12)');neb2.addColorStop(1,'rgba(46,110,150,0)');
+  g.fillStyle=neb2;g.fillRect(0,0,W2,H2);
+  for(let i=0;i<90;i++){ g.fillStyle='rgba(255,255,255,'+(0.10+r()*0.5).toFixed(2)+')';
+    g.fillRect(r()*W2, r()*H2*0.86, 1.3, 1.3); }
+  /* ground: a soft landing-pad disc + the explorer's shadow */
+  const pad=g.createRadialGradient(W2*0.5,H2*0.925,4,W2*0.5,H2*0.925,W2*0.36);
+  pad.addColorStop(0,'rgba(120,130,170,0.14)');pad.addColorStop(0.7,'rgba(60,66,96,0.07)');pad.addColorStop(1,'rgba(0,0,0,0)');
+  g.fillStyle=pad;g.beginPath();g.ellipse(W2*0.5,H2*0.925,W2*0.36,H2*0.036,0,0,7);g.fill();
+  g.fillStyle='rgba(0,0,0,0.55)';
+  g.beginPath();g.ellipse(W2*0.5,H2*0.928,W2*0.205,H2*0.020,0,0,7);g.fill();
+  const cx=W2*0.5;
+  const gold=(y0,y1)=>{const s=g.createLinearGradient(0,y0,0,y1);
+    s.addColorStop(0,'#ffe6a8');s.addColorStop(0.55,'#e0a84a');s.addColorStop(1,'#8a5e20');return s;};
+  const darkgold=(y0,y1)=>{const s=g.createLinearGradient(0,y0,0,y1);
+    s.addColorStop(0,'#d9a851');s.addColorStop(0.6,'#a87830');s.addColorStop(1,'#5e3f14');return s;};
+  /* LEGS: two tapered columns with a knee seam */
+  const hipY=H2*0.565, kneeY=H2*0.735, ankY=H2*0.875;
+  for(const sgn of [-1,1]){
+    const lx=cx+sgn*W2*0.062;
+    g.fillStyle=darkgold(hipY,ankY);
+    g.beginPath();
+    g.moveTo(lx-W2*0.052,hipY);g.lineTo(lx+W2*0.052,hipY);
+    g.lineTo(lx+W2*0.040,kneeY);g.lineTo(lx+W2*0.036,ankY);
+    g.lineTo(lx-W2*0.036,ankY);g.lineTo(lx-W2*0.040,kneeY);
+    g.closePath();g.fill();
+    /* knee plate */
+    g.fillStyle='rgba(255,230,168,0.30)';
+    g.beginPath();g.ellipse(lx,kneeY-H2*0.008,W2*0.036,H2*0.016,0,0,7);g.fill();
+    /* inner shade */
+    g.fillStyle='rgba(30,20,6,0.35)';
+    g.fillRect(lx-sgn*W2*0.012-W2*0.008,hipY,W2*0.014,ankY-hipY);
+  }
+  /* BOOTS: heavy, darker metal with a lit top rim */
+  for(const sgn of [-1,1]){
+    const lx=cx+sgn*W2*0.062;
+    const bg2=g.createLinearGradient(0,ankY,0,H2*0.925);
+    bg2.addColorStop(0,'#c9a050');bg2.addColorStop(0.5,'#7c5a22');bg2.addColorStop(1,'#3c2a0e');
+    g.fillStyle=bg2;
+    g.beginPath();
+    g.moveTo(lx-W2*0.042,ankY);g.lineTo(lx+W2*0.042,ankY);
+    g.lineTo(lx+W2*0.052,H2*0.912);g.lineTo(lx+sgn*W2*0.028+W2*0.052,H2*0.925);
+    g.lineTo(lx-W2*0.052,H2*0.925);g.lineTo(lx-W2*0.052,H2*0.912);
+    g.closePath();g.fill();
+    g.fillStyle='rgba(255,236,180,0.35)';g.fillRect(lx-W2*0.042,ankY,W2*0.084,2.2);
+  }
+  /* TORSO: the chest carapace — broad shoulders tapering to the waist */
+  const shY=H2*0.300, waY=H2*0.565;
+  g.fillStyle=gold(shY,waY);
+  g.beginPath();
+  g.moveTo(cx-W2*0.155,shY+H2*0.012);
+  g.quadraticCurveTo(cx-W2*0.175,shY+H2*0.075,cx-W2*0.120,H2*0.47);
+  g.quadraticCurveTo(cx-W2*0.115,H2*0.53,cx-W2*0.125,waY);
+  g.lineTo(cx+W2*0.125,waY);
+  g.quadraticCurveTo(cx+W2*0.115,H2*0.53,cx+W2*0.120,H2*0.47);
+  g.quadraticCurveTo(cx+W2*0.175,shY+H2*0.075,cx+W2*0.155,shY+H2*0.012);
+  g.quadraticCurveTo(cx,shY-H2*0.016,cx-W2*0.155,shY+H2*0.012);
+  g.closePath();g.fill();
+  /* belt */
+  g.fillStyle='rgba(40,26,8,0.75)';g.fillRect(cx-W2*0.125,waY-H2*0.012,W2*0.25,H2*0.020);
+  g.fillStyle='#ffcf8a';g.fillRect(cx-W2*0.020,waY-H2*0.012,W2*0.040,H2*0.020);
+  /* chest seam + sternum plate */
+  g.fillStyle='rgba(60,40,12,0.5)';g.fillRect(cx-W2*0.010,shY+H2*0.03,W2*0.020,H2*0.20);
+  g.fillStyle='rgba(255,240,200,0.22)';
+  g.beginPath();g.ellipse(cx,shY+H2*0.085,W2*0.075,H2*0.045,0,0,7);g.fill();
+  /* the chest lamp — the bust's little star, kept */
+  g.fillStyle='#ffcf8a';g.beginPath();g.arc(cx,shY+H2*0.075,W2*0.016,0,7);g.fill();
+  g.save();g.globalCompositeOperation='lighter';
+  const lampGlow=g.createRadialGradient(cx,shY+H2*0.075,1,cx,shY+H2*0.075,W2*0.09);
+  lampGlow.addColorStop(0,'rgba(255,207,138,0.5)');lampGlow.addColorStop(1,'rgba(255,207,138,0)');
+  g.fillStyle=lampGlow;g.fillRect(cx-W2*0.1,shY,W2*0.2,H2*0.16);
+  g.restore();
+  /* ARMS: hanging slightly out, sectioned at the elbow, glove fists */
+  for(const sgn of [-1,1]){
+    const sx=cx+sgn*W2*0.165, ex=cx+sgn*W2*0.205, hx=cx+sgn*W2*0.215;
+    const elY=H2*0.435, haY=H2*0.545;
+    g.strokeStyle='rgba(0,0,0,0)';
+    g.fillStyle=gold(shY,haY);
+    g.beginPath();   /* upper arm */
+    g.moveTo(sx-W2*0.043,shY+H2*0.020);g.lineTo(sx+W2*0.043,shY+H2*0.020);
+    g.lineTo(ex+W2*0.032,elY);g.lineTo(ex-W2*0.032,elY);g.closePath();g.fill();
+    g.fillStyle=darkgold(elY,haY);
+    g.beginPath();   /* forearm */
+    g.moveTo(ex-W2*0.030,elY);g.lineTo(ex+W2*0.030,elY);
+    g.lineTo(hx+W2*0.024,haY);g.lineTo(hx-W2*0.024,haY);g.closePath();g.fill();
+    /* shoulder pauldron */
+    g.fillStyle=gold(shY,elY);
+    g.beginPath();g.ellipse(sx,shY+H2*0.016,W2*0.055,H2*0.030,0,0,7);g.fill();
+    g.fillStyle='rgba(255,244,210,0.30)';
+    g.beginPath();g.ellipse(sx-sgn*W2*0.012,shY+H2*0.008,W2*0.030,H2*0.013,0,0,7);g.fill();
+    /* glove */
+    const gv=g.createRadialGradient(hx,haY+H2*0.012,2,hx,haY+H2*0.012,W2*0.040);
+    gv.addColorStop(0,'#f4d79e');gv.addColorStop(1,'#6e4c1a');
+    g.fillStyle=gv;
+    g.beginPath();g.ellipse(hx,haY+H2*0.014,W2*0.032,H2*0.022,0,0,7);g.fill();
+  }
+  /* HELMET + VISOR (the bust's exact language, scaled to the figure) */
+  const hx0=cx, hy0=H2*0.180, hr=W2*0.118;
+  /* neck ring */
+  g.fillStyle='#6e4c1a';g.fillRect(cx-W2*0.045,hy0+hr*0.8,W2*0.09,H2*0.030);
+  const helm=g.createRadialGradient(hx0-hr*0.4,hy0-hr*0.5,2,hx0,hy0,hr*1.25);
+  helm.addColorStop(0,'#fff2cf');helm.addColorStop(0.5,'#dca84e');helm.addColorStop(1,'#7c541e');
+  g.fillStyle=helm;g.beginPath();g.arc(hx0,hy0,hr,0,7);g.fill();
+  const vis=g.createRadialGradient(hx0-hr*0.3,hy0-hr*0.25,2,hx0,hy0,hr*0.86);
+  vis.addColorStop(0,'#cfe0ff');vis.addColorStop(0.5,'#4a5cb8');vis.addColorStop(1,'#161038');
+  g.fillStyle=vis;g.beginPath();g.arc(hx0,hy0+hr*0.06,hr*0.74,0,7);g.fill();
+  g.fillStyle='rgba(255,255,255,0.5)';
+  g.beginPath();g.ellipse(hx0-hr*0.30,hy0-hr*0.18,hr*0.22,hr*0.30,-0.5,0,7);g.fill();
+  for(let i=0;i<5;i++){ g.fillStyle='rgba(235,244,255,'+(0.4+r()*0.4).toFixed(2)+')';
+    g.fillRect(hx0-hr*0.5+r()*hr, hy0-hr*0.3+r()*hr*0.8, 1.1, 1.1); }
+  /* rim light: one warm stroke down the lit side, one cool kiss opposite */
+  g.save();g.globalCompositeOperation='lighter';
+  g.strokeStyle='rgba(255,220,150,0.55)';g.lineWidth=2.2;
+  g.beginPath();g.arc(hx0,hy0,hr,Math.PI*1.05,Math.PI*1.75);g.stroke();
+  g.strokeStyle='rgba(255,214,140,0.30)';g.lineWidth=2.6;
+  g.beginPath();
+  g.moveTo(cx-W2*0.150,shY+H2*0.020);
+  g.quadraticCurveTo(cx-W2*0.170,H2*0.42,cx-W2*0.125,waY);
+  g.moveTo(cx-W2*0.104,hipY+H2*0.01);g.lineTo(cx-W2*0.100,ankY);
+  g.stroke();
+  g.strokeStyle='rgba(140,170,255,0.20)';g.lineWidth=2;
+  g.beginPath();
+  g.moveTo(cx+W2*0.150,shY+H2*0.020);
+  g.quadraticCurveTo(cx+W2*0.170,H2*0.42,cx+W2*0.125,waY);
+  g.stroke();
+  g.restore();
+  /* painterly wear: faint tonal strokes over the metal, never flat */
+  for(let i=0;i<40;i++){
+    const wx=cx+(r()-0.5)*W2*0.34, wy=shY+r()*(ankY-shY);
+    g.fillStyle='rgba('+(r()<0.5?'255,240,205':'30,20,8')+','+(0.03+r()*0.05).toFixed(3)+')';
+    g.fillRect(wx, wy, 2+r()*8, 1.1);
+  }
+  /* floor fade */
+  const fg=g.createLinearGradient(0,H2*0.86,0,H2);
+  fg.addColorStop(0,'rgba(4,5,11,0)');fg.addColorStop(1,'rgba(4,5,11,0.6)');
+  g.fillStyle=fg;g.fillRect(0,H2*0.86,W2,H2*0.14);
+  _dollURL=cv.toDataURL();
+  return _dollURL;
+}
+/* where each socket pins to the figure (fractions of the doll canvas).
+   The Module docks beside the figure on the pad — its anchor is the
+   Shipyard thumbnail, not the body. */
+const DOLL_ANCHORS={
+  helmet:  [0.500,0.148],
+  ears:    [0.665,0.190],
+  necklace:[0.500,0.272],
+  suit:    [0.500,0.395],
+  gloves:  [0.258,0.560],
+  tool:    [0.742,0.560],
+  legs:    [0.500,0.665],
+  boots:   [0.500,0.868],
+  module:  [0.858,0.820],
+};
 const PLAYER_SEED=0x50A1E5;   /* a stable seed so duels against you are deterministic */
 function playerBattleStats(){
   const p=pstats, total=p.vit+p.fer+p.res+p.agi+p.ins;
@@ -11670,9 +11616,9 @@ function runDuel(mine, theirs){
   const winner = (hpA<=0&&hpB<=0)?null : hpA<=0?'B' : hpB<=0?'A' : (hpA/maxA>=hpB/maxB?'A':'B');
   return {A, B, log, winner, hpA, hpB, maxA, maxB};
 }
-return Object.freeze({abilityOf, battleStats, STAT_NAMES, STAT_HUES, runDuel, decodeCreature, encodeCreature, playerCombatant, playerAvatar, statBlockHTML, _statOpen, abilityTheme, normGenome, PLAYER_SEED, levelOf});
+return Object.freeze({abilityOf, battleStats, STAT_NAMES, STAT_HUES, runDuel, decodeCreature, encodeCreature, playerCombatant, playerAvatar, paperdollAvatar, DOLL_ANCHORS, statBlockHTML, _statOpen, abilityTheme, normGenome, PLAYER_SEED, levelOf});
 })();
-const {abilityOf, battleStats, STAT_NAMES, STAT_HUES, runDuel, decodeCreature, encodeCreature, playerCombatant, playerAvatar, statBlockHTML, _statOpen, abilityTheme, normGenome, PLAYER_SEED, levelOf}=CombatCore;
+const {abilityOf, battleStats, STAT_NAMES, STAT_HUES, runDuel, decodeCreature, encodeCreature, playerCombatant, playerAvatar, paperdollAvatar, DOLL_ANCHORS, statBlockHTML, _statOpen, abilityTheme, normGenome, PLAYER_SEED, levelOf}=CombatCore;
 /* @end CombatCore */
 /* ----------------------------------------------------------------
    @section duel-ui [app] — duel UI — code loader, side cards & fight flow (CFB- codes)
@@ -12492,7 +12438,7 @@ const GUIDE=[
  {id:'codes', t:'Share codes (CF1 / CFB)', k:'share code link friend cf1 cfb copy multiplayer social', body:
   '<p>There is no server — the universe is mathematics, identical on every device. A share code is just an address into that shared math:</p><ul><li><b>⇪ Share this discovery</b> on a survey card copies a <b>CF1-</b> code/link. Anyone who opens it lands on the exact same world, with your name for it attached.</li><li><b>⇪ Code</b> on a creature card copies a <b>CFB-</b> code carrying the full genome — the identical creature, stats and all, appears on your friend’s device for a duel.</li></ul><p>Codes are sanitized on arrival; a tampered code can’t hurt your save.</p>'},
  {id:'charters', t:'Expedition Charters', k:'charter charters hunt board weekly goals task starter reward stardust', body:
-  '<p>The <b>Charters</b> board (left rail) always has work for an explorer. Fresh expeditions receive five <b>starter charters</b> — one for each trade, in the order they chain: make planetfall, prospect a dead world, discover life, name a Field Scout, conquer a world. Each pays <b>☄ Stardust</b> the moment it completes — and trades you&#8217;ve already proven are quietly marked complete.</p><p>Once the trades are learned, the board turns weekly: three charters a week, identical for every explorer in the universe — deterministic, like everything else out here. Compare boards with a friend; they match.</p>'},
+  '<p>The <b>Charters</b> board (top right — it earned the prime slot) always has work for an explorer. Fresh expeditions receive five <b>starter charters</b> — one for each trade, in the order they chain: make planetfall, prospect a dead world, discover life, name a Field Scout, conquer a world. Each pays <b>☄ Stardust</b> the moment it completes — and trades you&#8217;ve already proven are quietly marked complete.</p><p>Once the trades are learned, the board turns weekly: three charters a week, identical for every explorer in the universe — deterministic, like everything else out here. Compare boards with a friend; they match.</p>'},
  {id:'beacon', t:'Traveler’s Beacon', k:'beacon daily random destination five minutes', body:
   '<p>The <b>Traveler’s Beacon</b> (left rail) offers a fresh destination every <b>5 minutes</b> — always somewhere <b>inside your charter</b>: it walks Sol while Sol is your world, the Neighborhood once you can jump, the whole galaxy once the Array is up, and the wider cosmos beyond the Rim. Picked deterministically, so every explorer on your ring is pointed at the same place at the same moment. An easy way to see something new when the infinite feels too big.</p>'},
  {id:'atlas', t:'The Star Atlas', k:'atlas bookmark favorite home save place travel star log', body:
@@ -12554,17 +12500,17 @@ const GUIDE=[
  {id:'harvest', t:'Harvesting', k:'harvest hourly cooldown settled world replenish stardust', body:
   '<p>Every settled world can be harvested for Stardust once per hour (rarer worlds yield more). The button lives on the world’s survey card — “Settled — replenishing” means come back later. An empire of settled worlds is a steady Stardust income; visit your conquests.</p>'},
  {id:'mining', t:'Mining & the Cargo hold', k:'mine mining elements minerals deposits cargo hold dead lifeless world vein iron gold prismatium samples field landing inventory icons', body:
-  '<p>Dead worlds carry the elements. Every lifeless planet has a deterministic mineral profile by type — iron and titanium in rock, ices and helium-3 on frozen worlds, hydrogen in the gas giants, precious metals in metal worlds — and rarer worlds hide richer veins, up to exotics like Voidglass and Prismatium.</p><ul><li><b>Landing pays.</b> Your first footfall on any world (home aside) collects <b>field samples</b> — a pinch of up to two of its elements and a few ☄ Stardust, richer on rarer worlds. Exploration stocks the hold all by itself.</li><li>Prospecting takes boots on the ground: press a lifeless world&#8217;s <b>Land</b> button, or dive in and confirm the descent — planetfall is a <b>ground survey</b>, and the Mine Deposits button opens with it. (Gas giants, hothouses and molten worlds will fight the landing — see <span data-gt="landing">Landing</span>.) (🛰 Deep Scanners read the veins from orbit, but the drills still need a surface under them.)</li><li><b>Mining is a pull, not a timer.</b> Every press of ⛏ Mine takes a varying haul from the world&#8217;s veins — sometimes a <b>rich strike</b> hits a rare pocket. <b>Reserves are finite:</b> the card counts the pulls left, and a world mined to nothing stays mined out forever (there are always more worlds). Crafted mining rigs multiply every haul, and the Auto-Extractor keeps pulling while you&#8217;re away — collect on your next visit.</li><li>Everything lands in your <b>🧰 Cargo hold</b> (right rail — it appears with your first cargo). Its <b>Inventory</b> tab is a grid of item tiles — ingots for metals, shards for ices, flasks for gases, cut gems for the exotics — and the <b>Research Bench</b> tab spends them, with the same icons in every recipe — see <span data-gt="research">Research &amp; ships</span>.</li></ul>'},
+  '<p>Dead worlds carry the elements. Every lifeless planet has a deterministic mineral profile by type — iron and titanium in rock, ices and helium-3 on frozen worlds, hydrogen in the gas giants, precious metals in metal worlds — and rarer worlds hide richer veins, up to exotics like Voidglass and Prismatium.</p><ul><li><b>Landing pays.</b> Your first footfall on any world (home aside) collects <b>field samples</b> — a pinch of up to two of its elements and a few ☄ Stardust, richer on rarer worlds. Exploration stocks the hold all by itself.</li><li>Prospecting takes boots on the ground: press a lifeless world&#8217;s <b>Land</b> button, or dive in and confirm the descent — planetfall is a <b>ground survey</b>, and the Mine Deposits button opens with it. (Gas giants, hothouses and molten worlds will fight the landing — see <span data-gt="landing">Landing</span>.) (🛰 Deep Scanners read the veins from orbit, but the drills still need a surface under them.)</li><li><b>Mining is a pull, not a timer.</b> Every press of ⛏ Mine takes a varying haul from the world&#8217;s veins — sometimes a <b>rich strike</b> hits a rare pocket. <b>Reserves are finite:</b> the card counts the pulls left, and a world mined to nothing stays mined out forever (there are always more worlds). Crafted mining rigs multiply every haul, and the Auto-Extractor keeps pulling while you&#8217;re away — collect on your next visit.</li><li>Everything lands in your <b>🧰 Cargo hold</b> — it lives on your <b>character screen</b> now, beneath the paperdoll (tap your nameplate, or the 🧰 shortcut that appears with your first cargo). Its <b>Inventory</b> tab is a grid of item tiles — ingots for metals, shards for ices, flasks for gases, cut gems for the exotics — and the <b>Research Bench</b> tab spends them, with the same icons in every recipe — see <span data-gt="research">Research &amp; ships</span>.</li></ul>'},
  {id:'research', t:'Research & ships', k:'research tech technology bench drive ship hull scanner lab fusion antimatter warp travel distance', body:
   '<p>The engineer’s track, parallel to the Prime Codex: the Prime Codex is your legend, the Research Bench is your capability. Research costs mined elements + ☄ Stardust:</p><ul><li><b>🛰 Deep Scanners</b> — survey cards reveal mineral veins from orbit.</li><li><b>🛡 Reinforced Hull</b> — hostile bioscans wound you 25% lighter.</li><li><b>🧪 Xenobotany Lab</b> — flora meals nourish one extra stat point.</li><li><b>The drive ladder</b> — 🚀 Fusion → ⚛ Antimatter → 🌀 Warp Fold. Hyperlane travel scales with real distance; each drive cuts it, and Warp Fold makes every jump arrive in a breath. Distance is never a wall — only a wait, and only ever a short one.</li></ul>'},
  {id:'crafting', t:'The Fabricator & gear', k:'craft crafting fabricator recipe parts components ship systems gear equipment suit tool module instrument charm slot equip mining rig auto extractor anchor', body:
-  '<p>The <b>🧰 Fabricator</b> (Cargo hold, middle tab) turns ore into capability, three rungs up: <b>T1 basic parts</b> (plates, wire, chips, weave) → <b>T2 components</b> (drive coils, nav cores, hull segments) → <b>T3 ship systems</b> and <b>explorer gear</b>. Recipes are fixed and identical for every explorer; nothing waits on a timer.</p><ul><li><b>Ship systems build once and stay built:</b> the ⚡ Jump Drive, 📡 Long-Range Array and 🌌 Intergalactic Drive open the travel rings (see <span data-gt="ascent">The Ascent</span>); the 🤖 Auto-Extractor keeps mining every world you&#8217;ve worked while you&#8217;re away.</li><li><b>Gear equips on YOU.</b> Your character sheet (tap your nameplate) grew nine sockets — Helmet, Earpiece, Necklace, Suit, Gloves, Leggings, Boots, Tool and ship Module. Mining rigs and gloves multiply hauls; suits, visors and leggings blunt field wounds (the T3 hazard suits open molten, crushing and frozen worlds to nearly-sure landings); boots, greaves and the module ladder steady landings up to the Gravitic Anchor, which never waves off; earpieces and necklaces sharpen first contact, rich strikes, meals and travel.</li><li><b>Risk is the frontier — gear is how you tame it.</b> Every roll in the game (landing, contact, bioscan) has a crafted answer.</li></ul>'},
+  '<p>The <b>🧰 Fabricator</b> (character screen → Cargo, middle tab) turns ore into capability, three rungs up: <b>T1 basic parts</b> (plates, wire, chips, weave) → <b>T2 components</b> (drive coils, nav cores, hull segments) → <b>T3 ship systems</b> and <b>explorer gear</b>. Recipes are fixed and identical for every explorer; nothing waits on a timer.</p><ul><li><b>Ship systems build once and stay built:</b> the ⚡ Jump Drive, 📡 Long-Range Array and 🌌 Intergalactic Drive open the travel rings (see <span data-gt="ascent">The Ascent</span>); the 🤖 Auto-Extractor keeps mining every world you&#8217;ve worked while you&#8217;re away.</li><li><b>Gear equips on YOU.</b> Your character screen (tap your nameplate) shows your explorer head to boots, with nine sockets pinned to the body — Helmet at the head, Earpiece at the ear, Necklace below the chin, Suit on the chest, Gloves and Tool at the hands, Leggings, Boots, and the ship Module docked beside the figure. Mining rigs and gloves multiply hauls; suits, visors and leggings blunt field wounds (the T3 hazard suits open molten, crushing and frozen worlds to nearly-sure landings); boots, greaves and the module ladder steady landings up to the Gravitic Anchor, which never waves off; earpieces and necklaces sharpen first contact, rich strikes, meals and travel.</li><li><b>Risk is the frontier — gear is how you tame it.</b> Every roll in the game (landing, contact, bioscan) has a crafted answer.</li></ul>'},
  {id:'ascent', t:'The Ascent', k:'ascent chapter chapters sol lock jump drive ring ladder progression mainline quest unlock neighborhood galaxy intergalactic', body:
-  '<p><b>⬆ The Ascent</b> is the mainline: three chapters, pinned at the top of your Charters board, that carry a new explorer from one rock to the whole sky. The rings, in order:</p><ul><li><b>Sol.</b> New expeditions start locked to the home system — the entire sky stays visible and surveyable (looking is always free; moving is what you earn). Mine Sol&#8217;s dead worlds and build the <b>⚡ Jump Drive</b>.</li><li><b>The Neighborhood.</b> The nearby stars open. Hunt life, settle a world, and build the <b>📡 Long-Range Array</b> for the whole galaxy.</li><li><b>Beyond the Rim.</b> Master the trades and build the <b>🌌 Intergalactic Drive</b> — from there the Prime Codex Signatures extend your reach, ring by ring, exactly as they always have.</li></ul><p><b>The spectrum expands with the rings.</b> Rarity is a ladder of distance: the Neighborhood catalogues up to <b>Legendary</b>, the home galaxy up to <b>Mythic</b>, and each region beyond opens one more band — Celestial, Primordial, Transcendent — until the Deep Field frees the <b>summit grades</b>. The strangest finds live farthest out; guardians, Paragons and your own bred bloodlines are beyond the law. Veteran expeditions from before v1.4 already hold the sky — the Ascent never re-locks anything you had, and no creature you already catalogued ever downgrades.</p>'},
+  '<p><b>⬆ The Ascent</b> is the mainline: three chapters, pinned at the top of your Charters board, that carry a new explorer from one rock to the whole sky. The rings, in order:</p><ul><li><b>Sol.</b> New expeditions start locked to the home system — the entire sky stays visible and surveyable (looking is always free; moving is what you earn). Mine Sol&#8217;s dead worlds and build the <b>⚡ Jump Drive</b>.</li><li><b>The Neighborhood.</b> The nearby stars open. Hunt life, settle a world, and build the <b>📡 Long-Range Array</b> for the whole galaxy.</li><li><b>Beyond the Rim.</b> Master the trades and build the <b>🌌 Intergalactic Drive</b> — from there the Prime Codex Signatures extend your reach, ring by ring, exactly as they always have.</li></ul><p><b>The spectrum expands with the rings.</b> Rarity is a ladder of distance: the Neighborhood catalogues up to <b>Legendary</b>, the home galaxy up to <b>Mythic</b>, and each region beyond opens one more band — Celestial, Primordial, Transcendent — until the Deep Field frees the <b>summit grades</b>. The strangest finds live farthest out; guardians, Paragons and your own bred bloodlines are beyond the law.</p>'},
 ]},
 {icon:'✦', cat:'The Prime Codex', blurb:'Signatures, the frontier, endings', topics:[
- {id:'signatures', t:'The nine Signatures', k:'signature prime codex stone ocean flame sky life mind prism star void win', body:
-  '<p>The Pathfinders died one discovery short of completing their master survey. Nine legendary <b>Signatures</b> remain — claim all nine to reach the Celestial Frontier. Seven are claimed by <b>conquering</b> a worthy world; two by <b>finding</b> a worthy object:</p><ul><li><b>Stone</b> — a rare rocky, metal or mineral world (conquer)</li><li><b>Ocean</b> — a living ocean world (conquer)</li><li><b>Flame</b> — an extreme volcanic world (conquer)</li><li><b>Sky</b> — an aerial or gas-giant ecosystem (conquer)</li><li><b>Life</b> — a complex land biosphere (conquer)</li><li><b>Mind</b> — a world with a sapient native (conquer)</li><li><b>Prism</b> — a unique prismatic lifeform’s world (conquer)</li><li><b>Star</b> — an extreme star or stellar remnant (find)</li><li><b>Void</b> — a black hole or galactic anomaly (find)</li></ul><p>Track them with the gold <b>✦ Prime Codex</b> button. Species-borne Signatures require their world to be conquered first.</p>'},
+ {id:'signatures', t:'The Pathfinders’ Trail (nine Signatures)', k:'signature prime codex trail beacon relic blueprint stone ocean flame sky life mind prism star void win endgame', body:
+  '<p><b>The Trail is the endgame</b> — it begins where the Ascent ends, beyond the Rim. The Pathfinders died one discovery short of completing their master survey; their nine lost beacons mark nine legendary <b>Signatures</b>. Claim all nine to reach the Celestial Frontier. Seven are claimed by <b>conquering</b> a worthy world; two by <b>finding</b> a worthy object:</p><ul><li><b>Stone</b> — a rare rocky, metal or mineral world (conquer)</li><li><b>Ocean</b> — a living ocean world (conquer)</li><li><b>Flame</b> — an extreme volcanic world (conquer)</li><li><b>Sky</b> — an aerial or gas-giant ecosystem (conquer)</li><li><b>Life</b> — a complex land biosphere (conquer)</li><li><b>Mind</b> — a world with a sapient native (conquer)</li><li><b>Prism</b> — a unique prismatic lifeform’s world (conquer)</li><li><b>Star</b> — an extreme star or stellar remnant (find)</li><li><b>Void</b> — a black hole or galactic anomaly (find)</li></ul><p><b>Every claim recovers a relic blueprint</b> — nine unique, signature-tier pieces of gear (one per socket) that only the Fabricator of a Signature-holder can forge. The Codex panel (✦, left rail) tells each beacon’s story, names how far its trail reaches, and marks the blueprints you hold. Species-borne Signatures require their world to be conquered first — and the deepest trails (Mind, Prism) only complete far out in the rings.</p>'},
  {id:'regions', t:'Frontier regions', k:'region reach frontier expand charter solar local cluster near deep outer dark travel gate', body:
   '<p>You begin charted for the <b>Solar Reach</b>. Each Signature claimed pushes your charter outward — <em>the Local Cluster, the Near Field, the Deep Field, the Outer Dark</em>, and finally <em>the Frontier</em>. Travel beyond your charter is blocked until you’ve earned it, and farther regions field tougher apex defenders with stranger life.</p>'},
  {id:'endings', t:'Endings & the Celestial Frontier', k:'ending win frontier legacy prismatic complete game finish', body:
@@ -12582,7 +12528,12 @@ const GUIDE=[
  {id:'saving', t:'Your save & reset', k:'save localstorage reset erase wipe browser device local', body:
   '<p>Your expedition saves automatically to this browser on this device — no account, no cloud. Clearing site data clears the expedition, so export your best creatures as CFB codes if you’re attached. <b>↺ Reset Game</b> in Settings erases everything after a confirm — the universe itself is unharmed; it’s math.</p>'},
 ]}];
-function _guideTopic(id){ for(const c of GUIDE) for(const t of c.topics) if(t.id===id) return {c,t}; return null; }
+/* v1.5: Cosmic Events + the Traveler's Beacon are HIDDEN for rework —
+   buttons off, panels off, engines dormant. The Guide must not advertise
+   what the player can't reach, so their topics vanish with them. */
+const DORMANT_TOPICS=new Set(['beacon','events']);
+function _liveTopics(c){ return c.topics.filter(t=>!DORMANT_TOPICS.has(t.id)); }
+function _guideTopic(id){ if(DORMANT_TOPICS.has(id)) return null; for(const c of GUIDE) for(const t of c.topics) if(t.id===id) return {c,t}; return null; }
 function _guideMenu(){
   const body=document.getElementById('guidebody'); if(!body) return;
   body.innerHTML=GUIDE.map((c,i)=>
@@ -12594,13 +12545,13 @@ function _guideMenu(){
 function _guideCat(i){
   const body=document.getElementById('guidebody'); const c=GUIDE[i]; if(!body||!c) return;
   body.innerHTML='<div class="gback" data-gb="menu" role="button" tabindex="0">‹ All topics</div>'+
-    c.topics.map(t=>'<div class="gitem" data-gt="'+t.id+'" role="button" tabindex="0"><span>'+c.icon+'</span> '+t.t+'<span class="gn">›</span></div>').join('');
+    _liveTopics(c).map(t=>'<div class="gitem" data-gt="'+t.id+'" role="button" tabindex="0"><span>'+c.icon+'</span> '+t.t+'<span class="gn">›</span></div>').join('');
   body.scrollTop=0;
   refocus(body, '.gback');
 }
 function _guideShow(id){
   const body=document.getElementById('guidebody'); const hit=_guideTopic(id); if(!body||!hit) return;
-  const others=hit.c.topics.filter(t=>t.id!==id).slice(0,4);
+  const others=_liveTopics(hit.c).filter(t=>t.id!==id).slice(0,4);
   body.innerHTML='<div class="gback" data-gb="'+GUIDE.indexOf(hit.c)+'" role="button" tabindex="0">‹ '+hit.c.cat+'</div>'+
     '<div class="gtopic"><h4>'+hit.c.icon+' '+hit.t.t+'</h4>'+hit.t.body+
     (others.length?'<div class="gsee">In '+hit.c.cat+': '+others.map(t=>'<span data-gt="'+t.id+'" role="button" tabindex="0">'+t.t+'</span>').join(' · ')+'</div>':'')+
@@ -12613,7 +12564,7 @@ function _guideSearch(q){
   q=q.trim().toLowerCase();
   if(q.length<2){ _guideMenu(); return; }
   const hits=[];
-  for(const c of GUIDE) for(const t of c.topics){
+  for(const c of GUIDE) for(const t of _liveTopics(c)){
     const hay=(t.t+' '+t.k+' '+t.body.replace(/<[^>]*>/g,' ')).toLowerCase();
     if(hay.includes(q)) hits.push({c,t, rank:(t.t.toLowerCase().includes(q)?0:(t.k.includes(q)?1:2))});
   }
@@ -12792,10 +12743,30 @@ document.addEventListener('focusout', ()=>{ if(_tipFor) hideTip(); });
    @section release-notes [app] — versioned release notes, update popup + history
    Owns: GAME_VERSION, RELEASES, _rnSeen, openReleaseNotes
    ---------------------------------------------------------------- */
-const GAME_VERSION='1.4';
-const BUILD_ID='86f1b9f';   /* replaced with the git sha at deploy time */
+const GAME_VERSION='1.5';
+const BUILD_ID='0d86e32';   /* replaced with the git sha at deploy time */
 /* newest first; categories appear in the order listed */
 const RELEASES=[
+{v:'1.5', title:'Fresh Start', date:'July 2026', sections:[
+ ['✨ New Features & Systems', [
+  '🌅 A FRESH START FOR EVERYBODY — v1.5 begins the frontier anew: every expedition, veteran and newcomer alike, starts from the same first morning in Sol. Nothing is grandfathered, nothing is carried — the Ascent is now every explorer&#8217;s canon opening. Your old expedition is honored on its way out: a farewell card sends it off, rarest find and all. The universe itself is untouched — same seeds, same worlds, same share codes; only the record starts over.',
+  '🧍 THE CHARACTER SCREEN — one centered home for the whole explorer, Diablo-style: your full-length painterly explorer stands center with all nine gear sockets pinned to the body (Helmet at the head, Earpiece at the ear, Necklace below the chin, Suit on the chest, Gloves and Tool at the hands, Leggings, Boots — and the ship Module docked beside the figure). Stats fill the left column; your whole Cargo hold, Fabricator and Research Bench ride underneath. The 🧰 button is a shortcut straight to the inventory. On phones it stacks: paperdoll first, stats, then the hold.',
+  '✦ THE PATHFINDERS&#8217; TRAIL — the Prime Codex is the endgame arc now, beginning where the Ascent ends. Each Signature tells one lost beacon&#8217;s story, names how far its trail reaches, and its claim recovers a RELIC BLUEPRINT: nine unique signature-tier pieces of gear, one per socket, that only a Signature-holder&#8217;s Fabricator can forge. Walk the whole Trail and the Legacy — a prestige layer — is coming in a future update.',
+  '🧭 QUEST NOTIFICATIONS — the frontier now names your next step: a gentle nudge on login and when the session goes quiet points at your current chapter goal or charter. Never twice for the same goal, never over another conversation, and the 🔔 tray remembers.'],
+ ],
+ ['🖱 UI Enhancements', [
+  '⚔ CHARTERS TAKE THE PRIME SLOT — the hunt board and the Ascent are the daily drive now, so they wear the gold pill top right where the Prime Codex used to sit; the Codex (endgame) moved to the left rail.',
+  '🐾 SPECIMEN CARDS CONDENSED — the world-card pattern comes to creatures: identity and battle stats up top, the field-notes wall folded behind a remembered expand group with a one-line digest. Extremophile finds keep their ⟁ headline — a discovery story never hides. Compendium shelf rows clamp to a glance; the card holds the prose.',
+  '🌙 QUIET SKIES FOR NOW — Cosmic Events and the Traveler&#8217;s Beacon are tucked away while they&#8217;re reworked into something worthier; their achievements shelve with them. They&#8217;ll return.'],
+ ],
+ ['⚖ Balancing', [
+  '🛡 LEVELS YOU CAN ACTUALLY REACH — a 240-session synthetic panel found the class system was fiction past level 1: only 3% of sessions ever woke the second innate art, and nobody reached the third. Level thresholds are now half as steep: level 3 lands around seven victories, level 6 is a real multi-session arc, and level 9 is the long chase. XP awards are unchanged — duels +8, conquests +20, guardians +60, exactly as the card says.'],
+ ],
+ ['🐛 Bug Fixes', [
+  'The notification tray no longer sits over the search box during Field Training — every lesson closes the panels the next lesson doesn&#8217;t need.',
+  'Groundfall and Trailblazer count again — the worlds-landed-on tally froze in v1.3.8 when landings stopped leaving space; it now ticks with the landing rite itself.'],
+ ],
+]},
 {v:'1.4', title:'The Ascent', date:'July 2026', sections:[
  ['✨ New Features & Systems', [
   '⬆ THE ASCENT — a mainline of three chapters, pinned atop the Charters board. New expeditions start locked to Sol and mine → craft → build their way to the stars: the ⚡ Jump Drive opens the Neighborhood, the 📡 Long-Range Array opens the whole galaxy, the 🌌 Intergalactic Drive opens the dark between. The whole sky stays visible from day one — looking is free, moving is earned. Veteran saves already hold everything and lose nothing.',
@@ -13369,7 +13340,7 @@ function biomeVeinFor(seed){
     return (b && BIOME_VEIN[b.k])||null;
   }catch(_){ return null; }
 }
-const mined=new Map();         /* pseed → last mine ms (auto-extractor anchor + veteran grandfather) */
+const mined=new Map();         /* pseed → last mine ms (auto-extractor accrual anchor) */
 const mineX=new Map();         /* pseed → extractions taken so far (save field mx) */
 const cargo=new Map();         /* element symbol → qty */
 /* ---- v1.4 THE ASCENT: mining is a CLICK, not a timer (Nick: "I don't
@@ -13638,14 +13609,16 @@ function renderCargo(){
   if(cargoView==='fab'){
     /* the FABRICATOR: recipes grouped by rung — Basic Parts → Components →
        Ship Systems → Gear. Costs light green when you hold them. */
-    const GROUPS=[['part','Basic Parts — T1'],['comp','Components — T2'],['sys','Ship Systems — T3'],['gear','Explorer Gear']];
+    const GROUPS=[['part','Basic Parts — T1'],['comp','Components — T2'],['sys','Ship Systems — T3'],['gear','Explorer Gear'],['relic','Signature Relics — the Pathfinders’ legacy']];
     for(const [cat,label] of GROUPS){
       html+='<div class="chead" style="margin-top:8px">'+label+'</div>';
+      if(cat==='relic') html+='<div class="ambient" style="font-size:10px;color:var(--faint);font-style:italic;margin:0 6px 6px">Nine blueprints, one per claimed Prime Codex Signature — recovered from the order&#8217;s lost beacons.</div>';
       for(const it of ITEMS){
         if(it.cat!==cat) continue;
         const own=itemCount(it.id);
         const built=it.cat==='sys' && own>0;
-        const gatedBy=it.req && itemCount(it.req)<1 ? (ITEM_BY.get(it.req)||{}).name : null;
+        const sigLock=it.sig && !primeFill[it.sig] ? (SIGS.find(s2=>s2.id===it.sig)||{}).name : null;
+        const gatedBy=sigLock ? null : (it.req && itemCount(it.req)<1 ? (ITEM_BY.get(it.req)||{}).name : null);
         const can=_canCraft(it) && !built;
         const bits=[];
         /* the grail exotics name their source biome — the ladder is only
@@ -13664,7 +13637,7 @@ function renderCargo(){
         html+='<div class="bset'+(built?' done':'')+'"><span><img class="ci big" src="'+partIcon(it.id)+'" alt=""> <b>'+it.name+'</b>'+
           (it.slot?' <span class="gslot">'+(EQ_SLOTS.find(s=>s.id===it.slot)||{}).ic+' '+it.slot+'</span>':'')+
           (own&&it.cat!=='sys'?' <span style="color:#7fe6a0">×'+own+'</span>':'')+' — '+it.d+
-          (built?'':'<br><span class="bcnt">'+(gatedBy?'requires '+gatedBy:bits.join(' + '))+'</span>')+'</span>'+
+          (built?'':'<br><span class="bcnt">'+(sigLock?'🔒 the blueprint waits on the '+sigLock+' (Prime Codex)':(gatedBy?'requires '+gatedBy:bits.join(' + ')))+'</span>')+'</span>'+
           (built?'<span class="bclaimed">online ✓</span>'
                 :(can?'<button class="bclaim" data-craft="'+it.id+'" type="button">Craft</button>':''))+
           '</div>';
@@ -13692,10 +13665,10 @@ function renderCargo(){
   cargoEl.innerHTML=html;
 }
 if(cargoBtn){
+  /* v1.5: the 🧰 button is a shortcut into the character screen, landed
+     on its inventory (the cargo panel folded into the sheet) */
   cargoBtn.addEventListener('click', ()=>{
-    cargoOpen=!cargoOpen;
-    cargoEl.style.display=cargoOpen?'block':'none';
-    if(cargoOpen){ closePanels('cargo'); renderCargo(); }
+    if(sheetOpen) closeSheet(); else openSheet('inv');
   });
 }
 if(cargoEl){
@@ -13789,6 +13762,19 @@ const ITEMS=[
  /* ---- GEAR: BOOTS slot ---- */
  {id:'magboots', cat:'gear', slot:'boots', tier:1, fam:'boot', hue:'#aab2c2', name:'Mag-Boots',      d:'The ground holds you the moment you touch it — landings land', cost:{}, parts:{plate:1,weave:1}, eff:{land:5}},
  {id:'gravboots',cat:'gear', slot:'boots', tier:3, fam:'boot', hue:'#3fe8c8', name:'Graviton Boots', d:'Woven around geode-world neodymium — the fall never wins', cost:{Nd:1}, parts:{coil:1,weave:1}, req:'magboots', eff:{land:10,struts:1}},
+ /* ---- v1.5 SIGNATURE RELICS (the Pathfinders' Trail): one blueprint per
+    claimed Signature — endgame-tier gear recovered from the lost beacons.
+    `sig` gates the recipe on primeFill; one relic per socket, nine in all.
+    Effects stay inside the wired keys — POWER IS DECOUPLED FROM RARITY. */
+ {id:'rl-stone', cat:'relic', sig:'stone', slot:'suit',     tier:3, fam:'suit',  hue:'#c9a878', name:'Graven Aegis',        d:'Beacon I&#8217;s hull plating, re-forged — the ground itself argues on your side', cost:{Fe:8,W:4,Nd:1}, parts:{hullseg:1}, eff:{scut:0.25}},
+ {id:'rl-ocean', cat:'relic', sig:'ocean', slot:'boots',    tier:3, fam:'boot',  hue:'#4fc8e8', name:'Tidewalker Boots',    d:'Beacon II&#8217;s keeper walked out under the sea and never slipped once',        cost:{H2O:8,Ti:4},     parts:{weave:1,servo:1}, eff:{land:6,struts:1}},
+ {id:'rl-flame', cat:'relic', sig:'flame', slot:'gloves',   tier:3, fam:'glove', hue:'#ff7a4a', name:'Emberforged Gauntlets', d:'Pulled glowing from Beacon III&#8217;s wreck — they remember the heat of the strike', cost:{S:6,Fe:6,Pz:1},  parts:{servo:1}, eff:{yield:0.2,strike:0.08}},
+ {id:'rl-sky',   cat:'relic', sig:'sky',   slot:'module',   tier:3, fam:'drive', hue:'#8fd6ff', name:'Skysail Module',      d:'Beacon IV&#8217;s storm-rig — it reads every deck and rides the fastest lane',    cost:{H:8,He3:2},      parts:{coil:1,navcore:1}, eff:{speed:1,land:4}},
+ {id:'rl-life',  cat:'relic', sig:'life',  slot:'necklace', tier:3, fam:'charm', hue:'#7fe6a0', name:'Verdant Locket',      d:'A seed from Beacon V&#8217;s canopy, still green — meals mend far past their measure', cost:{O:6,H2O:6},     parts:{cryogel:1}, eff:{heal:0.3}},
+ {id:'rl-mind',  cat:'relic', sig:'mind',  slot:'ears',     tier:3, fam:'chip',  hue:'#c79fff', name:'Mindreader Coil',     d:'Tuned to the voice that answered Beacon VI — first contact hears you coming',    cost:{Si:8,Ir:2}, parts:{chip:1,wire:1}, eff:{contact:12}},
+ {id:'rl-star',  cat:'relic', sig:'star',  slot:'helmet',   tier:3, fam:'helm',  hue:'#ffd96a', name:'Starcrowned Helm',    d:'Beacon VII&#8217;s lens, set in gold — it finds the bright seam in anything',      cost:{Au:4,Pt:2},      parts:{lens:1}, eff:{strike:0.1,contact:4}},
+ {id:'rl-void',  cat:'relic', sig:'void',  slot:'legs',     tier:3, fam:'legs',  hue:'#9a8aff', name:'Voidwoven Leggings',  d:'Cut from what came back of Beacon VIII — half here, half elsewhere, all yours',  cost:{C:6,Ir:2},       parts:{weave:2}, eff:{scut:0.15,speed:1}},
+ {id:'rl-prism', cat:'relic', sig:'prism', slot:'tool',     tier:3, fam:'rig',   hue:'#ff7ae8', name:'Prismatic Lathe',     d:'Beacon IX&#8217;s last word, made a tool — it takes the color no one could name',  cost:{Vg:1,Pm:1,Pz:1}, parts:{coil:1,servo:1}, eff:{yield:0.35,strike:0.06}},
 ];
 const ITEM_BY=new Map(ITEMS.map(it=>[it.id, it]));
 /* the nine sockets (Nick's slot set, 2026-07-18): the ARPG body — head to
@@ -13845,6 +13831,7 @@ function _equipLandFam(type){
   return v;
 }
 function _canCraft(it){
+  if(it.sig && !primeFill[it.sig]) return false;    /* v1.5 relics: the Signature IS the blueprint */
   if(it.req && itemCount(it.req)<1) return false;   /* the ladder: own the rung below */
   if(it.sd && essence<it.sd) return false;
   for(const k in (it.cost||{})) if((cargo.get(k)||0)<it.cost[k]) return false;
@@ -13873,9 +13860,9 @@ function craftItem(id){
     cinematic({kicker:'🛠 Ship System Online', title:it.name, sub:it.unlock||it.d, hex:'#7fd0ff', tier:5});
   }
   gameEvent('crafted', {id:id, cat:it.cat, tier:it.tier});
-  if(it.cat==='sys'){ /* announced above */ } else if(it.cat==='gear'){
-    playRaritySting(4); fxBurst(FX_GOLD,20);
-    toast('🛠 Crafted — '+it.name, it.d+'. Equip it on your character sheet (tap your nameplate).');
+  if(it.cat==='sys'){ /* announced above */ } else if(it.cat==='gear'||it.cat==='relic'){
+    playRaritySting(it.cat==='relic'?6:4); fxBurst(FX_GOLD,it.cat==='relic'?40:20);
+    toast('🛠 '+(it.cat==='relic'?'Relic Forged':'Crafted')+' — '+it.name, it.d.replace(/&#8217;/g,'’')+'. Equip it on your character sheet (tap your nameplate).');
     /* an empty matching socket takes new gear immediately — no menu-diving
        for the common case; swapping later is the character sheet's job */
     if(it.slot && !equip[it.slot]) equipItem(it.slot, id, true);
@@ -13885,6 +13872,7 @@ function craftItem(id){
   }
   showCargoBtn(); if(cargoOpen) renderCargo();
   if(statsOpen) renderStats();
+  try{ if(sheetOpen) renderDoll(); }catch(_){ }   /* fresh gear may auto-equip into a socket */
   checkAch(); renderRank(); queueSave();
 }
 function equipItem(slot, id, quiet){
@@ -13896,7 +13884,7 @@ function equipItem(slot, id, quiet){
     const it=id?ITEM_BY.get(id):null;
     toast('🎽 '+(it?('Equipped — '+it.name):'Unequipped'), it?it.d:'The socket stands empty.');
   }
-  if(statsOpen) renderStats();
+  try{ if(sheetOpen) renderDoll(); }catch(_){ }
   checkAch(); queueSave();   /* Outfitted lands the moment gear is worn */
 }
 /* painterly part icons — the _hdElemIcon language extended to crafted
@@ -14280,16 +14268,31 @@ function shipImage(){
    @section prime [app] — Prime Codex — 9 Signatures, frontier regions & endings
    Owns: SIGS, SIG_IDS, primeFill, frontierUnlocked, frontierEnding, primeCount, REGIONS, currentRegion, reachRadius, withinReach, …
    ---------------------------------------------------------------- */
+/* v1.5 THE PATHFINDERS' TRAIL: the Codex is the ENDGAME arc that begins
+   where the Ascent ends. Each Signature is a chapter told through one of
+   the order's nine lost beacons (lore), it names how far its trail
+   reaches (the ring-spectrum synergy), and claiming it unlocks a unique
+   Fabricator BLUEPRINT \u2014 the signature relics. Claim mechanics, region
+   gating and endings are UNCHANGED; the Trail is how the arc reads. */
 const SIGS=[
-  {id:'stone', icon:'\ud83e\udea8', name:'Stone Signature', verb:'Conquer', hint:'a rare world of stone, metal or mineral \u2014 the Pathfinders\u2019 first vow'},
-  {id:'ocean', icon:'\ud83c\udf0a', name:'Ocean Signature', verb:'Conquer', hint:'a living ocean world \u2014 they called them \u201cthe breathing seas\u201d'},
-  {id:'flame', icon:'\ud83c\udf0b', name:'Flame Signature', verb:'Conquer', hint:'an extreme volcanic world, where their third beacon fell'},
-  {id:'sky',   icon:'\u2601\ufe0f', name:'Sky Signature',  verb:'Conquer', hint:'an aerial or gas-giant ecosystem \u2014 life with no ground at all'},
-  {id:'life',  icon:'\ud83c\udf3f', name:'Life Signature', verb:'Conquer', hint:'a complex land biosphere, the kind they crossed the dark to find'},
-  {id:'mind',  icon:'\ud83e\udde0', name:'Mind Signature', verb:'Conquer', hint:'an intelligent natural lifeform \u2014 hunt the signals, as they did'},
-  {id:'star',  icon:'\u2734\ufe0f', name:'Star Signature', verb:'Find', hint:'an extreme star or stellar remnant \u2014 the lights that outlived them'},
-  {id:'void',  icon:'\ud83d\udd73\ufe0f', name:'Void Signature', verb:'Find', hint:'a black hole, void or anomaly \u2014 what swallowed their last beacon'},
-  {id:'prism', icon:'\ud83d\udd2e', name:'Prism Signature', verb:'Conquer', hint:'a unique prismatic lifeform \u2014 the one discovery they died short of'},
+  {id:'stone', icon:'\ud83e\udea8', name:'Stone Signature', verb:'Conquer', hint:'a rare world of stone, metal or mineral \u2014 the Pathfinders\u2019 first vow',
+    lore:'Beacon I fell silent on a world of graven stone. The first vow of the order: know the ground you stand on.', reach:'any ring \u2014 rarer stone lies farther out'},
+  {id:'ocean', icon:'\ud83c\udf0a', name:'Ocean Signature', verb:'Conquer', hint:'a living ocean world \u2014 they called them \u201cthe breathing seas\u201d',
+    lore:'Beacon II still pings beneath a breathing sea. Its keeper never surfaced.', reach:'any ring with living seas'},
+  {id:'flame', icon:'\ud83c\udf0b', name:'Flame Signature', verb:'Conquer', hint:'an extreme volcanic world, where their third beacon fell',
+    lore:'Beacon III burned on a molten shore, transmitting to the last.', reach:'the hostile worlds of any ring'},
+  {id:'sky',   icon:'\u2601\ufe0f', name:'Sky Signature',  verb:'Conquer', hint:'an aerial or gas-giant ecosystem \u2014 life with no ground at all',
+    lore:'Beacon IV rode the cloud decks. The keeper wrote of life that never once touched ground.', reach:'the gas giants of any ring'},
+  {id:'life',  icon:'\ud83c\udf3f', name:'Life Signature', verb:'Conquer', hint:'a complex land biosphere, the kind they crossed the dark to find',
+    lore:'Beacon V stood in a canopy older than the order itself.', reach:'any living ring'},
+  {id:'mind',  icon:'\ud83e\udde0', name:'Mind Signature', verb:'Conquer', hint:'an intelligent natural lifeform \u2014 hunt the signals, as they did',
+    lore:'Beacon VI answered back \u2014 in a voice that was not the keeper\u2019s.', reach:'the Near Field and beyond'},
+  {id:'star',  icon:'\u2734\ufe0f', name:'Star Signature', verb:'Find', hint:'an extreme star or stellar remnant \u2014 the lights that outlived them',
+    lore:'Beacon VII drifted into the glare of a dying sun, and kept singing.', reach:'the extreme stars of any ring'},
+  {id:'void',  icon:'\ud83d\udd73\ufe0f', name:'Void Signature', verb:'Find', hint:'a black hole, void or anomaly \u2014 what swallowed their last beacon',
+    lore:'Beacon VIII crossed an event horizon mid-sentence.', reach:'the dark places of any ring'},
+  {id:'prism', icon:'\ud83d\udd2e', name:'Prism Signature', verb:'Conquer', hint:'a unique prismatic lifeform \u2014 the one discovery they died short of',
+    lore:'Beacon IX was never found. Its last word was a color no one could name.', reach:'the Deep Field \u2014 the trail\u2019s end'},
 ];
 const SIG_IDS=SIGS.map(s=>s.id);
 const primeFill={};
@@ -14358,8 +14361,10 @@ function claimSignature(id, info, quiet){
   if(!quiet){
     const sg=SIGS.find(s=>s.id===id);
     playRaritySting(6); fxBurst(FX_GOLD,72);
+    const _rl=(typeof ITEMS!=='undefined')?ITEMS.find(it=>it.sig===id):null;
     toast(sg.icon+' '+sg.name+' Claimed!',
-      '\u201c'+info.title+'\u201d completes the '+sg.name+' \u2014 '+primeCount()+'/9 of the Prime Codex.');
+      '\u201c'+info.title+'\u201d completes the '+sg.name+' \u2014 '+primeCount()+'/9 of the Prime Codex.'+
+      (_rl?' Blueprint recovered: the Fabricator can now forge the '+_rl.name+'.':''));
     const _R=REGIONS.find(R=>R.sigs>0 && R.sigs===primeCount());
     if(_R) setTimeout(()=>toast('\u2727 The Frontier Expands','Your reach now extends into '+_R.name+'. Distant galaxies open to you.'), 950);
     queueSave();
@@ -14399,20 +14404,25 @@ function checkFrontier(quiet){
 function renderPrime(){
   const el=document.getElementById('prime-grid'); if(!el) return;
   const n=primeCount();
-  el.innerHTML=SIGS.map(s=>{
+  el.innerHTML=SIGS.map((s,i)=>{
     const f=primeFill[s.id];
+    const relic=(typeof ITEMS!=='undefined')?ITEMS.find(it=>it.sig===s.id):null;
     if(f){
       const stars='\u2605'.repeat(Math.min(4,Math.max(0,(f.tier||0)-1)));
       return '<div class="psig filled'+(f.where?' goable':'')+'"'+(f.where?' data-pgo="'+s.id+'"':'')+' style="--c:'+(f.hex||'#9fb6d6')+'">'+
         '<div class="pic">'+s.icon+'</div>'+
         '<div class="pm"><div class="pn">'+s.name+'</div>'+
         '<div class="pby">'+f.title+(stars?' <span class="pstar">'+stars+'</span>':'')+'</div>'+
-        '<div class="psub2">'+(f.sub||'')+(f.where?' \u00b7 tap to travel \u2197':'')+'</div></div>'+
-        '<div class="pchk">\u2713</div></div>';
+        '<div class="psub2">'+(f.sub||'')+(f.where?' \u00b7 tap to travel \u2197':'')+'</div>'+
+        (relic?'<div class="psub2" style="color:#7fe6a0">\ud83d\udee0 Blueprint recovered: '+relic.name+' \u2014 the Fabricator can forge it</div>':'')+
+        '</div><div class="pchk">\u2713</div></div>';
     }
     return '<div class="psig locked"><div class="pic">'+s.icon+'</div>'+
-      '<div class="pm"><div class="pn">'+s.name+'</div><div class="psub2">'+(s.verb||'Find')+' '+s.hint+'</div></div>'+
-      '<div class="pchk">\u25cb</div></div>';
+      '<div class="pm"><div class="pn">'+s.name+'</div>'+
+      (s.lore?'<div class="psub2" style="font-style:italic;color:var(--dim)">'+s.lore+'</div>':'')+
+      '<div class="psub2">'+(s.verb||'Find')+' '+s.hint+'</div>'+
+      (s.reach?'<div class="psub2" style="color:var(--plasma)">Trail reaches: '+s.reach+(relic?' \u00b7 relic blueprint waits':'')+'</div>':'')+
+      '</div><div class="pchk">\u25cb</div></div>';
   }).join('');
   const meter=document.getElementById('prime-meter'); if(meter) meter.style.width=Math.round(n/9*100)+'%';
   const lbl=document.getElementById('prime-count'); if(lbl) lbl.textContent=n+' / 9';
@@ -14451,7 +14461,7 @@ function chooseEnding(id){
   document.getElementById('ending-choices').style.display='none';
   const r=document.getElementById('ending-result'); r.style.display='block';
   document.getElementById('ending-title').textContent=e.title;
-  document.getElementById('ending-text').innerHTML='You are now <b>'+e.title+'</b>. The master survey is finished \u2014 the first in history. Somewhere out in the dark, a thousand quiet beacons answer at last. The infinite galaxy remains, endless and open. Explore on, '+(explorerName||'Pathfinder')+'.';
+  document.getElementById('ending-text').innerHTML='You are now <b>'+e.title+'</b>. The master survey is finished \u2014 the first in history. Somewhere out in the dark, a thousand quiet beacons answer at last. The infinite galaxy remains, endless and open. Explore on, '+(explorerName||'Pathfinder')+'.<br><br><span style="color:#c9a8ff">The Pathfinders&#8217; Trail is walked. What an order does with a finished survey \u2014 <b>the Legacy</b> \u2014 is a story for a coming update.</span>';
   playRaritySting(7);
 }
 function openFrontier(){
@@ -14523,6 +14533,7 @@ function commitExplorerName(){
   explorerName=nm||'Explorer';
   nameBox.style.display='none';
   renderRank(); queueSave();
+  try{ if(sheetOpen) renderDoll(); }catch(_){ }   /* the paperdoll header wears the new name */
   flushToasts();   /* anything held back while the title screen was up */
   toast('Welcome, '+explorerName, 'The frontier is yours. Your name rides on everything you discover and share.');
   if(_nameInitial){
@@ -14551,7 +14562,7 @@ nameIn.addEventListener('input', ()=>{ const ok=document.getElementById('nameok'
    @section tutorial [app] — event-gated new-player field training (sandboxed)
    Owns: tutDone, _tutRig, gameEvent, TUT_STEPS, startTutorial, tutAbort
    ---------------------------------------------------------------- */
-let tutDone=false;            /* saved as `tut`; absent in old saves = veteran */
+let tutDone=false;            /* saved as `tut`; absent (edited save) reads done */
 let _tutRig=null;             /* while training, key rolls are rigged kind: {heal,breed,feed} */
 let _tutHook=null, _tutStep=-1, _tutSnap=null, _tutPreIds=null, _tutTimer=0;
 /* the one funnel game systems report through; free when no tutorial listens */
@@ -14634,6 +14645,57 @@ function charterEvent(type, detail){
   }
   if(hit){ if(chOpen) renderCharters(); _chBadge(); checkAch(); renderRank(); queueSave(); }
 }
+/* ---- v1.5 QUEST NOTIFICATIONS: the next-step heartbeat ----
+   A gentle nudge that names the player's NEXT goal — once on login,
+   and when the session goes quiet — through the toast/tray rail.
+   Laws: silent during training; silent while any modal is up; NEVER
+   twice for the same goal in a session (the tray remembers the rest). */
+let _lastActT=Date.now();
+const _nudged=new Set();
+function nextStepGoal(){
+  try{
+    if(!tutDone) return null;
+    const ch=_ascActive();
+    if(ch){
+      const g=ch.goals.find(g2=>(ascProg[g2.id]||0)<g2.n);
+      if(g){
+        const p=Math.min(ascProg[g.id]||0, g.n);
+        return {key:'asc:'+g.id, tt:'🧭 Next Step — '+ch.name.replace(/^Chapter \d+ — /,''),
+          ms:g.t.replace(/&#8217;/g,'’')+(g.n>1?' ('+p+' / '+g.n+')':'')+'. The chapter rides atop your Charters board (top right).'};
+      }
+    }
+    const _far0=(typeof ascStage==='function' && ascStage()===0)?{'st-scan':1,'st-scout':1,'st-conq':1}:{};
+    const c=_chActive().find(c2=>!_chDoneOf(c2) && !_far0[c2.id]);
+    if(c){
+      const p=Math.min(chProg[c.id]||0, c.n);
+      return {key:'ch:'+c.id+(c.id[0]==='w'?':'+chWeek:''), tt:'🧭 Next Charter — '+c.t,
+        ms:c.d+(c.n>1?' ('+p+' / '+c.n+')':'')+' Pays +'+c.sd+' ☄ on the spot.'};
+    }
+    if(primeCount()<9){
+      return {key:'prime:'+primeCount(), tt:'🧭 The Long Road',
+        ms:'The board is clear — the Prime Codex waits. '+(9-primeCount())+' Signature'+(primeCount()===8?'':'s')+' left; the ✦ panel (left rail) names the next.'};
+    }
+  }catch(_){ }
+  return null;
+}
+function _questNudge(){
+  const g=nextStepGoal();
+  if(!g || _nudged.has(g.key)) return;
+  try{   /* one voice: never talk over a held breath */
+    for(const id of ['reveal','pickbox','duelbox','namebox','deathbox','endingbox','relbox','descbox','sharebox','guidebox','farewellbox','cinema','primebox','vistabox']){
+      const el=document.getElementById(id);
+      if(el && el.style.display && el.style.display!=='none') return;
+    }
+  }catch(_){ }
+  _nudged.add(g.key);
+  toast(g.tt, g.ms);
+}
+document.addEventListener('pointerdown', ()=>{ _lastActT=Date.now(); }, {passive:true, capture:true});
+document.addEventListener('keydown', ()=>{ _lastActT=Date.now(); }, {passive:true, capture:true});
+setTimeout(()=>{ try{ _questNudge(); }catch(_){ } }, 14000);         /* login: the plan, once the dust settles */
+setInterval(()=>{ try{
+  if(Date.now()-_lastActT>5*6e4){ _questNudge(); _lastActT=Date.now(); }   /* idle: 5 quiet minutes earn one pointer */
+}catch(_){ } }, 6e4);
 const chBtn=document.getElementById('chbtn'), chPanel=document.getElementById('chpanel');
 function _chBadge(){
   const dot=chBtn&&chBtn.querySelector('.dot');
@@ -14682,9 +14744,8 @@ if(chBtn) chBtn.addEventListener('click', ()=>{
    The mainline: ordered chapters on the charter machinery. New saves start
    LOCKED TO SOL — the whole sky stays visible and surveyable (gate TRAVEL,
    never CURIOSITY) — and mine → craft their way off the rock. Each chapter's
-   capstone is a SHIP SYSTEM whose existence IS the unlock, so veterans who
-   already hold the capability are grandfathered past the gate by absence of
-   the save field. The ring ladder: Sol → the Neighborhood (a slice of the
+   capstone is a SHIP SYSTEM whose existence IS the unlock — the built
+   drives speak for themselves at every gate. The ring ladder: Sol → the Neighborhood (a slice of the
    home galaxy) → the whole galaxy → the intergalactic frontier (where the
    Prime Codex Signature ladder takes over, as it always did). */
 /* ----------------------------------------------------------------
@@ -14727,8 +14788,7 @@ const ASC_CHAPTERS=[
 let ascCh=0;          /* current chapter index; length ⇒ the Ascent is complete (save asc) */
 let ascProg={};       /* goal id → count (save ascp) */
 function ascStage(){
-  /* the ring you stand on — the built system IS the key, so a veteran with
-     no asc field but no drives still reads complete via ascCh */
+  /* the ring you stand on — the built system IS the key */
   if(ascCh>=ASC_CHAPTERS.length) return 3;
   if(itemCount('igdrive')) return 3;
   if(itemCount('array')) return 2;
@@ -14930,11 +14990,59 @@ function _tutSpot(){
 }
 function _tutAdvance(){
   _tutRig=null;
+  const prev=_tutStep>=0?TUT_STEPS[_tutStep]:null;
   _tutStep++;
   if(_tutStep>=TUT_STEPS.length){ _tutFinish(); return; }
   const s=TUT_STEPS[_tutStep];
+  _tutPanelSweep(s, prev);
   if(s.enter){ try{ s.enter(); }catch(_){} }
   _tutShow();
+}
+/* one lesson, one voice (v1.5, Nick's live pass): the tray opened by the
+   tray lesson sat over the search box in the next step — the outside-tap
+   closer is training-inert by design, so nothing ever closed it. On every
+   step advance, any open panel the NEW step's allow list doesn't name
+   closes. Exact-token match — '#logbtn' must never keep '#log' alive.
+   REVIEW CATCH: the completing click and the advance share one task, so
+   an immediate close would rob the lesson's own panel of every frame —
+   the recruit taps the bell and NOTHING appears. A panel the JUST-DONE
+   step allowed gets a grace beat on screen before it yields the stage. */
+let _tutSweepT=0;
+function _tutPanelSweep(s, prev){
+  try{
+    const toks=new Set(TUT_ALWAYS.concat((s&&s.allow)||[]));
+    const prevToks=(prev&&prev.allow)||[];
+    clearTimeout(_tutSweepT);
+    const owned=[];
+    const matches=(p)=>{
+      const el=p.el();
+      const idSel=(el&&el.id)?('#'+el.id):null;
+      const btns=p.btn?String(p.btn).split(','):[];
+      const inSet=(t)=>toks.has(t);
+      if((idSel && inSet(idSel)) || btns.some(inSet)) return 'keep';
+      /* did the step we just finished teach this panel? el id, its buttons,
+         or any allowed selector living INSIDE it (the sheet holds #stats) */
+      try{
+        for(const t of prevToks){
+          if((idSel && t===idSel) || btns.includes(t)) return 'grace';
+          if(el && el.querySelector && el.querySelector(t)) return 'grace';
+        }
+      }catch(_){ }
+      return 'close';
+    };
+    for(const p of PANELS){
+      try{
+        if(!p.open()) continue;
+        const m=matches(p);
+        if(m==='keep') continue;
+        if(m==='grace'){ owned.push(p); continue; }
+        p.close();
+      }catch(_){ }
+    }
+    if(owned.length){
+      _tutSweepT=setTimeout(()=>{ for(const p of owned){ try{ if(p.open()) p.close(); }catch(_){ } } }, 1600);
+    }
+  }catch(_){ }
 }
 /* practice specimens: three random Earth beasts, three random Earth flora.
    Random on purpose — every recruit trains a different menagerie. */
@@ -15011,9 +15119,9 @@ function _tutFinish(){
     toast('✦ Welcome to the Frontier', 'Training complete. Fly far, '+(explorerName||'Explorer')+' — the Guide (?) is always at hand.');
     /* the hunt board takes over where training leaves off: five starter
        charters teach the trades in order, each paid on the spot */
-    pushNotif('Expedition Charters', 'Your hunt board is open (Charters, left rail) — first charter: Make planetfall.');
+    pushNotif('Expedition Charters', 'Your hunt board is open (Charters, top right) — first charter: Make planetfall.');
     /* v1.4: a NEW expedition starts its Ascent — the mainline announces
-       itself once, right where training ends (veterans read complete) */
+       itself once, right where training ends */
     if(typeof _ascActive==='function' && _ascActive()){
       pushNotif('⬆ The Ascent — '+_ascActive().name, 'Sol is your charter for now. '+_ascActive().intro+' (Pinned atop your Charters board.)');
     }
@@ -15330,9 +15438,13 @@ function renderEvents(){
   }
   eventsEl.innerHTML=html;
 }
-/* rare events pop up over time: a toast the moment their window opens */
+/* rare events pop up over time: a toast the moment their window opens.
+   v1.5: DORMANT — the whole system is hidden for rework; announcing a
+   spectacle the player has no panel to reach would be a taunt. */
+const EVENTS_DORMANT=true;
 const _evAnnounced=new Set();
 function announceRareEvents(){
+  if(EVENTS_DORMANT) return;
   const now=Date.now();
   for(const def of EVENT_DEFS){
     if(def.per<=86400) continue;
@@ -15349,6 +15461,7 @@ function announceRareEvents(){
 setTimeout(announceRareEvents, 5000);
 setInterval(announceRareEvents, 600000);
 eventsBtn.addEventListener('click', ()=>{
+  if(EVENTS_DORMANT) return;   /* v1.5: hidden for rework — engine dormant */
   eventsOpen=!eventsOpen;
   eventsEl.style.display=eventsOpen?'block':'none';
   clearInterval(_evTimer);
@@ -15390,10 +15503,11 @@ eventsEl.addEventListener('click', e=>{
 const PANELS=[
   {id:'log',      el:()=>logEl,    btn:'#logbtn',    x:1, open:()=>logOpen,    close:()=>{ logOpen=false;    logEl.style.display='none'; }},
   {id:'codex',    el:()=>codexEl,  btn:'#codexbtn',  x:1, open:()=>codexOpen,  close:()=>{ codexOpen=false;  codexEl.style.display='none'; }},
-  {id:'cargo',    el:()=>cargoEl,  btn:'#cargobtn',  x:1, open:()=>cargoOpen,  close:()=>{ cargoOpen=false;  cargoEl.style.display='none'; }},
   {id:'charters', el:()=>chPanel,  btn:'#chbtn',     x:1, open:()=>chOpen,     close:()=>{ chOpen=false;     chPanel.style.display='none'; }},
   {id:'events',   el:()=>eventsEl, btn:'#eventsbtn', x:1, open:()=>eventsOpen, close:()=>{ eventsOpen=false; eventsEl.style.display='none'; clearInterval(_evTimer); }},
-  {id:'stats',    el:()=>statsEl,  btn:'#rank',      x:1, open:()=>statsOpen,  close:()=>{ statsOpen=false;  statsEl.style.display='none'; _eqOpen=null; }},
+  /* v1.5: stats + cargo merged into the one character screen */
+  {id:'sheet',    el:()=>document.getElementById('sheetcard'), btn:'#rank,#cargobtn', x:1,
+    open:()=>sheetOpen, close:()=>closeSheet()},
   {id:'tray',     el:()=>trayEl,   btn:'#bellwrap',  x:0, open:()=>trayOpen,   close:()=>{ trayOpen=false;   trayEl.style.display='none'; }},
   {id:'set',      el:()=>setPanel, btn:'#setbtn',    x:0, open:()=>setPanel.style.display==='block', close:()=>{ setPanel.style.display='none'; }},
   {id:'guide',    el:()=>document.getElementById('guidebox'), btn:'#helpbtn', x:0,
@@ -15462,62 +15576,15 @@ function renderStats(){
   for(const e of codex.values()){
     if(e.grade){ tierHave[e.grade.tier]++; if(!rarest || e.grade.tier>rarest.grade.tier) rarest=e; }
   }
-  /* THE PLAYER FRAME (v1.4 HD pass, Nick's ask): the painterly explorer
-     portrait — the same gold-visored avatar who fights your duels —
-     finally fronts the character sheet, in a framed header */
-  let html='<div class="pframe">'+
-    '<img class="pav" src="'+playerAvatar()+'" alt="Your explorer">'+
-    '<div class="pmeta">'+
-      '<div class="pname">✪ '+(explorerName||'Explorer')+
-        '<span class="cfrom" id="renameme" style="float:right;cursor:pointer;font-size:11px;color:#9fc2ff;text-transform:none;letter-spacing:0;padding:2px 6px">✎ rename</span></div>'+
-      '<div class="prank">'+r.name+'</div>'+
-      '<div class="srow" style="margin:3px 0 4px"><span class="k">Expedition score</span><span>'+r.score+(r.next?' / '+r.next[0]+' → '+r.next[1]:' · max rank')+'</span></div>'+
-      '<div class="bar"><i style="width:'+pct.toFixed(0)+'%"></i></div>'+
-    '</div></div>';
+  /* v1.5: the LEFT column of the character screen — rank/score, battle
+     stats, statistics, nameplate, ladder, achievements. The portrait,
+     sockets and Shipyard live on the paperdoll (renderDoll); the cargo
+     hold rides beneath (renderCargo). */
+  let html='<h4>Rank & score</h4>'+
+    '<div class="srow"><span class="k">Rank</span><span style="color:#f0cf8a">'+r.name+'</span></div>'+
+    '<div class="srow"><span class="k">Expedition score</span><span>'+r.score+(r.next?' / '+r.next[0]+' → '+r.next[1]:' · max rank')+'</span></div>'+
+    '<div class="bar" style="margin-bottom:9px"><i style="width:'+pct.toFixed(0)+'%"></i></div>';
   html+=statBlockHTML();
-  /* ---- EQUIPMENT (v1.4): the ARPG half of the Ascent — nine sockets on
-     the explorer. Tap a socket to choose among owned gear for it. ---- */
-  html+='<h4>Equipment</h4><div class="eqrow">'+EQ_SLOTS.map(s=>{
-    const it=equip[s.id]?ITEM_BY.get(equip[s.id]):null;
-    return '<div class="eqslot'+(it?' filled t'+it.tier:'')+(_eqOpen===s.id?' sel':'')+'" data-eqslot="'+s.id+'" role="button" tabindex="0" data-tip="'+s.name+(it?' — '+it.name:' — empty socket')+'">'+
-      (it?'<img src="'+partIcon(it.id)+'" alt="'+it.name+'">':'<span class="eqph">'+s.ic+'</span>')+
-      '<span class="eqname">'+(it?it.name:s.name)+'</span></div>';
-  }).join('')+'</div>';
-  if(_eqOpen){
-    const cands=ITEMS.filter(it=>it.slot===_eqOpen && itemCount(it.id)>0);
-    const cur=equip[_eqOpen];
-    html+='<div class="eqpick">'+
-      (cands.length?cands.map(it=>{
-        const effTxt=_effWords(it);
-        return '<div class="eqcand'+(cur===it.id?' on':'')+'" data-eqpick="'+it.id+'" role="button" tabindex="0">'+
-          '<img src="'+partIcon(it.id)+'" alt=""><div class="m"><div class="nm">'+it.name+(cur===it.id?' ✓':'')+'</div>'+
-          '<div class="ds">'+effTxt+'</div></div></div>';
-      }).join(''):'<div class="empty" style="padding:8px">Nothing crafted for this socket yet — the 🧰 Fabricator builds gear from mined parts.</div>')+
-      (cur?'<div class="eqcand" data-eqpick="" role="button" tabindex="0"><span class="eqph">∅</span><div class="m"><div class="nm">Unequip</div><div class="ds">leave the socket empty</div></div></div>':'')+
-      '</div>';
-  }
-  /* the live effect readout — what all this metal actually does */
-  {
-    const fx=[];
-    const y=_equipBonus('yield'); if(y>0) fx.push('⛏ +'+Math.round(y*100)+'% mining yield');
-    const stk=_equipBonus('strike'); if(stk>0) fx.push('💎 +'+Math.round(stk*100)+'% rich-strike odds');
-    if(_equipBonus('auto')>0) fx.push('🤖 auto-extractor online');
-    const ld=_equipBonus('land'); if(ld>0) fx.push('🛬 +'+ld+'% landing');
-    if(_equipBonus('land100')>0) fx.push('⚓ landings never wave off');
-    const sct=clamp(_equipBonus('scut'),0,0.7); if(sct>0) fx.push('🛡 −'+Math.round(sct*100)+'% field wounds');
-    const ct=_equipBonus('contact'); if(ct>0) fx.push('🤝 +'+ct+'% first contact');
-    const hl=_equipBonus('heal'); if(hl>0) fx.push('💚 +'+Math.round(hl*100)+'% meal healing');
-    const sp=_equipBonus('speed'); if(sp>0) fx.push('🚀 quicker hyperlanes');
-    if(fx.length) html+='<div class="eqfx">'+fx.join(' · ')+'</div>';
-  }
-  /* ---- THE SHIPYARD (v1.4): your ship, wearing every system you build ---- */
-  {
-    const sysNames=ITEMS.filter(it=>it.cat==='sys' && itemCount(it.id)>0).map(it=>it.name);
-    html+='<h4>Shipyard</h4><img class="shipimg" src="'+shipImage()+'" alt="Your ship">'+
-      '<div class="shipcap">'+(sysNames.length
-        ? sysNames.join(' · ')+' online'
-        : 'A bare hull on chemical thrusters — the 🧰 Fabricator builds her out.')+'</div>';
-  }
   const _statBody=
     '<div class="srow"><span class="k">Living worlds surveyed</span><span>'+stats.surveys+'</span></div>'+
     '<div class="srow"><span class="k">Galaxies explored</span><span>'+galSeen.size+'</span></div>'+
@@ -15558,11 +15625,15 @@ function renderStats(){
       '<div class="c">'+n+'</div>'+T.name+'</div>';
   }
   html+='</div>';
-  html+='<h4>Achievements · '+unlocked.size+' / '+ACH.length+'</h4>';
+  /* v1.5: the Cosmic Events system (beacon + events) is dormant — its
+     achievement shelf hides with it rather than dangle unreachable goals.
+     Anything already unlocked still counts toward the total. */
+  const _achShown=ACH.filter(a=>!(EVENTS_DORMANT && a.cat==='Cosmic Events' && !unlocked.has(a.id)));
+  html+='<h4>Achievements · '+unlocked.size+' / '+_achShown.length+'</h4>';
   const cats=[];
-  for(const a of ACH) if(!cats.includes(a.cat||'Misc')) cats.push(a.cat||'Misc');
+  for(const a of _achShown) if(!cats.includes(a.cat||'Misc')) cats.push(a.cat||'Misc');
   for(const cat of cats){
-    const list2=ACH.filter(a=>(a.cat||'Misc')===cat);
+    const list2=_achShown.filter(a=>(a.cat||'Misc')===cat);
     const got=list2.filter(a=>unlocked.has(a.id)).length;
     const open=_agOpen.has(cat);
     let body='';
@@ -15576,14 +15647,99 @@ function renderStats(){
   }
   statsEl.innerHTML=html;
 }
+/* ---- THE PAPERDOLL REGION (v1.5): the full-body explorer with the nine
+   sockets anchored to the body — Helmet at the head, Earpiece at the ear,
+   Necklace below the chin, Suit on the chest, Gloves and Tool at the
+   hands, Leggings on the legs, Boots at the feet, and the ship Module
+   docked beside the figure on the Shipyard thumbnail. ---- */
+function renderDoll(){
+  const dollEl=document.getElementById('doll'); if(!dollEl) return;
+  const r=rankInfo();
+  let html='<div class="dname">✪ '+(explorerName||'Explorer')+
+    ' <span class="cfrom" id="renameme" role="button" tabindex="0" style="cursor:pointer;font-size:11px;color:#9fc2ff;font-weight:400">✎ rename</span>'+
+    '<span class="drank">'+r.name+'</span></div>';
+  html+='<div class="dollwrap"><img class="dollimg" src="'+paperdollAvatar()+'" alt="Your explorer">';
+  /* the ship docks beside the figure; the Module socket pins to her hull */
+  html+='<img class="dship" src="'+shipImage()+'" alt="Your ship" style="left:'+(DOLL_ANCHORS.module[0]*100)+'%;top:'+((DOLL_ANCHORS.module[1]-0.075)*100)+'%">';
+  for(const s of EQ_SLOTS){
+    const a=DOLL_ANCHORS[s.id]; if(!a) continue;
+    const it=equip[s.id]?ITEM_BY.get(equip[s.id]):null;
+    html+='<div class="dsock'+(it?' filled t'+it.tier:'')+(_eqOpen===s.id?' sel':'')+'" data-eqslot="'+s.id+'" role="button" tabindex="0"'+
+      ' style="left:'+(a[0]*100)+'%;top:'+(a[1]*100)+'%" data-tip="'+s.name+(it?' — '+it.name:' — empty socket')+'">'+
+      (it?'<img src="'+partIcon(it.id)+'" alt="'+it.name+'">':'<span class="eqph">'+s.ic+'</span>')+'</div>';
+  }
+  html+='</div>';
+  {
+    const sysNames=ITEMS.filter(it=>it.cat==='sys' && itemCount(it.id)>0).map(it=>it.name);
+    html+='<div class="shipcap">'+(sysNames.length
+      ? sysNames.join(' · ')+' online'
+      : 'A bare hull on chemical thrusters — the Fabricator below builds her out.')+'</div>';
+  }
+  if(_eqOpen){
+    const cands=ITEMS.filter(it=>it.slot===_eqOpen && itemCount(it.id)>0);
+    const cur=equip[_eqOpen];
+    const sl=EQ_SLOTS.find(s=>s.id===_eqOpen)||{};
+    html+='<div class="eqpick"><div class="chead" style="padding:2px 4px 4px">'+(sl.ic||'')+' '+(sl.name||'')+'</div>'+
+      (cands.length?cands.map(it=>{
+        const effTxt=_effWords(it);
+        return '<div class="eqcand'+(cur===it.id?' on':'')+'" data-eqpick="'+it.id+'" role="button" tabindex="0">'+
+          '<img src="'+partIcon(it.id)+'" alt=""><div class="m"><div class="nm">'+it.name+(cur===it.id?' ✓':'')+'</div>'+
+          '<div class="ds">'+effTxt+'</div></div></div>';
+      }).join(''):'<div class="empty" style="padding:8px">Nothing crafted for this socket yet — the Fabricator below builds gear from mined parts.</div>')+
+      (cur?'<div class="eqcand" data-eqpick="" role="button" tabindex="0"><span class="eqph">∅</span><div class="m"><div class="nm">Unequip</div><div class="ds">leave the socket empty</div></div></div>':'')+
+      '</div>';
+  }
+  /* the live effect readout — what all this metal actually does */
+  {
+    const fx=[];
+    const y=_equipBonus('yield'); if(y>0) fx.push('⛏ +'+Math.round(y*100)+'% mining yield');
+    const stk=_equipBonus('strike'); if(stk>0) fx.push('💎 +'+Math.round(stk*100)+'% rich-strike odds');
+    if(_equipBonus('auto')>0) fx.push('🤖 auto-extractor online');
+    const ld=_equipBonus('land'); if(ld>0) fx.push('🛬 +'+ld+'% landing');
+    if(_equipBonus('land100')>0) fx.push('⚓ landings never wave off');
+    const sct=clamp(_equipBonus('scut'),0,0.7); if(sct>0) fx.push('🛡 −'+Math.round(sct*100)+'% field wounds');
+    const ct=_equipBonus('contact'); if(ct>0) fx.push('🤝 +'+ct+'% first contact');
+    const hl=_equipBonus('heal'); if(hl>0) fx.push('💚 +'+Math.round(hl*100)+'% meal healing');
+    const sp=_equipBonus('speed'); if(sp>0) fx.push('🚀 quicker hyperlanes');
+    if(fx.length) html+='<div class="eqfx">'+fx.join(' · ')+'</div>';
+  }
+  dollEl.innerHTML=html;
+}
+/* ---- the character screen itself: one centered surface, three regions ---- */
+let sheetOpen=false;
+function renderSheet(){ renderStats(); renderDoll(); renderCargo(); }
+function openSheet(view){
+  sheetOpen=true; statsOpen=true; cargoOpen=true;   /* the old flags mirror the sheet — every caller keeps working */
+  closePanels('sheet');
+  if(view==='inv') cargoView='inv';
+  const sh=document.getElementById('sheet'); if(sh) sh.style.display='flex';
+  statsEl.style.display='block'; if(cargoEl) cargoEl.style.display='block';
+  renderSheet();
+  /* the corner ✕: #sheetcard's own children never mutate (renders happen
+     inside the regions), so the panel manager's observer never re-seats —
+     seat it here instead. Hidden during training, per the standing law. */
+  try{ if(tutDone){ const card=document.getElementById('sheetcard');
+    if(card && !card.querySelector('[data-pnx]')) card.appendChild(_mkPnx('sheet')); } }catch(_){ }
+  try{
+    const card=document.getElementById('sheetcard');
+    if(card){ card.scrollTop=0;
+      if(view==='inv'){ const cg=document.getElementById('sheetcargo'); if(cg && cg.offsetTop) card.scrollTop=cg.offsetTop-10; } }
+  }catch(_){ }
+}
+function closeSheet(){
+  sheetOpen=false; statsOpen=false; cargoOpen=false; _eqOpen=null;
+  const sh=document.getElementById('sheet'); if(sh) sh.style.display='none';
+  statsEl.style.display='none'; if(cargoEl) cargoEl.style.display='none';
+}
+document.getElementById('doll').addEventListener('click', e=>{
+  if(e.target && e.target.id==='renameme'){ askExplorerName(false); renderDoll(); return; }
+  const eqp=e.target.closest('[data-eqpick]');
+  if(eqp){ equipItem(_eqOpen, eqp.dataset.eqpick||null); _eqOpen=null; renderDoll(); return; }
+  const eqs=e.target.closest('[data-eqslot]');
+  if(eqs){ _eqOpen=(_eqOpen===eqs.dataset.eqslot)?null:eqs.dataset.eqslot; renderDoll(); return; }
+});
 const _agOpen=new Set();
 statsEl.addEventListener('click', e=>{
-  if(e.target && e.target.id==='renameme'){ askExplorerName(false); renderStats(); return; }
-  /* v1.4 equipment sockets: tap a slot to open its picker, tap gear to equip */
-  const eqp=e.target.closest('[data-eqpick]');
-  if(eqp){ equipItem(_eqOpen, eqp.dataset.eqpick||null); _eqOpen=null; renderStats(); return; }
-  const eqs=e.target.closest('[data-eqslot]');
-  if(eqs){ _eqOpen=(_eqOpen===eqs.dataset.eqslot)?null:eqs.dataset.eqslot; renderStats(); return; }
   const pl=e.target.closest('.plate');
   if(pl){ if(pl.dataset.plate!==undefined){ nameHue=+pl.dataset.plate; applyNameplate(); renderStats(); queueSave(); } return; }
   const sr=e.target.closest('.statrow');
@@ -15595,15 +15751,10 @@ statsEl.addEventListener('click', e=>{
   grp.classList.toggle('open');
 });
 rankEl.addEventListener('click', ()=>{
-  statsOpen=!statsOpen;
-  statsEl.style.display=statsOpen?'block':'none';
-  if(statsOpen){
-    closePanels('stats');
-    renderStats();
-  }
-  gameEvent('stats-open', {open:statsOpen});
+  if(sheetOpen) closeSheet(); else openSheet('stats');
+  gameEvent('stats-open', {open:sheetOpen});
 });
-/* stats outside-close now lives in the panel manager (v1.3.5) */
+/* sheet outside-close lives in the panel manager (v1.3.5 law) */
 
 /* ---- view persistence: a browser tab-discard or reload returns you
         exactly where you were instead of dumping you at the universe view ---- */
@@ -15616,15 +15767,48 @@ function whereOfView(){
     if(st.mode==='galaxy' && st.gal) return {type:'galaxy', gal:slimGal(st.gal)};
     if(st.mode==='system' && st.gal && st.star)
       return {type:'star', gal:slimGal(st.gal), star:{x:st.star.x, y:st.star.y, seed:st.star.seed}};
-    if(st.mode==='surface' && st.gal && st.star && st.planet && st.planet.P)
-      return {type:'planet', gal:slimGal(st.gal), star:{x:st.star.x, y:st.star.y, seed:st.star.seed}, pseed:st.planet.P.seed};
   }catch(_){}
   return null;
 }
 let _savedView=null;
 
+/* ---- the farewell card (v1.5 fresh start): the old expedition is
+   honored, the frontier begins anew. Shown once, over everything but
+   death, then never again — the legacy key is already gone. ---- */
+function showFarewell(fw){
+  const box=document.createElement('div');
+  box.id='farewellbox';
+  box.style.cssText='position:fixed;inset:0;z-index:46;display:flex;align-items:center;justify-content:center;background:rgba(4,6,14,0.82);backdrop-filter:blur(6px)';
+  let bestHtml='';
+  if(fw.best){
+    let art='';
+    try{ art=speciesPortrait(fw.best.g)||''; }catch(_){ }
+    const gr=fw.best.grade;
+    bestHtml=
+      '<div style="margin:12px 0 4px;padding:13px 14px;border-radius:12px;background:rgba(20,26,48,0.55);border:1px solid rgba(150,162,210,0.22)">'+
+        (art?'<img src="'+art+'" alt="" style="width:104px;height:104px;border-radius:12px;display:block;margin:0 auto 8px;filter:drop-shadow(0 0 14px '+gr.hex+'66)">':'')+
+        '<div style="font:700 14px var(--ui);color:var(--ink)">'+fw.best.name+'</div>'+
+        '<div style="font:600 10.5px var(--ui);letter-spacing:.14em;text-transform:uppercase;color:'+gr.hex+';margin-top:3px">'+gr.name+'</div>'+
+        '<div style="font:11.5px/1.55 var(--ui);color:var(--dim);margin-top:7px">Your rarest find stands in the old record forever — its world is still out there, wearing the same sky.</div>'+
+      '</div>';
+  }
+  box.innerHTML=
+    '<div class="card" style="width:min(400px,calc(100vw - 36px));max-height:calc(100dvh - 40px);overflow-y:auto;text-align:center;padding:22px 20px;border-radius:16px;background:linear-gradient(180deg,rgba(26,32,58,0.97),rgba(13,17,32,0.97));border:1px solid rgba(170,184,236,0.3);box-shadow:0 20px 70px rgba(0,0,0,0.6)">'+
+      '<div style="font:700 10px var(--ui);letter-spacing:.2em;text-transform:uppercase;color:var(--plasma)">The frontier begins anew</div>'+
+      '<h3 style="font:700 24px var(--ui);margin:9px 0 8px;color:#f0cf8a">Farewell'+(fw.me?', '+fw.me:'')+'</h3>'+
+      '<div style="font:12.5px/1.65 var(--ui);color:var(--dim)">Your old expedition is honored — '+(fw.n?fw.n+' species catalogued, ':'')+'every league of it real. With v1.5 the frontier starts everyone anew on the same footing: one sky, one Ascent, no head starts.</div>'+
+      bestHtml+
+      '<button id="farewellok" style="width:100%;margin-top:13px;padding:12px 0;font:700 12px var(--ui);letter-spacing:.1em;text-transform:uppercase;color:#1a1206;border:0;border-radius:11px;background:linear-gradient(180deg,#ffe9b0,#e0a84a);cursor:pointer">Begin the new expedition</button>'+
+    '</div>';
+  document.body.appendChild(box);
+  const ok=box.querySelector('#farewellok');
+  if(ok) ok.addEventListener('click', ()=>{ try{ box.remove(); }catch(_){ box.style.display='none'; } });
+}
+
 /* ---- boot: restore your expedition, honor a shared link ---- */
+readLegacySave();   /* v1.5 fresh start — one read of the old key, then gone */
 const _hadSave=loadSave();
+try{ const _fw=legacyFarewell(); if(_fw) showFarewell(_fw); }catch(_){}
 if(!explorerName || explorerName==='Explorer') askExplorerName(true);
 renderRank();
 renderHP();
@@ -15657,7 +15841,7 @@ if(_hadSave && tutDone && _rnSeen!==GAME_VERSION){
 
 /* ---------------- main loop ---------------- */
 /* one draw pass per zoom mode — adding a mode means registering a painter */
-const MODE_PAINTERS=Object.freeze({universe:drawUniverse, galaxy:drawGalaxy, system:drawSystem, surface:drawSurface});
+const MODE_PAINTERS=Object.freeze({universe:drawUniverse, galaxy:drawGalaxy, system:drawSystem});
 function frameInner(){
   ctx.setTransform(DPR,0,0,DPR,0,0);
   const time=perfTime();
@@ -15672,15 +15856,10 @@ function frameInner(){
     if(st.gal.quasar) unlock('quasar');
     if(st.gal.dwarf) unlock('dwarfg');
   }
-  if(st.mode==='surface' && st.planet && st.planet.P){
-    const ps=st.planet.P.seed;
-    if(ps===133) unlock('home');
-    if(!surfSeen.has(ps)){ surfSeen.add(ps); checkAch(); queueSave(); }
-  }
   picks.length=0;
   checkTransitions();
   if(st.mode!==_lastMode){ _lastMode=st.mode; locked=null; _autoScanned=null; _frozenFor=null; }
-  (MODE_PAINTERS[st.mode]||drawSurface)(time);
+  (MODE_PAINTERS[st.mode]||drawUniverse)(time);
   if(st.fade>0.02){
     ctx.fillStyle=`rgba(2,2,8,${st.fade})`;
     ctx.fillRect(0,0,W,H);
@@ -15700,9 +15879,7 @@ function frameInner(){
         (p.kind==='comet' && p.data.ci!=null && p.data.ci===ref.data.ci)
       )))||null;
   };
-  if(st.mode==='surface' && st.planet){
-    hovered={kind:'planet', data:{P:st.planet.P, sys:st.sys, pl:st.planet}};
-  } else {
+  {
     if(mouse.x!=null && !dragging && !mouseOverUI){
       let bd=1e9;
       for(const p of picks){
@@ -15718,7 +15895,7 @@ function frameInner(){
        inspecting. At universe/galaxy scale a fast sweep strobed every
        star's card — taps still open everything, everywhere (the star
        signature hunts depend on them). */
-    if(hovered && st.mode!=='system' && st.mode!=='surface') hovered=null;
+    if(hovered && st.mode!=='system') hovered=null;
     if(hovered && !tutDone){
       /* training shows only the current lesson's card: a cursor sweep
          across Sol must not pop glances over the guidance (Nick's ask).
