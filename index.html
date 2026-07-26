@@ -5364,7 +5364,12 @@ function _kbCycle(dir){
   _announce(_kbName(p)+' — '+(i+1)+' of '+sorted.length+'. Enter to survey.');
 }
 cv.addEventListener('keydown', e=>{
-  if(_trainingUp && typeof _trainingUp==='function' && !tutDone){ /* training keeps its own script */ }
+  /* focus lockdown, keyboard edition (Nick's live step-6 lock, 2026-07-26):
+     the pointer/wheel gate never covered keydown, so Escape could release the
+     survey card — and ± could zoom the mode over, clearing the lock — during
+     a lesson with NO allowed way to reopen it (atlas-add). Canvas keys act
+     only when the lesson opens the canvas, exactly like taps. */
+  if(!tutDone){ const sG=TUT_STEPS[_tutStep]; if(!(sG && (sG.allow||[]).includes('#cosmos'))) return; }
   if(e.key==='ArrowRight'||e.key==='ArrowDown'){ e.preventDefault(); _kbCycle(1); return; }
   if(e.key==='ArrowLeft'||e.key==='ArrowUp'){ e.preventDefault(); _kbCycle(-1); return; }
   if(e.key==='Enter'||e.key===' '){
@@ -18663,10 +18668,16 @@ document.addEventListener('focusout', ()=>{ if(_tipFor) hideTip(); });
    @section release-notes [app] — versioned release notes, update popup + history
    Owns: GAME_VERSION, RELEASES, _rnSeen, openReleaseNotes
    ---------------------------------------------------------------- */
-const GAME_VERSION='1.7.7';
-const BUILD_ID='7e1a122';   /* replaced with the git sha at deploy time */
+const GAME_VERSION='1.7.8';
+const BUILD_ID='2ba78d7';   /* replaced with the git sha at deploy time */
 /* newest first; categories appear in the order listed */
 const RELEASES=[
+{v:'1.7.8', title:'The Courier', date:'July 2026', sections:[
+ ['🐛 Bug Fixes', [
+  '🧭 TRAINING STEP 6, UNSTUCK — Earth&#8217;s survey card could vanish between the Atlas lesson and the landing lesson with no way to bring it back (opening the Atlas, travelling from its Earth row, or a keyboard Escape could each close it). The card now rides safely into the landing step, tapping Earth always reopens it, and keyboard shortcuts respect the lesson like taps do.',
+  '⬆ UPDATES ACTUALLY ARRIVE — the game now checks for a newer build the moment it starts and quietly swaps a stale copy for the live one before play begins (your expedition is untouched — saves live on your device, not in the page). The update pill&#8217;s refresh now truly fetches the new build instead of re-serving the cached one.'],
+ ],
+]},
 {v:'1.7.7', title:'The Open Door', date:'July 2026', sections:[
  ['✦ New Features & Systems', [
   '⌨ THE BOARD ANSWERS THE KEYBOARD — focus the star map and the arrow keys cycle every pickable body nearest-first (a gold dashed ring marks your target), <b>Enter surveys it</b> with full credit, +/− zoom on it, Escape releases. The universe is no longer mouse-only.',
@@ -19213,30 +19224,60 @@ function openReleaseNotes(mode, then){
    (iOS Safari resurrects days-old tabs). Offline or local play ('dev'
    build, file://, no fetch): the watcher never arms — the game stays
    fully offline-capable. Refreshing is safe: beforeunload saves first. */
-let _updSeen=false;
+let _updSeen=null;   /* the build we last offered — a NEWER deploy re-offers */
+function _updGo(build){
+  /* CACHE-BUSTED navigation (Nick live, 2026-07-26: "the build is not
+     refreshing even after resetting"): a plain location.reload() can re-serve
+     the CACHED document — iOS Safari + Pages' max-age=600 — so the pill
+     "refreshed" straight back into the old build. A new URL is a guaranteed
+     cache miss. Saves are untouched: localStorage survives navigation and the
+     beforeunload save fires first. */
+  try{ location.replace(location.pathname+'?v='+encodeURIComponent(build||'x')+location.hash); }
+  catch(_){ try{ location.reload(); }catch(_){ } }
+}
 function _updOffer(j){
   if(_tutHook){ setTimeout(()=>_updOffer(j), 60e3); return; }   /* never interrupt training */
   let pill=document.getElementById('updatepill');
   if(!pill){ pill=document.createElement('div'); pill.id='updatepill'; document.body.appendChild(pill);
-    pill.addEventListener('click', ()=>{ try{ location.reload(); }catch(_){} }); }
+    pill.addEventListener('click', ()=>{ _updGo(j&&j.build); }); }
   const vTxt=(j && j.v && j.v!==GAME_VERSION) ? 'v'+j.v+' is here' : 'A new build is live';
   pill.textContent='⬆ '+vTxt+' — tap to refresh';
   pill.style.display='block';
   toast('⬆ Update Available', vTxt+'. Tap the gold pill to refresh — your expedition saves first.');
 }
-function _updCheck(){
-  if(_updSeen || BUILD_ID==='dev') return;
+function _updCheck(boot){
+  if(BUILD_ID==='dev') return;
   if(typeof fetch!=='function' || !/^https?:$/.test(location.protocol)) return;
   fetch('version.json?cb='+Date.now(), {cache:'no-store'})
     .then(r=>r&&r.ok?r.json():null)
-    .then(j=>{ if(j && j.build && j.build!==BUILD_ID){ _updSeen=true; _updOffer(j); } })
+    .then(j=>{
+      if(!(j && j.build && j.build!==BUILD_ID)) return;
+      /* BOOT: a stale cached boot SELF-HEALS before play begins — this is the
+         path a returning player (or an in-game reset, which reloads the same
+         cached file) actually takes. One silent try per target build, guarded
+         in sessionStorage: if the CDN still serves the old build after the
+         busted reload (Pages can lag minutes), fall through to the pill
+         instead of reload-looping. */
+      if(boot===true){
+        let tried=null; try{ tried=sessionStorage.getItem('cf_updtry'); }catch(_){ }
+        if(tried!==j.build){
+          try{ sessionStorage.setItem('cf_updtry', j.build); }catch(_){ }
+          _updGo(j.build); return;
+        }
+      }
+      if(_updSeen!==j.build){ _updSeen=j.build; _updOffer(j); }
+    })
     .catch(()=>{});
 }
 if(BUILD_ID!=='dev'){
+  _updCheck(true);   /* immediately at boot — 45s of stale play was the old floor */
   setTimeout(_updCheck, 45e3);
   setInterval(_updCheck, 600e3);
   document.addEventListener('visibilitychange', ()=>{ if(document.visibilityState==='visible') _updCheck(); });
 }
+/* keep the address bar canonical: strip a spent cache-buster so bookmarks and
+   shares never carry it (the boot check re-busts whenever it's truly needed) */
+try{ if(/[?&]v=/.test(location.search)) history.replaceState(null,'',location.pathname+location.hash); }catch(_){ }
 
 /* ---- Prime Codex wiring ---- */
 (function(){
@@ -23120,7 +23161,12 @@ const TUT_STEPS=[
  {id:'atlas-open', spot:'#logbtn', allow:['#logbtn','#log'],
   text:()=>'Earth is charted — your Atlas’s first entry. Open the <b>Star Atlas</b> (the dock). Tapping any entry travels there instantly; ☆ favorites and the ⌂ home mark live there too.',
   when:(t,d)=>t==='atlas-open'&&!!d.open},
- {id:'land', spot:'#panel [data-act="landcta"]', allow:['#panel','#vistabox','#cosmos'], acts:['landcta'],   /* the canvas stays open: a closed card can always be re-opened by tapping Earth */
+ {id:'land', spot:'#panel [data-act="landcta"]', allow:['#panel','#vistabox','#cosmos'], acts:['landcta'],
+  /* the canvas stays open — and pick() makes the promise real: without it, the
+     tap gate (v1.3.9) nulled every canvas tap during this step, so a recruit
+     whose card closed at the atlas step could NEVER reopen Earth (Nick's live
+     step-6 lock, 2026-07-26) */
+  pick:p=>!!(p && p.kind==='planet' && p.data && p.data.P && p.data.P.seed===133),
   /* a returning player already has Earth in `landed` (samples long since read),
      so noteLanding(133) would early-return and NEVER fire the landfall event
      this step waits on — the ring lights but Land "does nothing". Un-land home
@@ -23420,6 +23466,11 @@ function _tutPanelSweep(s, prev){
     if(_tutGraceArm){ try{ _tutGraceArm(); }catch(_){ } _tutGraceArm=null; }
     for(const p of PANELS){
       try{
+        /* the SURVEY CARD's training lifecycle belongs to the canvas sweep
+           above (its needsCard grace spans atlas→land) — the registry's
+           grace-dismiss would close it on the very tap that opens the Atlas,
+           stranding the land step (Nick's live step-6 lock, 2026-07-26) */
+        if(p.id==='panel') continue;
         if(!p.open()) continue;
         const m=matches(p);
         if(m==='keep') continue;
