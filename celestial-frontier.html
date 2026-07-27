@@ -1557,6 +1557,9 @@
   .plate.auto{display:flex;align-items:center;justify-content:center;background:rgba(150,162,210,0.18);color:var(--dim);font:700 10px var(--ui)}
   /* ---- the Binder (1.0): type-collection pages, sets, the Fifty Paragons ---- */
   .cvtabs{display:flex;gap:6px;margin:0 0 10px}
+  /* the Atlas chart pane (Batch-C tail) */
+  #log .chartwrap{margin-top:9px}
+  #atlaschart{display:block;max-width:100%;border:1px solid rgba(150,162,210,0.22);border-radius:12px;cursor:pointer;background:#04050c}
   /* kingdom shelf language (v1.3.10): plants and animals stop blurring —
      filter chips + each shelf header wears its kingdom's color */
   .cktabs{display:flex;gap:5px;margin:0 0 10px;flex-wrap:wrap}
@@ -4901,7 +4904,29 @@ function planetDescriptor(P, sys, pl){
   const desig = spectral(dom, P.seed,
     {salt:P.seed===133?0:3, boost:lifeBoost+(P.seed===133?0:Math.floor(_dreg/2)), force:P.seed===133?5:undefined});
   rows.unshift(['Spectral class', desig.label+' — '+desig.name, 'grade']);
-  return {title:(pl&&pl.name)||'Planet',
+  /* CF-008 NAME VARIETY (v1.7, Nick's queue 2026-07-26): a NOTABLE world wears
+     a deterministic EPITHET — "Vethara — the Shrouded". Legendary+ designations
+     only, hash-gated under half of those so the honor stays an event; the
+     vocabulary keys to the world's hue family so the name says what the eye
+     will meet. Earth is Earth (Nick's law) — the cradle never re-labels. */
+  let _epi='';
+  if(P.seed!==133 && desig.tier>=5){
+    const EPI={
+      lava:['the Burning','the Emberheld','the Unquenched','the Cinderborn'],
+      venus:['the Shrouded','the Veiled Furnace','the Cauldron','the Smokebound'],
+      ice:['the Stillwhite','the Frozen Vigil','the Glasswind','the Last Winter'],
+      ocean:['the Drowned','the Deepsworn','the Tideveiled','the Endless Shore'],
+      teal:['the Drowned','the Deepsworn','the Tideveiled','the Endless Shore'],
+      desert:['the Sunscoured','the Glasslands','the Parched Crown','the Duneheld'],
+      gas:['the Stormcrowned','the Bannered','the Ringed Court','the Sky Forever'],
+      rocky:['the Grey Sentinel','the Cratered Watch','the Silent','the Unbowed'],
+      terran:['the Verdant','the Blooming','the Second Cradle','the Kindled'],
+      verdant:['the Verdant','the Blooming','the Second Cradle','the Kindled'],
+    };
+    const _er=mulberry32(hashInt(P.seed, 0xE917, 0x2B)>>>0);
+    if(_er()<0.45){ const _l=EPI[dom]||EPI.rocky; _epi=' — '+_l[(_er()*_l.length)|0]; }
+  }
+  return {title:((pl&&pl.name)||'Planet')+_epi,
     sub:(TYPE_LABEL[P.type]||'World'),
     thumb:planetThumb(P), rows, species, planetSeed:P.seed, planetName:(pl&&pl.name)||'Planet',
     ptype:P.type,
@@ -13741,7 +13766,13 @@ function renderPanel(p, isLocked){
         /* §5: the exceptional vein is a LANDING payoff too — prospecting from
            orbit names the palette, boots on the ground find the pure seam */
         const _xv=grounded ? exVeinFor(d.planetSeed, d.ptype, _mTier) : null;
-        rows+='<div class="splabel"><span class="k">Mineral veins</span><span class="v">'+_dp.map(s=>matName(s)).join(' · ')+
+        /* §5 resolver: on the GROUND each vein wears its resolved grade for
+           this world (orbit keeps plain names — the worth is a landing payoff) */
+        rows+='<div class="splabel"><span class="k">Mineral veins</span><span class="v">'+_dp.map(s=>{
+          if(!grounded) return matName(s);
+          const _rr=displayRarity(resolvedDepositTier(s, _mTier));
+          return '<span style="color:'+_rr.hex+'" data-tip="'+matName(s)+' — '+_rr.name+'-grade in these veins">'+matName(s)+'</span>';
+        }).join(' · ')+
           (_bv?' · <span style="color:'+matColor(_bv)+'">'+matName(_bv)+' ✦</span>':'')+
           (_cv?' · <span style="color:'+matColor(_cv)+'">'+matName(_cv)+' ✦</span>':'')+
           (_xv?' · <span style="color:'+displayRarity(exTierOf(_xv)).hex+'">✦ exceptional '+matName(_xv)+'</span>':'')+
@@ -14086,6 +14117,95 @@ function addToLog(d){
   gameEvent('atlas-add', {id:d.logId});
   queueSave();
 }
+let logView='list';   /* Atlas views: 'list' | 'chart' (Batch-C tail feature) */
+let _chartPts=[];     /* hit-targets from the last chart paint: {x,y,id} in css px */
+function _paintAtlasChart(items){
+  const cv=document.getElementById('atlaschart'); if(!cv) return;
+  _chartPts=[];
+  const W2=Math.max(240,(logEl.clientWidth||300)-26), H2=Math.round(W2*0.94);
+  const dpr=Math.min(2, window.devicePixelRatio||1);
+  cv.width=Math.round(W2*dpr); cv.height=Math.round(H2*dpr);
+  cv.style.width=W2+'px'; cv.style.height=H2+'px';
+  const g=cv.getContext('2d'); if(!g) return;
+  g.scale(dpr,dpr);
+  /* painterly deep space — FIXED seed, so the chart is the same panorama
+     every open (engine law: canvas washes + glows, no flat primitives) */
+  const r=mulberry32(777001);
+  const bgv=g.createLinearGradient(0,0,0,H2);
+  bgv.addColorStop(0,'#070a16'); bgv.addColorStop(1,'#04050c');
+  g.fillStyle=bgv; g.fillRect(0,0,W2,H2);
+  const NEB=['143,120,255','80,160,255','255,150,190'];
+  for(let i=0;i<3;i++){
+    const nx=r()*W2, ny=r()*H2, nr=W2*(0.28+r()*0.3);
+    const ng=g.createRadialGradient(nx,ny,0,nx,ny,nr);
+    ng.addColorStop(0,'rgba('+NEB[i]+',0.055)'); ng.addColorStop(1,'rgba(0,0,0,0)');
+    g.fillStyle=ng; g.fillRect(0,0,W2,H2);
+  }
+  for(let i=0;i<140;i++){
+    g.fillStyle='rgba(220,228,255,'+(0.10+r()*0.45).toFixed(2)+')';
+    g.fillRect(r()*W2, r()*H2, (r()<0.1?1.6:1), 1);
+  }
+  /* cluster the entries by host galaxy */
+  const cl=new Map();
+  for(const it of items){
+    const gx=it.where&&it.where.gal; if(!gx || !Number.isFinite(gx.x) || !Number.isFinite(gx.y)) continue;
+    const k=Math.round(gx.x*10)+'|'+Math.round(gx.y*10);
+    if(!cl.has(k)) cl.set(k, {x:gx.x, y:gx.y, list:[]});
+    cl.get(k).list.push(it);
+  }
+  if(!cl.size){ g.fillStyle='#7c86ae'; g.font='11px sans-serif'; g.textAlign='center';
+    g.fillText('Nothing charted with a mapped location yet.', W2/2, H2/2); return; }
+  /* fit: bbox over clusters + the current view position, generous margins */
+  let minX=1e15,maxX=-1e15,minY=1e15,maxY=-1e15;
+  const _inc=(x,y)=>{ if(x<minX)minX=x; if(x>maxX)maxX=x; if(y<minY)minY=y; if(y>maxY)maxY=y; };
+  for(const c of cl.values()) _inc(c.x, c.y);
+  let here=null;
+  try{ const v=whereOfView(); if(v&&v.gal&&Number.isFinite(v.gal.x)){ here={x:v.gal.x,y:v.gal.y}; _inc(here.x,here.y); } }catch(_){ }
+  const span=Math.max(maxX-minX, maxY-minY, 24), pad=44;
+  const sc=(Math.min(W2,H2)-pad*2)/span;
+  const ox=(W2-(maxX-minX)*sc)/2 - minX*sc, oy=(H2-(maxY-minY)*sc)/2 - minY*sc;
+  const P=(x,y)=>({x:x*sc+ox, y:y*sc+oy});
+  const KIND_HEX={p:'#7fe6a0', s:'#ffd96a', m:'#9fb6d6', c:'#bfe8ff', b:'#c8b28a', g:'#cdbcff', r:'#cdbcff'};
+  /* the current view — a quiet crosshair, drawn under the lights */
+  if(here){
+    const h=P(here.x,here.y);
+    g.strokeStyle='rgba(200,210,240,0.35)'; g.lineWidth=1;
+    g.beginPath(); g.arc(h.x,h.y,9,0,TAU); g.stroke();
+    g.beginPath(); g.moveTo(h.x-14,h.y); g.lineTo(h.x-5,h.y); g.moveTo(h.x+5,h.y); g.lineTo(h.x+14,h.y);
+    g.moveTo(h.x,h.y-14); g.lineTo(h.x,h.y-5); g.moveTo(h.x,h.y+5); g.lineTo(h.x,h.y+14); g.stroke();
+    g.fillStyle='rgba(200,210,240,0.5)'; g.font='8px sans-serif'; g.textAlign='center';
+    g.fillText('you', h.x, h.y+22);
+  }
+  let labeled=0;
+  for(const c of cl.values()){
+    const base=P(c.x,c.y), n=c.list.length;
+    /* the cluster's halo breathes with how much is charted there */
+    const halo=g.createRadialGradient(base.x,base.y,0,base.x,base.y,14+4*Math.sqrt(n));
+    halo.addColorStop(0,'rgba(150,170,255,'+Math.min(0.5,0.16+n*0.05)+')'); halo.addColorStop(1,'rgba(0,0,0,0)');
+    g.fillStyle=halo; g.beginPath(); g.arc(base.x,base.y,14+4*Math.sqrt(n),0,TAU); g.fill();
+    for(let i=0;i<n;i++){
+      const it=c.list[i];
+      /* first entry sits on the core; the rest ring it, golden-angle spaced */
+      const ang=i*2.399963, rad=i===0?0:(9+((i*7)%3)*2.4);
+      const p={x:base.x+Math.cos(ang)*rad, y:base.y+Math.sin(ang)*rad};
+      const hex=KIND_HEX[String(it.id)[0]]||'#cfd6f2';
+      const isHome=it.id===homeId;
+      const gl=g.createRadialGradient(p.x,p.y,0,p.x,p.y,isHome?7:5);
+      gl.addColorStop(0,hex); gl.addColorStop(0.55,hex+'aa'); gl.addColorStop(1,'rgba(0,0,0,0)');
+      g.fillStyle=gl; g.beginPath(); g.arc(p.x,p.y,isHome?7:5,0,TAU); g.fill();
+      if(it.fav){ g.strokeStyle=hex; g.lineWidth=1; g.beginPath(); g.arc(p.x,p.y,7.5,0,TAU); g.stroke(); }
+      if(isHome){
+        g.fillStyle='#f0cf8a'; g.font='700 9px sans-serif'; g.textAlign='center';
+        g.fillText('⌂ '+String(it.title||'').slice(0,14), p.x, p.y-11); labeled++;
+      } else if(it.fav && labeled<7){
+        g.fillStyle=hex; g.font='8.5px sans-serif'; g.textAlign='center';
+        g.fillText('★ '+String(it.title||'').slice(0,12), p.x, p.y-10); labeled++;
+      }
+      _chartPts.push({x:p.x, y:p.y, id:it.id});
+    }
+  }
+  cv.dataset.n=String(_chartPts.length);
+}
 function renderLog(){
   /* v1.7.6 (round 2): the undo lives IN the list where the row was — the toast
      alone put it ~400px from the finger that mis-tapped */
@@ -14108,7 +14228,12 @@ function renderLog(){
     return ra!==rb ? rb-ra : b.t-a.t;
   });
   const favCount=[...logMap.values()].filter(it=>it.fav).length;
-  let html='<div class="log-head">'+
+  /* THE CHART PANE (Batch-C tail, Nick greenlit 2026-07-26): the Atlas's
+     second view — every charted place plotted across the universe on a
+     painterly star chart, clustered by galaxy, tap a light to travel. */
+  let html='<div class="cvtabs"><span class="cvt'+(logView==='list'?' on':'')+'" data-lvw="list" role="button" tabindex="0">📋 List</span>'+
+    '<span class="cvt'+(logView==='chart'?' on':'')+'" data-lvw="chart" role="button" tabindex="0">🗺 Chart</span></div>';
+  html+='<div class="log-head">'+
     '<div class="lfilt">'+
       '<button data-filt="all" class="'+(logFilter==='all'?'on':'')+'">All</button>'+
       '<button data-filt="fav" class="'+(logFilter==='fav'?'on':'')+'">★ '+favCount+'</button>'+
@@ -14118,6 +14243,13 @@ function renderLog(){
     '</div>'+
     ((homeId&&logMap.has(homeId))?'<button class="lgohome" data-gohome="1" title="Travel to your home">⌂ Travel Home</button>':'')+
   '</div>';
+  if(logView==='chart'){
+    html+='<div class="chartwrap"><canvas id="atlaschart" role="img" aria-label="Star chart of your charted places — use the List view for full keyboard access"></canvas>'+
+      '<div class="sub-hint">your reach across the universe · tap a light to travel · brighter = more charted there</div></div>';
+    logEl.innerHTML=_undoRow+html;
+    try{ _paintAtlasChart(items); }catch(_){ }
+    return;
+  }
   if(!items.length){
     html+='<div class="empty">'+(logFilter==='won'?'No settled worlds bookmarked yet — conquer one and add it here.':(logFilter==='life'?'No living or civilized finds bookmarked yet.':'No favorites yet — tap ☆ on any entry to star it.'))+'</div>';
   }
@@ -14147,6 +14279,20 @@ function renderLog(){
   logEl.innerHTML=html;
 }
 logEl.addEventListener('click', e=>{
+  const lvw=e.target.closest('[data-lvw]');
+  if(lvw){ logView=lvw.dataset.lvw; renderLog(); refocus(logEl, '.cvt[data-lvw="'+logView+'"]'); return; }
+  const cch=e.target.closest('#atlaschart');
+  if(cch){
+    /* tap a light → travel there (nearest hit-target within a fingertip) */
+    try{
+      const rc=cch.getBoundingClientRect();
+      const mx=e.clientX-rc.left, my=e.clientY-rc.top;
+      let best=null, bd=1e9;
+      for(const p of _chartPts){ const d=Math.hypot(p.x-mx, p.y-my); if(d<bd){ bd=d; best=p; } }
+      if(best && bd<=16){ const en=logMap.get(best.id); if(en && en.where) travelTo(en.where); }
+    }catch(_){ }
+    return;
+  }
   const filt=e.target.closest('[data-filt]');
   if(filt){ logFilter=filt.dataset.filt; renderLog(); refocus(logEl, '[data-filt="'+logFilter+'"]'); return; }
   const gh=e.target.closest('[data-gohome]');
@@ -14652,7 +14798,7 @@ function showReveal(entry, isHybrid){
       }
       if(entry.kind==='Fauna'){
         const _t=faunaTastes(entry.genome);
-        stEl.innerHTML+='<div class="abil" style="font-size:9.5px;opacity:.95"><span style="color:#7fe6a0">♥ Favours</span> '+_t.likes.map(k=>STAT_META[k].name).join(', ')+' · <span style="color:#ffd96a">⊘ Dislikes</span> '+STAT_META[_t.dislikes[0]].name+'-rich flora</div>';
+        stEl.innerHTML+='<div class="abil" style="font-size:9.5px;opacity:.95"><span style="color:#7fe6a0">♥ Favors</span> '+_t.likes.map(k=>STAT_META[k].name).join(', ')+' · <span style="color:#ffd96a">⊘ Dislikes</span> '+STAT_META[_t.dislikes[0]].name+'-rich flora</div>';
       }
     }
     if(acts){
@@ -16723,7 +16869,7 @@ function abilityTheme(g){
    Reckoning III". Constants tuned empirically by tools/balance-sim.js. */
 const ARCH_ROMAN=['I','II','III','IV','V'];
 const ARCHETYPES=[
- {id:'smite',   n:'Smite',     d:'lands every blow harder',                              mk:m=>({dmg:1.14+m*0.050})},
+ {id:'smite',   n:'Smite',     d:'lands every blow harder',                              mk:m=>({dmg:1.12+m*0.045})},
  {id:'aegis',   n:'Aegis',     d:'wears a warded hide that takes less damage',           mk:m=>({taken:0.90-m*0.030})},
  {id:'dot',     n:'Affliction',d:'sears the foe for a share of vitality each round',     mk:m=>({burn:0.015+m*0.0035})},
  {id:'fury',    n:'Fury',      d:'builds ferocity every round',                          mk:m=>({ramp:0.024+m*0.006})},
@@ -16738,7 +16884,7 @@ const ARCHETYPES=[
  {id:'reck',    n:'Reckoning', d:'punishes wounded foes below half vitality',            mk:m=>({execB:0.28+m*0.09})},
  {id:'bulwark', n:'Bulwark',   d:'raises a wall no single blow can breach',              mk:m=>({cap:0.28-m*0.015})},
  {id:'shock',   n:'Shock',     d:'staggers the foe clean out of its next strike',        mk:m=>({stun:0.095+m*0.024})},
- {id:'roulette',n:'Roulette',  d:'swings wild — a gambler’s ceiling',                    mk:m=>({gambit:0.45+m*0.10})},
+ {id:'roulette',n:'Roulette',  d:'swings wild — a gambler’s ceiling',                    mk:m=>({gambit:0.42+m*0.09})},
  {id:'enrage',  n:'Rage',      d:'grows stronger the more it bleeds',                    mk:m=>({enrage:0.16+m*0.05})},
 ];
 /* ---- creature classes (1.0): innate arts, levels, power through WINS ----
@@ -18379,7 +18525,7 @@ const GUIDE=[
  {id:'rarity', t:'Rarity & grades', k:'rarity grade tier common uncommon notable rare exotic legendary mythic celestial primordial transcendent spectrum color', body:
   '<p>Every species wears one of ten grades on a single ladder shared by creatures, plants, worlds and stars alike: <b>Common → Uncommon → Notable → Rare → Exotic → Legendary → Mythic → Celestial → Primordial → Transcendent</b>. Most expeditions live in the lower bands; the top grades grow vanishingly rare, and a <b>Transcendent</b> is a one-in-a-million roll — the province of master bloodlines and <span data-gt="guardians">Apex Guardians</span>. Rarity tints the card, pitches the discovery chime, and matters mechanically:</p><ul><li>Rarer flora heal more — and poison more. Rarer pairs are harder to breed but forge stronger bloodlines.</li><li>Finding a Legendary-or-better species pays a ☄ Stardust bonus (first discovery only).</li><li>Stars and worlds carry rarity too — but a world hides its grade until you <b>land</b> and stand on it; a star reveals its grade on <b>survey</b>. Rarer worlds yield richer conquest spoils.</li><li>Chasing the rare grades? Size, glow, wild apex blood and deep hybrid generations all push a creature’s grade upward — a master bloodline can climb far past what nature rolls.</li></ul>'},
  {id:'specimen', t:'Reading a specimen card', k:'specimen card stats power ability bloodline brood fed gen hybrid tastes', body:
-  '<p>Tap any species in the Compendium to open its card:</p><ul><li><b>Five stat bars + Power</b> — its battle strength, rolled deterministically from its genome (see <span data-gt="stats">The five stats</span>).</li><li><b>❤ HP & Condition</b> — its battle pool, and whether it’s Healthy, Bruised, Injured or Critical. Wounds persist and dull every stat — see <span data-gt="injuries">Injuries &amp; recovery</span>.</li><li><b>✧ Ability</b> — its biome-themed combat trick (see <span data-gt="abilities">Abilities</span>).</li><li><b>♥ Favours / ⊘ Dislikes</b> — its feeding tastes (fauna only).</li><li><b>♞ Bloodline</b> — <em>brood</em> (generations bred) and <em>fed</em> (meals taken) both permanently raise its stats.</li><li>Buttons: <b>⇪ Code</b> (share), <b>⚔ Duel</b>, <b>🧬 Breed</b>, <b>🌿 Feed</b>, <b>✎ Rename</b>.</li></ul>'},
+  '<p>Tap any species in the Compendium to open its card:</p><ul><li><b>Five stat bars + Power</b> — its battle strength, rolled deterministically from its genome (see <span data-gt="stats">The five stats</span>).</li><li><b>❤ HP & Condition</b> — its battle pool, and whether it’s Healthy, Bruised, Injured or Critical. Wounds persist and dull every stat — see <span data-gt="injuries">Injuries &amp; recovery</span>.</li><li><b>✧ Ability</b> — its biome-themed combat trick (see <span data-gt="abilities">Abilities</span>).</li><li><b>♥ Favors / ⊘ Dislikes</b> — its feeding tastes (fauna only).</li><li><b>♞ Bloodline</b> — <em>brood</em> (generations bred) and <em>fed</em> (meals taken) both permanently raise its stats.</li><li>Buttons: <b>⇪ Code</b> (share), <b>⚔ Duel</b>, <b>🧬 Breed</b>, <b>🌿 Feed</b>, <b>✎ Rename</b>.</li></ul>'},
  {id:'drift', t:'Passive evolution', k:'drift evolve hybrid automatic epoch cosmic clock', body:
   '<p>Your Compendium is alive. As the cosmic clock ticks (one epoch ≈ every 4 minutes of play), two of your species quietly drift into a new hybrid on their own — the collection keeps surprising you the more you explore. Drift pauses at 500 species so your save stays healthy.</p>'},
  {id:'sapience', t:'Sapience & civilizations', k:'sapient intelligence civilization advanced eras mind signature', body:
@@ -18389,9 +18535,9 @@ const GUIDE=[
  {id:'breeding', t:'Breeding', k:'breed pair parents consumed odds hybrid bloodline stardust boost union', body:
   '<p>Pick a specimen, press <b>Breed</b>, choose a same-kingdom mate. Both parents are consumed by the union — win or lose.</p><ul><li>The odds shown depend on the pair’s rarity — rare pairs are long shots.</li><li>☄ Stardust you’ve earned passively boosts odds (up to +15%) — see <span data-gt="stardust">Stardust</span>.</li><li>Success forges a <b>new bloodline</b>: a hybrid child with boosted stats (+1 brood). Chain generations for monsters.</li><li>Failure loses both parents. Breed your spares, not your champions.</li><li>Two extremophile parents breed a true extremophile; a mixed pair breeds back toward ordinary stock. A creature&#8217;s two-tone hide follows its accent gene, so children visibly carry their parents&#8217; colors.</li></ul>'},
  {id:'feeding', t:'Feeding beasts', k:'feed flora meal tastes loved disliked poison toxic dead bloodline fed mend medicine', body:
-  '<p>Fauna can be fed flora from your Compendium (<b>Feed</b> on their card). The plant is always consumed. Every beast has <b>tastes</b> — two stat-flavours it loves, one it dislikes (shown on its card):</p><ul><li>A loved meal grows its <b>fed bloodline</b> — permanent strength.</li><li>Feeding is also medicine: a welcome meal mends a wounded beast, and loved flavours mend most. A disliked meal that goes badly can wound it further — see <span data-gt="injuries">Injuries &amp; recovery</span>.</li><li>Every meal carries a <b>poison chance</b> (worse for rare flora and disliked tastes) — a toxic roll poisons the beast, biting off a chunk of its condition; rarer flora bite far deeper. Only a beast whose strength is already spent dies of it — at zero, it’s gone. The Iron Gut ability shrugs toxins off.</li></ul>'},
+  '<p>Fauna can be fed flora from your Compendium (<b>Feed</b> on their card). The plant is always consumed. Every beast has <b>tastes</b> — two stat-flavors it loves, one it dislikes (shown on its card):</p><ul><li>A loved meal grows its <b>fed bloodline</b> — permanent strength.</li><li>Feeding is also medicine: a welcome meal mends a wounded beast, and loved flavors mend most. A disliked meal that goes badly can wound it further — see <span data-gt="injuries">Injuries &amp; recovery</span>.</li><li>Every meal carries a <b>poison chance</b> (worse for rare flora and disliked tastes) — a toxic roll poisons the beast, biting off a chunk of its condition; rarer flora bite far deeper. Only a beast whose strength is already spent dies of it — at zero, it’s gone. The Iron Gut ability shrugs toxins off.</li></ul>'},
  {id:'injuries', t:'Injuries & recovery', k:'injury wound hurt condition bruised critical mend recover heal scars medicine', body:
-  '<p>Wounds persist. A creature’s condition — <b style="color:#7fe6a0">Healthy</b> → <b style="color:#ffd96a">Bruised</b> → <b style="color:#ff8a72">Injured</b> → <b style="color:#ff5a4a">Critical</b> — lives on its specimen card, and the wounded fight below their strength (nearly half power at the brink).</p><ul><li><b>How they get hurt:</b> winning a conquest by a thread leaves scars, and a disliked meal that goes badly can wound. Friendly duels are still pure sport — no harm done.</li><li><b>How they heal:</b> feed them. A welcome meal mends, the flavours a beast ♥ loves mend most, and rarer flora mend deeper. Wounds never fade on their own — medicine is a deliberate act.</li><li>Injuries don’t travel in CFB codes — a shared creature arrives fresh.</li><li>Newborn hybrids are born unhurt, whatever shape their parents were in.</li></ul>'},
+  '<p>Wounds persist. A creature’s condition — <b style="color:#7fe6a0">Healthy</b> → <b style="color:#ffd96a">Bruised</b> → <b style="color:#ff8a72">Injured</b> → <b style="color:#ff5a4a">Critical</b> — lives on its specimen card, and the wounded fight below their strength (nearly half power at the brink).</p><ul><li><b>How they get hurt:</b> winning a conquest by a thread leaves scars, and a disliked meal that goes badly can wound. Friendly duels are still pure sport — no harm done.</li><li><b>How they heal:</b> feed them. A welcome meal mends, the flavors a beast ♥ loves mend most, and rarer flora mend deeper. Wounds never fade on their own — medicine is a deliberate act.</li><li>Injuries don’t travel in CFB codes — a shared creature arrives fresh.</li><li>Newborn hybrids are born unhurt, whatever shape their parents were in.</li></ul>'},
  {id:'eating', t:'Eating flora (healing)', k:'heal eat flora hp medicine poison stat growth heart nourish', body:
   '<p>Tap the <b>❤ heart</b> by your HP bar to eat flora yourself. The plant is consumed and two things happen:</p><ul><li>You heal. Rarer flora restore more HP — but their poison chance is higher, and a toxic roll wounds you instead. The deadliest medicine heals hardest.</li><li>You grow. Each plant nourishes one specific battle stat permanently (shown on its card). Vitality meals also raise your max HP.</li></ul><p>See <span data-gt="stats">The five stats</span>.</p>'},
 ]},
@@ -18782,10 +18928,24 @@ document.addEventListener('focusout', ()=>{ if(_tipFor) hideTip(); });
    @section release-notes [app] — versioned release notes, update popup + history
    Owns: GAME_VERSION, RELEASES, _rnSeen, openReleaseNotes
    ---------------------------------------------------------------- */
-const GAME_VERSION='1.7.12';
-const BUILD_ID='e52ec69';   /* replaced with the git sha at deploy time */
+const GAME_VERSION='1.7.13';
+const BUILD_ID='9d07a74';   /* replaced with the git sha at deploy time */
 /* newest first; categories appear in the order listed */
 const RELEASES=[
+{v:'1.7.13', title:'The Cartographer', date:'July 2026', sections:[
+ ['✦ New Features & Systems', [
+  '🗺 THE STAR CHART — your Atlas gains a second view: every charted place painted across the universe on one deep-space chart, clustered by galaxy, favorites starred, home marked, a quiet crosshair where you stand. Tap any light to travel there. Your filters apply to the chart too.',
+  '🏷 WORLDS OF RENOWN — the rarest worlds now carry names worth saying twice: &#8220;the Shrouded&#8221;, &#8220;the Ringed Court&#8221;, &#8220;the Sky Forever&#8221;. Rare near home, commoner out in the deep field where legends live. The same world bears the same name for every explorer, forever.',
+  '⛏ VEINS WORTH READING — stand on a world and its mineral veins now show their grade for that ground; Primordial worlds enrich every seam one step.'],
+ ],
+ ['⚖ Balancing', [
+  '⚔ THE ARENA LEVELED — two fighting styles had quietly drifted stronger than the field (Smite and Roulette); both are back inside the fair band, measured across thousands of simulated duels. Every archetype now wins between 42% and 58% against the field.',
+  '🏆 NO DEAD RELICS — the Graven Aegis and the Prismatic Lathe were weaker than ordinary gear in their own slots; both are now true sidegrades with their own identity (the Aegis holds the protection line with steadier landings; the Lathe trades peak yield for the best rich-strike luck in the game).'],
+ ],
+ ['🐛 Bug Fixes', [
+  '⛏ THE DOUBLE VEIN — metal and lava worlds could list the same mineral twice on their survey card; every vein now appears once.'],
+ ],
+]},
 {v:'1.7.12', title:'Quiet Gold', date:'July 2026', sections:[
  ['🖱 UI Enhancements', [
   '🥇 THE PRIMARY SPEAKS SOFTLY — the survey card&#8217;s Land button trades its solid gold slab for a gold outline and gold lettering on the shared dark pill. Still unmistakably the next step; no longer shouting over the card.'],
@@ -19861,9 +20021,24 @@ function depositsFor(seed, type, tier){
   const n=3+((r()*3)|0);
   const pool=prof.slice(), picks=[];
   for(let i=0;i<n && pool.length;i++) picks.push(pool.splice((r()*pool.length)|0, 1)[0]);
-  if(r() < 0.10+(tier||0)*0.05)                       /* a rare vein — richer on rarer worlds */
-    picks.push(RARE_VEIN[Math.min(RARE_VEIN.length-1, (r()*(1+(tier||0)))|0)]);
+  if(r() < 0.10+(tier||0)*0.05){                      /* a rare vein — richer on rarer worlds */
+    /* P2-005 DEDUP (v1.7, queue item 4): metal worlds carry Ag/Au/Pt/Ir in
+       their own pool and lava carries U — the vein roll could DOUBLE a row
+       already picked. Skip-on-dup keeps the rng stream identical (same r()
+       draws), so only the formerly-doubled worlds change: they lose the
+       duplicate line, nothing else in the universe moves. */
+    const rv=RARE_VEIN[Math.min(RARE_VEIN.length-1, (r()*(1+(tier||0)))|0)];
+    if(picks.indexOf(rv)<0) picks.push(rv);
+  }
   return picks;
+}
+/* §5 PER-DEPOSIT RESOLVER (queue item 4, the doc's last unbuilt §5 piece):
+   a vein's worth AT THIS WORLD — its substance base grade, raised one step
+   on Primordial+ ground (world rarity influences richness, §6), clamped at
+   the semantic cap 6 (only explicit cosmics sit above materials science).
+   Display/economic language only — generation is untouched. */
+function resolvedDepositTier(sym, wtier){
+  return Math.min(6, matBaseTier(sym) + ((wtier||0)>=8?1:0));
 }
 /* v1.4 BIOME-GATED VEINS (Nick: "rarer worlds' veins gate rarer recipes —
    do it"): four showpiece biomes are the LIVING SOURCES of the four
@@ -21700,7 +21875,7 @@ const ITEMS=[
     claimed Signature — endgame-tier gear recovered from the lost beacons.
     `sig` gates the recipe on primeFill; one relic per socket, nine in all.
     Effects stay inside the wired keys — POWER IS DECOUPLED FROM RARITY. */
- {id:'rl-stone', cat:'relic', sig:'stone', slot:'suit',     tier:3, fam:'suit',  hue:'#c9a878', name:'Graven Aegis',        d:'Beacon I&#8217;s hull plating, re-forged — the ground itself argues on your side', cost:{Fe:8,W:4,Nd:1}, parts:{hullseg:1}, eff:{scut:0.25}},
+ {id:'rl-stone', cat:'relic', sig:'stone', slot:'suit',     tier:3, fam:'suit',  hue:'#c9a878', name:'Graven Aegis',        d:'Beacon I&#8217;s hull plating, re-forged — the ground itself argues on your side', cost:{Fe:8,W:4,Nd:1}, parts:{hullseg:1}, eff:{scut:0.45,struts:2}},
  {id:'rl-ocean', cat:'relic', sig:'ocean', slot:'boots',    tier:3, fam:'boot',  hue:'#4fc8e8', name:'Tidewalker Boots',    d:'Beacon II&#8217;s keeper walked out under the sea and never slipped once',        cost:{H2O:8,Ti:4},     parts:{weave:1,servo:1}, eff:{land:6,struts:1}},
  {id:'rl-flame', cat:'relic', sig:'flame', slot:'gloves',   tier:3, fam:'glove', hue:'#ff7a4a', name:'Emberforged Gauntlets', d:'Pulled glowing from Beacon III&#8217;s wreck — they remember the heat of the strike', cost:{S:6,Fe:6,Pz:1},  parts:{servo:1}, eff:{yield:0.2,strike:0.08}},
  {id:'rl-sky',   cat:'relic', sig:'sky',   slot:'module',   tier:3, fam:'drive', hue:'#8fd6ff', name:'Skysail Module',      d:'Beacon IV&#8217;s storm-rig — it reads every deck and rides the fastest lane',    cost:{H:8,He3:2},      parts:{coil:1,navcore:1}, eff:{speed:1,land:4}},
@@ -21708,7 +21883,7 @@ const ITEMS=[
  {id:'rl-mind',  cat:'relic', sig:'mind',  slot:'ears',     tier:3, fam:'chip',  hue:'#c79fff', name:'Mindreader Coil',     d:'Tuned to the voice that answered Beacon VI — first contact hears you coming',    cost:{Si:8,Ir:2}, parts:{chip:1,wire:1}, eff:{contact:12}},
  {id:'rl-star',  cat:'relic', sig:'star',  slot:'helmet',   tier:3, fam:'helm',  hue:'#ffd96a', name:'Starcrowned Helm',    d:'Beacon VII&#8217;s lens, set in gold — it finds the bright seam in anything',      cost:{Au:4,Pt:2},      parts:{lens:1}, eff:{strike:0.1,contact:4}},
  {id:'rl-void',  cat:'relic', sig:'void',  slot:'legs',     tier:3, fam:'legs',  hue:'#9a8aff', name:'Voidwoven Leggings',  d:'Cut from what came back of Beacon VIII — half here, half elsewhere, all yours',  cost:{C:6,Ir:2},       parts:{weave:2}, eff:{scut:0.15,speed:1}},
- {id:'rl-prism', cat:'relic', sig:'prism', slot:'tool',     tier:3, fam:'rig',   hue:'#ff7ae8', name:'Prismatic Lathe',     d:'Beacon IX&#8217;s last word, made a tool — it takes the color no one could name',  cost:{Vg:1,Pm:1,Pz:1}, parts:{coil:1,servo:1}, eff:{yield:0.35,strike:0.06}},
+ {id:'rl-prism', cat:'relic', sig:'prism', slot:'tool',     tier:3, fam:'rig',   hue:'#ff7ae8', name:'Prismatic Lathe',     d:'Beacon IX&#8217;s last word, made a tool — it takes the color no one could name',  cost:{Vg:1,Pm:1,Pz:1}, parts:{coil:1,servo:1}, eff:{yield:1.5,strike:0.12}},
  /* ---- v1.7 THE FORGE — COSMIC GEAR (MATERIALS_AND_GEAR.md §12/§17): each of the
     five WORLD-cosmics earns its job as the DEFINING anchor of one endgame piece —
     faithful to the doc's affinities (Protomatter→construction, Primordial Ice→
@@ -23381,7 +23556,7 @@ const TUT_STEPS=[
   text:()=>'Fighters, breeders and medicine all live here, shelved by realm. <b>Tap any specimen</b> to open its card.',
   when:(t)=>t==='specimen'},
  {id:'card-tour', spot:'#reveal .card', btn:'Got It', rev:'scout',   /* the tour's one live verb — reversible, and it IS on the card */
-  text:()=>'Read it like a Pathfinder: five stat bars and total Power; its ✧ ability; the rarity grade tinting the card. Rarer life fights harder, breeds stronger, heals — or poisons — more. Beasts also list the flora flavours they ♥ love and ⊘ dislike.'},
+  text:()=>'Read it like a Pathfinder: five stat bars and total Power; its ✧ ability; the rarity grade tinting the card. Rarer life fights harder, breeds stronger, heals — or poisons — more. Beasts also list the flora flavors they ♥ love and ⊘ dislike.'},
  /* Nick live 2026-07-26 (steps 10/14 screenshots): the specimen card from the
     PREVIOUS lesson lingered over these steps — "it says open a beast, but the
     card's already open". Each lesson that says "Open a …" now takes the stage
