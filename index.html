@@ -2009,6 +2009,28 @@
      so the padding must clear 44 from the SMALLER metric on EITHER axis. 12+32=44.
      The matching negative margin keeps the layout cost at exactly zero. */
   #hpheart{display:inline-flex;align-items:center;justify-content:center;padding:16px;margin:-16px;cursor:pointer;line-height:1}
+    /* ===== v1.8 the denial contract — a blocked action hands back a LEAD ===== */
+  .denial{padding:14px 13px;text-align:left}
+  .denial .dw{font-size:11.5px;line-height:1.6;color:var(--dim)}
+  .denial .dw b{color:var(--ink)}
+  .denial .dcta{display:block;width:100%;margin-top:11px;padding:10px 12px;min-height:44px;box-sizing:border-box;
+    font:600 11.5px var(--ui);letter-spacing:.03em;cursor:pointer;border-radius:10px;
+    color:#ffd96a;background:rgba(240,198,116,0.10);border:1px solid rgba(255,217,106,0.55)}
+  .denial .dcta:hover,.denial .dcta:focus-visible{background:rgba(240,198,116,0.2);color:#ffe49a}
+  /* the same language the Fabricator uses for an unaffordable recipe */
+  #reveal .acts button.needs{color:var(--faint);border-color:rgba(150,162,210,0.22);cursor:help;font-size:9.5px}
+    /* v1.8 the stall detector: the chip changes VOICE when nothing is moving —
+     it stops restating a goal the player knows they are failing and offers a way on */
+  #chchip.stalled{border-color:rgba(255,217,106,0.6);background:rgba(240,198,116,0.14);color:#ffe49a}
+  #chchip.stalled b{color:#ffd96a}
+    /* v1.8 the matchup meter: a band you can act on + the true number + why */
+  #pick-list .cand .odds{display:flex;flex-direction:column;align-items:flex-end;line-height:1.25;text-align:right}
+  #pick-list .cand .odds b{font:700 10.5px var(--ui);letter-spacing:.05em;text-transform:uppercase}
+  #pick-list .cand .odds i{font-style:normal;font-size:9.5px;opacity:.75}
+  #pick-list .cand .ds.why{font-size:9.5px;color:var(--faint);margin-top:1px}
+    /* v1.8 spotlight + breeding anticipation */
+  #panel .spot{display:inline-block;margin-top:3px;font-size:10.5px;color:var(--dim)}
+  #panel .spot b{color:var(--ink)}
   </style>
 </head>
 <body>
@@ -2106,6 +2128,10 @@
   <div class="sgrp" data-sg="a">
     <div class="srow2"><span>Sound</span>
       <span class="opts"><span id="sndopt" class="fsopt on" role="button" tabindex="0">On</span></span></div>
+    <div class="srow2"><span>Creature voices</span>
+      <span class="opts"><span id="voiceopt" class="fsopt on" role="button" tabindex="0" data-tip="Every creature has its own voice, generated from its genome — Earth animals sound like what they are, and a hybrid inherits both parents. Off silences them.">On</span></span></div>
+    <div class="srow2"><span>Battle sound</span>
+      <span class="opts"><span id="combatopt" class="fsopt on" role="button" tabindex="0" data-tip="Blow-by-blow impacts, critical hits and ability strikes during duels and conquests. Off keeps fights silent.">On</span></span></div>
     <div class="srow2"><span>Volume</span>
       <span class="opts"><input id="volslider" type="range" min="0" max="100" step="5" value="100" aria-label="Sound effects volume"></span></div>
   </div>
@@ -12461,6 +12487,7 @@ let _lastVista=null, _vistaHideT=0, _vistaShowSeq=0, _vistaArmedAt=0, _vistaPD=0
    the show, and real taps work instantly; only the ghost is filtered. */
 vistaBox.addEventListener('pointerdown', ()=>{ _vistaPD=performance.now(); });
 function _vistaDismiss(){
+  try{ ambienceStop(); }catch(_){ }
   /* a show's fade-in rides a queued animation frame — bump the sequence so
      a lightning-fast tap can't lose the race and strand the view open */
   _vistaShowSeq++;
@@ -12550,6 +12577,11 @@ function _vistaExtras(host){
    framed card floating over the game, ✕ on the frame). One mount path for
    every scene family + the re-view. */
 function _vistaMount(headHtml, cv, vtTxt){
+  /* v1.8: planetfall ARRIVES, and the world speaks under it */
+  try{ playArrival((_lastVista&&_lastVista.xtra&&_lastVista.xtra.tier)||0);
+    const _bk=(_lastVista&&_lastVista.xtra&&_lastVista.xtra.biome)||null;
+    ambienceStart(_bk);
+  }catch(_){ }
   _vistaArmedAt=performance.now();   /* the dismiss arms shortly AFTER the show */
   vistaBox.innerHTML='';
   const card=document.createElement('div'); card.className='vcard';
@@ -13536,6 +13568,20 @@ function renderPanel(p, isLocked){
      (persistent, rides surveyedSet), then 🐾 Tame / 🌿 Scavenge are how
      species enter the Compendium (v1.5.2c, Nick's capture design) */
   const lifeScanned = d.species && d.species.length && ((d.planetSeed!=null && surveyedSet.has(d.planetSeed)) || d.species.every(g=>codex.has(codexId(g))));
+  /* v1.8 SPOTLIGHT: name the world's most notable resident up front — rarest,
+     ties broken by raw power. Presentation ONLY (the audits' rule: 'an unusual
+     creature in 5 minutes' must be presentation, never generation). */
+  try{
+    if(lifeScanned && d.species && d.species.length>1){
+      let best=null, bt=-1, bp=-1;
+      for(const g of d.species){
+        const gr=(typeof speciesGrade==='function')?speciesGrade(g):null, t=gr?gr.tier:0;
+        const p=battleStats(g).total;
+        if(t>bt || (t===bt && p>bp)){ bt=t; bp=p; best=g; }
+      }
+      d._spot=best?{n:(best._earthName||describeSpecies(best).name), t:bt}:null;
+    }
+  }catch(_){ }
   const lifeOpen = d.species && d.species.length && (lifeScanned || _spExpanded===d.logId);
   if(lifeOpen && !d._spArt){ d._spArt={}; for(const g of d.species) d._spArt[g.seed]=speciesPortrait(g); }
   const inLog=logMap.has(d.logId);
@@ -13743,7 +13789,9 @@ function renderPanel(p, isLocked){
         ? 'Hostile wildlife may wound you for '+dz.dmg+' HP — conquer the world first to discover life safely'
         : 'Discover &amp; catalogue this world\u2019s species')+'">'+
         '<span class="thumbmini" style="background:rgba(127,230,160,0.14)"></span>'+
-        '<span class="spk"></span><span class="v"><b>Discover Life</b> — '+spRows.length+' life forms detected'+dzTxt+'</span></div>';
+        '<span class="spk"></span><span class="v"><b>Discover Life</b> — '+spRows.length+' life forms detected'+dzTxt+
+          (d._spot?'<br><span class="spot">✦ Notable: <b>'+esc(d._spot.n)+'</b>'+((GRADE_TIERS[d._spot.t]||{}).name?' · <span style="color:'+GRADE_TIERS[d._spot.t].hex+'">'+GRADE_TIERS[d._spot.t].name+'</span>':'')+'</span>':'')+
+          '</span></div>';
     } else if(!glance && spRows.length){
       /* THE LIFE FORMS FOLD (Nick, v1.5.2c): the surveyed roster and its
          🐾 Tame / 🌿 Scavenge actions collapse behind the card's expand/close
@@ -14811,7 +14859,9 @@ function showReveal(entry, isHybrid){
   document.getElementById('rev-t').textContent = (isHybrid||entry.hybrid)?'Hybrid specimen':'Compendium specimen';
   const xEl=document.getElementById('rev-x');
   if(xEl) xEl.textContent = pendingReveals.length? ('tap to continue · '+pendingReveals.length+' more — hold to skip all') : 'tap to continue';
-  document.getElementById('rev-img').src = (entry.genome?speciesPortrait(entry.genome):entry.art||'');   /* CF16-005: the reveal is a DETAIL surface — full portrait, never the list thumb */
+  document.getElementById('rev-img').src = (entry.genome?speciesPortrait(entry.genome):entry.art||'');
+  /* v1.8: a creature SPEAKS when you meet it — its own voice, every time */
+  try{ if(entry.genome) setTimeout(()=>playVoice(entry.genome, 0.45), 90); }catch(_){ }   /* CF16-005: the reveal is a DETAIL surface — full portrait, never the list thumb */
   /* a soft biome-coloured aura behind the portrait: ability theme for fauna,
      nourished-stat colour for flora, plasma blue for everything else */
   try{
@@ -14925,8 +14975,12 @@ function showReveal(entry, isHybrid){
       acts.style.display='grid';   /* was 'flex' — inline flex overrode the CSS grid and crushed 7-8 verbs into one row ("RenamRecord"); grid wraps them tidily at every resolution */
       /* verb order (Nick): Breed · Feed · Duel · Scout · Code · [Champion] · [Record]; Rename moved to the ✎ icon by the name */
       acts.innerHTML=
-        (codex.has(entry.id) ? '<button id="rev-breed" type="button" data-guide="breeding" data-tip="Forge a new bloodline — both parents are consumed, win or lose.">Breed</button>' : '')+
-        (entry.kind==='Fauna' && codex.has(entry.id) ? '<button id="rev-feed" type="button" data-guide="feeding" data-tip="A welcome meal grows its bloodline and mends its wounds — a toxic one poisons, and can finish a beast with nothing left.">Feed</button>' : '')+
+        (codex.has(entry.id) ? (()=>{ const d=_denial('breed', entry);
+          return d ? '<button id="rev-breed" type="button" class="needs" aria-disabled="true" data-guide="breeding" data-tip="'+esc(d.why.replace(/<[^>]*>/g,''))+'">'+esc(d.short)+'</button>'
+                   : '<button id="rev-breed" type="button" data-guide="breeding" data-tip="Forge a new bloodline — both parents are consumed, win or lose.">Breed</button>'; })() : '')+
+        (entry.kind==='Fauna' && codex.has(entry.id) ? (()=>{ const d=_denial('feed', entry);
+          return d ? '<button id="rev-feed" type="button" class="needs" aria-disabled="true" data-guide="feeding" data-tip="'+esc(d.why.replace(/<[^>]*>/g,''))+'">'+esc(d.short)+'</button>'
+                   : '<button id="rev-feed" type="button" data-guide="feeding" data-tip="A welcome meal grows its bloodline and mends its wounds — a toxic one poisons, and can finish a beast with nothing left.">Feed</button>'; })() : '')+
         '<button id="rev-duel" type="button" data-guide="duels" data-tip="A friendly duel — sport only, nothing is lost.">Duel</button>'+
         (entry.kind==='Fauna' && codex.has(entry.id) ? '<button id="rev-scout" type="button"'+(scoutId===entry.id?' class="on"':'')+' data-guide="discover" data-tip="Your Field Scout takes the hit when a bioscan turns hostile — wounds and all. A scout with nothing left is lost forever.">'+(scoutId===entry.id?'Scouting ✓':'Scout')+'</button>' : '')+
         '<button id="rev-share" type="button" data-guide="codes" data-tip="Copy a CFB code — the identical creature, stats and all, on any device.">⇪ Code</button>'+
@@ -15226,6 +15280,15 @@ function _codexTabs(){
       (r[0]>0?' style="color:'+RARITY_V17[r[0]].hex+'"':'')+'>'+r[1]+'</span>').join('')+'</div>';
   }
   return h;
+}
+/* v1.8: the temperament a genome already implies, spoken aloud. Pure display —
+   derived from existing genes, so nothing about generation changes. */
+const _TEMPER=['curious','wary','bold','placid','territorial','playful','patient','skittish','stoic','sociable'];
+function temperamentOf(g){
+  try{
+    const i=(hashInt((g.seed>>>0), 0x7E3D, 0x11)>>>3)%_TEMPER.length;
+    return _TEMPER[i];
+  }catch(_){ return 'wary'; }
 }
 function _binderOwn(){
   const own={tiers:new Set(), realms:new Set(), bodies:new Set(), themes:new Set(), flavors:new Set(), kinds:new Set(), sizes:new Set(), xeno:false};
@@ -15749,6 +15812,7 @@ let motionMode=-1;       /* -1 Auto (follow the OS reduce-motion preference, liv
                             Auto is the default AND is what gets saved unless the player explicitly
                             picks Full/Reduced — so the OS preference is never frozen into the save. */
 let _sfxBus=null;
+let voiceOn=true, combatSfxOn=true;   /* v1.8: creature voices + battle sound, independently switchable */
 function motionOK(){ return motionMode===-1 ? !_sysReduced : motionMode===0; }
 function sfxOut(a){
   /* every synth exits through one shared gain so a single slider rules them all */
@@ -15796,6 +15860,110 @@ function ac(){
 document.addEventListener('visibilitychange', ()=>{
   if(document.visibilityState==='visible' && AC && AC.state!=='running' && sndOn){ try{ AC.resume().catch(()=>{}); }catch(_){} }
 });
+/* the eighteen rig families, each with a voice ARCHETYPE. kind drives the
+   synthesis shape; the numbers are its character. */
+const _VOICE={
+  mammal:   {kind:'roar',  f0:150, rich:0.85, nz:0.30, vib:4.5, vibD:0.03, dur:0.55, sweep:-0.30},
+  primate:  {kind:'hoot',  f0:330, rich:0.55, nz:0.18, vib:7.0, vibD:0.06, dur:0.40, sweep:+0.18},
+  bird:     {kind:'chirp', f0:2100,rich:0.30, nz:0.06, vib:14,  vibD:0.16, dur:0.22, sweep:+0.55},
+  bat:      {kind:'chirp', f0:5200,rich:0.16, nz:0.05, vib:22,  vibD:0.20, dur:0.10, sweep:-0.60},
+  reptile:  {kind:'hiss',  f0:520, rich:0.20, nz:0.88, vib:2.0, vibD:0.02, dur:0.50, sweep:-0.06},
+  serpent:  {kind:'hiss',  f0:640, rich:0.10, nz:0.95, vib:1.5, vibD:0.01, dur:0.60, sweep:-0.04},
+  amphibian:{kind:'croak', f0:210, rich:0.70, nz:0.28, vib:26,  vibD:0.30, dur:0.34, sweep:-0.10},
+  turtle:   {kind:'grunt', f0:170, rich:0.60, nz:0.35, vib:3.0, vibD:0.02, dur:0.30, sweep:-0.16},
+  fish:     {kind:'thrum', f0:120, rich:0.35, nz:0.42, vib:5.0, vibD:0.04, dur:0.24, sweep:-0.10},
+  marine:   {kind:'song',  f0:190, rich:0.45, nz:0.10, vib:2.2, vibD:0.10, dur:1.10, sweep:+0.75},
+  ceph:     {kind:'jet',   f0:280, rich:0.15, nz:0.92, vib:1.0, vibD:0.01, dur:0.30, sweep:-0.35},
+  insect:   {kind:'buzz',  f0:420, rich:0.55, nz:0.22, vib:58,  vibD:0.42, dur:0.42, sweep:0.00},
+  arachnid: {kind:'rasp',  f0:340, rich:0.30, nz:0.70, vib:40,  vibD:0.34, dur:0.26, sweep:-0.05},
+  crust:    {kind:'click', f0:900, rich:0.12, nz:0.55, vib:0,   vibD:0,    dur:0.12, sweep:-0.20},
+  gastropod:{kind:'thrum', f0:150, rich:0.20, nz:0.30, vib:1.0, vibD:0.02, dur:0.30, sweep:-0.08},
+  jelly:    {kind:'pulse', f0:110, rich:0.10, nz:0.40, vib:1.6, vibD:0.14, dur:0.70, sweep:+0.10},
+  sessile:  {kind:'pulse', f0:95,  rich:0.12, nz:0.34, vib:0.8, vibD:0.08, dur:0.80, sweep:+0.04},
+  legacy:   {kind:'roar',  f0:220, rich:0.60, nz:0.35, vib:6.0, vibD:0.05, dur:0.42, sweep:-0.18},
+};
+const _VOICE_KEYS=Object.keys(_VOICE);
+function _blendVoice(A,B,t){   /* t=0 → all A, t=1 → all B */
+  const o={kind:(t<0.5?A.kind:B.kind)};
+  for(const k of ['f0','rich','nz','vib','vibD','dur','sweep']) o[k]=A[k]+(B[k]-A[k])*t;
+  return o;
+}
+/* the voice a genome carries. Pure, deterministic, no rng consumed. */
+function voiceOf(g){
+  try{
+    if(!g) return _VOICE.legacy;
+    const sizeF=1/(0.55+((+g.size||0)%6)*0.22);          /* bigger body → lower voice */
+    const bold=((+g.behavior||0)%5)/4;                    /* temperament tilts the character */
+    let base=null;
+    /* 1. a named Earth animal sounds like ITSELF, via the art's own taxonomy */
+    const en=g._earthName||g._earthBlend;
+    if(en){
+      let rig='legacy';
+      try{ const o=_earthArt(String(en)); if(o&&o.rig&&_VOICE[o.rig]) rig=o.rig; }catch(_){ }
+      base=_VOICE[rig];
+      /* 2. a HYBRID drifts off its Earth anchor toward its alien half — the same
+         anchor law the renderer uses to graft alien phenotype onto an Earth rig */
+      const anchor=(g._earthName!=null)?1:(g._anchorVal!=null?+g._anchorVal:0.85);
+      if(anchor<0.999){
+        const alien=_VOICE[_VOICE_KEYS[(hashInt((g.seed>>>0),0x5F0C,0x2D)>>>4)%_VOICE_KEYS.length]];
+        base=_blendVoice(base, alien, Math.max(0, Math.min(1, 1-anchor)));
+      }
+    } else {
+      /* 3. a wholly procedural creature: its body plan picks the family */
+      base=_VOICE[_VOICE_KEYS[(hashInt((g.seed>>>0),0x5F0C,0x2D)>>>4)%_VOICE_KEYS.length]];
+    }
+    return {kind:base.kind,
+      f0:Math.max(60, Math.min(6000, base.f0*sizeF*(0.9+bold*0.3))),
+      rich:Math.max(0,Math.min(1, base.rich*(0.85+bold*0.4))),
+      nz:Math.max(0,Math.min(1, base.nz)),
+      vib:base.vib, vibD:base.vibD,
+      dur:Math.max(0.08, Math.min(1.4, base.dur*(1.15-bold*0.25))),
+      sweep:base.sweep};
+  }catch(_){ return _VOICE.legacy; }
+}
+/* synthesis — one short utterance, entirely procedural (no payload) */
+function playVoice(g, gain){
+  try{
+    const a=ac(); if(!a || a.state!=='running' || !voiceOn) return;
+    const v=voiceOf(g), t0=a.currentTime+0.02, d=v.dur;
+    const out=a.createGain();
+    out.gain.setValueAtTime(0.0001, t0);
+    out.gain.exponentialRampToValueAtTime(Math.max(0.0002,(gain==null?0.5:gain)), t0+Math.min(0.06, d*0.2));
+    out.gain.exponentialRampToValueAtTime(0.0001, t0+d);
+    out.connect(sfxOut(a));
+    /* the voiced part */
+    if(v.nz<0.9){
+      const osc=a.createOscillator();
+      osc.type = v.kind==='chirp'?'sine' : (v.kind==='buzz'?'sawtooth' : (v.rich>0.5?'sawtooth':'triangle'));
+      osc.frequency.setValueAtTime(v.f0, t0);
+      osc.frequency.exponentialRampToValueAtTime(Math.max(40, v.f0*(1+v.sweep)), t0+d);
+      const tone=a.createGain(); tone.gain.value=1-v.nz*0.6;
+      /* vibrato / wingbeat / croak-pulse all come from the same LFO */
+      if(v.vib>0 && v.vibD>0){
+        const lfo=a.createOscillator(), lg=a.createGain();
+        lfo.frequency.value=v.vib; lg.gain.value=v.f0*v.vibD;
+        lfo.connect(lg); lg.connect(osc.frequency); lfo.start(t0); lfo.stop(t0+d);
+      }
+      const lp=a.createBiquadFilter(); lp.type='lowpass';
+      lp.frequency.value=Math.max(300, v.f0*(2+v.rich*8));
+      osc.connect(tone); tone.connect(lp); lp.connect(out);
+      osc.start(t0); osc.stop(t0+d);
+    }
+    /* the breath / hiss / rasp */
+    if(v.nz>0.05){
+      const n=Math.max(1, Math.floor(a.sampleRate*d));
+      const buf=a.createBuffer(1, n, a.sampleRate), ch=buf.getChannelData(0);
+      let last=0;
+      for(let i=0;i<n;i++){ const w=Math.random()*2-1; last=(last+w*0.22)/1.22; ch[i]=last*(1-i/n); }
+      const src=a.createBufferSource(); src.buffer=buf;
+      const bp=a.createBiquadFilter(); bp.type='bandpass';
+      bp.frequency.value=Math.max(200, v.f0*1.6); bp.Q.value=v.kind==='hiss'?1.2:3.5;
+      const ng=a.createGain(); ng.gain.value=v.nz*0.5;
+      src.connect(bp); bp.connect(ng); ng.connect(out);
+      src.start(t0); src.stop(t0+d);
+    }
+  }catch(_){ }
+}
 function playRaritySting(tier){
   /* celestial tones: soft detuned sine pairs climbing a pentatonic ladder,
      airy harmonics above, and a deep drone beneath the rarest finds.
@@ -16188,6 +16356,7 @@ function doSave(){
       view:whereOfView(),
       hp:hp, pstats:pstats, fs:fsMode, tone:toneMode, font:fontMode, snd:sndOn?1:0, fx:fxOn?1:0, chart:chartsOn?1:0, shake:shakeOn?1:0, sv:salvageConfirm?1:0, notif:notifOn?1:0, tips:tipsOn?1:0,
       vol:Math.round(sfxVol*100), gt:Math.round(glassTint*100), rm:motionMode, cx:cardExpand,
+      vce:voiceOn?1:0, cbx:combatSfxOn?1:0,   /* v1.8 audio toggles (absent ⇒ on) */
       land:(()=>{ /* union in settled/mined worlds so cap eviction can never
         re-hide a census you demonstrably hold (review catch); insertion
         order keeps oldest-first eviction */
@@ -16214,6 +16383,7 @@ function doSave(){
       at:Date.now(),   /* wall-clock save stamp — anchors offline-accrual clamps on load */
       cargo:[...cargo], cgx:[...cgx], jrn:journal.slice(-24), pin:pinnedRecipe||undefined, ctb:cargoTab, seen:[...seenSp].filter(id=>codex.has(id)), minedw:[...mined], mx:[...mineX], skx:[...skimX], bx:[...bioX], tech:[...techOwned], mines:stats.mines||0,
       items:[...items], eq:equip, ea:equipAff, crafts:stats.crafts||0, minedout:stats.minedout||0,
+      xpf:[...xpFirsts].slice(-4000),   /* v1.8: the one-shot XP ledger */
       skims:stats.skims||0, cosmics:stats.cosmics||0,   /* v1.7 (review catch: unsaved, the counters reset each session) */
       asc:ascCh, ascp:ascProg,
       names:[...customNames],
@@ -16418,6 +16588,7 @@ function loadSave(){
     stats.surveys=surveyedSet.size;
     for(const s of _capA(data.gals,20000)) galSeen.add(s);
     for(const s of _capA(data.surf,60000)) surfSeen.add(s);
+    for(const s of _capA(data.xpf,4000)) if(typeof s==='string') xpFirsts.add(s.slice(0,64));   /* v1.8 (absent ⇒ the firsts are earnable again — safe) */
     for(const s of _capA(data.sysv,60000)){ const n=+s; if(Number.isFinite(n)) sysSeen.add(n); }   /* absent ⇒ arrivals pay fresh (safe) */
     for(const s of _capA(data.starK,200)) starKindsSeen.add(s);
     for(const s of _capA(data.ptypes,200)) ptypesSeen.add(s);
@@ -16436,6 +16607,8 @@ function loadSave(){
     /* CF1715-01: a save written MID-TRAINING carries the pre-training
        expedition in `tsnap` — hand it to startTutorial so the restart's
        promise survives a reload. Absent ⇒ null (every pre-1.7.18 save). */
+    if(data.vce!=null) voiceOn=!!data.vce;   /* v1.8: absent ⇒ stays on */
+    if(data.cbx!=null) combatSfxOn=!!data.cbx;
     if(data.tsnap && typeof data.tsnap==='object' && !data.tut) _tutSnapPending=data.tsnap;
     /* the field scout must still exist in the Compendium (it may have been
        bred away, fed away, or lost) — a stale id silently stands down */
@@ -16825,7 +16998,10 @@ searchRes.addEventListener('click', e=>{
   else if(o.go.sp){ const sp=codex.get(o.go.sp); if(sp) showReveal(sp, sp.hybrid); }
 });
 document.addEventListener('pointerdown', e=>{
-  if(!e.target.closest('#searchwrap')) searchRes.style.display='none';
+  /* v1.8: a global handler must never assume its target is an Element — a
+     synthetic or retargeted event (document/window) has no .closest and threw
+     an uncaught TypeError out of the capture phase (caught by the new stall test) */
+  if(!(e.target && e.target.closest && e.target.closest('#searchwrap'))) searchRes.style.display='none';
 });
 
 /* ---- traveler's beacon: a fresh random destination every 5 minutes ---- */
@@ -17760,6 +17936,7 @@ function setArenaBackdrop(d){
 }
 let _lastDuelText='';
 let _lastDuelCredit=0;   /* anti-farm: friendly-duel progression credit throttle */
+let _lastDuelPart=0;     /* v1.8: participation XP rides its OWN window so it can never eat a win's */
 let _tutHadEarthLanded=false;   /* the land-step drill records Earth's prior landed state to restore it */
 document.addEventListener('click', e=>{
   if(e.target && e.target.id==='duel-share-log' && _lastDuelText){
@@ -17773,14 +17950,25 @@ document.addEventListener('click', e=>{
   }
 });
 /* class XP lands only on victories — duels +8, conquests +20, guardians +60 */
-function awardXP(id, n){
+/* v1.8: one-shot XP ledger — 'firsts' pay once per creature, forever.
+   Absent-safe: an old save simply has an empty set and earns them again. */
+const xpFirsts=new Set();
+function awardXPOnce(id, key, n, why){
+  if(!id) return false;
+  const k=id+'|'+key;
+  if(xpFirsts.has(k)) return false;
+  xpFirsts.add(k);
+  awardXP(id, n, why);
+  return true;
+}
+function awardXP(id, n, why){
   const en=codex.get(id); if(!en || en.kind!=='Fauna') return;
   const g=en.genome, before=levelOf(g);
   g.xp=Math.min(1e6, ((+g.xp)||0)+n);
   const after=levelOf(g);
   if(after>before){
     playRaritySting(4); fxBurst(FX_GOLD,22);
-    toast('🛡 Level '+after+' — '+en.name, (after===3||after===6)?'A new innate art awakens!':'Its legend grows with every victory.');
+    toast('🛡 Level '+after+' — '+en.name, (after===3||after===6)?'A new innate art awakens!':(why?'Earned '+why+'.':'Its legend grows.'));
   }
   queueSave();
 }
@@ -17922,9 +18110,20 @@ function fightNow(mine, theirs, opts){
            free sport; the PROGRESSION credit (win tally + class XP) is throttled
            to once per 30s, so casual duels count but a farm loop does not. App-
            layer cooldown (Date.now fine here — never feeds generation). */
+        /* v1.8: PARTICIPATION teaches — a hard-fought loss is experience too,
+           on the same throttle so it can never become a farm loop. */
+        if(res.winner!=='A' && mine && mine.id){
+          const _dl=Date.now();
+          /* v1.8 A/B CATCH: participation MUST NOT share the win throttle — a loss
+             consumed the 30s window a subsequent win needed, so adding XP could
+             SUBTRACT it. Its own timer, same anti-farm interval. */
+          if(_dl-_lastDuelPart>30000){ _lastDuelPart=_dl;
+            const _close=(res.hpB/Math.max(1,res.maxB))<0.25;
+            awardXP(mine.id, _close?3:2, _close?'a fight taken to the wire':'a bout survived'); }
+        }
         if(res.winner==='A'){
           const _dn=Date.now();
-          if(_dn-_lastDuelCredit>30000){ _lastDuelCredit=_dn; stats.duelwins++; if(mine && mine.id) awardXP(mine.id, 8); }
+          if(_dn-_lastDuelCredit>30000){ _lastDuelCredit=_dn; stats.duelwins++; if(mine && mine.id) awardXP(mine.id, 8, 'a duel won'); }
           else toast('⚔ Sparring Cooldown','A win this soon after the last pays no ledger credit or XP — give it '+Math.ceil((30000-(_dn-_lastDuelCredit))/1000)+'s between counted bouts.');   /* review fix: never silently uncredited */
         }
         playRaritySting(res.winner==='A'?5:2);
@@ -17937,6 +18136,13 @@ function fightNow(mine, theirs, opts){
     do{
       const L=res.log[i++];
       narrate(L);
+      /* v1.8: the fight is no longer silent — every blow lands, scaled by how
+         hard it hit, with crits and ability procs carrying their own voice.
+         Skipped playback stays quiet (no machine-gun burst). */
+      try{ if(!_skip && !L.tick && L.dmg>0){
+        const _mx=(L.side==='A')?res.maxB:res.maxA;
+        playHit(L.dmg/Math.max(1,_mx), !!L.crit, !!(L.fs||L.ex||L.stp));
+      } }catch(_){ }
       if(eA) eA.style.width=Math.round(L.hpA/res.maxA*100)+'%';
       if(eB) eB.style.width=Math.round(L.hpB/res.maxB*100)+'%';
     } while(_skip && i<res.log.length);
@@ -18111,6 +18317,135 @@ function playFanfare(){
       o.connect(g); g.connect(master); o.start(t0); o.stop(t0+1.0);} });
   }catch(_){}
 }
+/* v1.8: the fight itself, blow by blow. Damage scales weight, a crit cracks,
+   an ability lands with a tone of its own, and the loser's last hit lands
+   heavier. All procedural, all through the shared bus. */
+function playHit(frac, crit, ability){
+  try{
+    const a=ac(); if(!a || a.state!=='running' || !combatSfxOn) return;
+    const t=a.currentTime+0.01;
+    const heavy=Math.max(0.15, Math.min(1, frac||0.3));
+    const out=a.createGain();
+    out.gain.setValueAtTime(0.0001,t);
+    out.gain.exponentialRampToValueAtTime(0.16+heavy*0.3, t+0.008);
+    out.gain.exponentialRampToValueAtTime(0.0001, t+0.10+heavy*0.22);
+    out.connect(sfxOut(a));
+    /* body: a short pitched thump, lower the heavier the blow */
+    const o=a.createOscillator(); o.type='triangle';
+    o.frequency.setValueAtTime(220-heavy*120, t);
+    o.frequency.exponentialRampToValueAtTime(Math.max(40,70-heavy*25), t+0.09+heavy*0.14);
+    o.connect(out); o.start(t); o.stop(t+0.12+heavy*0.22);
+    /* impact: filtered noise burst */
+    const n=Math.max(1,Math.floor(a.sampleRate*0.07));
+    const buf=a.createBuffer(1,n,a.sampleRate), ch=buf.getChannelData(0);
+    for(let i=0;i<n;i++) ch[i]=(Math.random()*2-1)*(1-i/n);
+    const src=a.createBufferSource(); src.buffer=buf;
+    const bp=a.createBiquadFilter(); bp.type='bandpass';
+    bp.frequency.value=crit?2600:(900+heavy*700); bp.Q.value=crit?2.2:1.1;
+    const ng=a.createGain(); ng.gain.value=crit?0.5:0.28;
+    src.connect(bp); bp.connect(ng); ng.connect(out); src.start(t); src.stop(t+0.08);
+    /* a crit rings above the blow */
+    if(crit){
+      const c=a.createOscillator(), cg=a.createGain(); c.type='sine';
+      c.frequency.setValueAtTime(1760,t); c.frequency.exponentialRampToValueAtTime(2640,t+0.14);
+      cg.gain.setValueAtTime(0.0001,t); cg.gain.exponentialRampToValueAtTime(0.14,t+0.02);
+      cg.gain.exponentialRampToValueAtTime(0.0001,t+0.20);
+      c.connect(cg); cg.connect(sfxOut(a)); c.start(t); c.stop(t+0.22);
+    }
+    /* an ability proc gets its own colour */
+    if(ability){
+      const p=a.createOscillator(), pg=a.createGain(); p.type='sawtooth';
+      p.frequency.setValueAtTime(330,t+0.02); p.frequency.exponentialRampToValueAtTime(880,t+0.16);
+      pg.gain.setValueAtTime(0.0001,t+0.02); pg.gain.exponentialRampToValueAtTime(0.08,t+0.05);
+      pg.gain.exponentialRampToValueAtTime(0.0001,t+0.22);
+      const f=a.createBiquadFilter(); f.type='bandpass'; f.frequency.value=1200; f.Q.value=4;
+      p.connect(f); f.connect(pg); pg.connect(sfxOut(a)); p.start(t+0.02); p.stop(t+0.24);
+    }
+  }catch(_){ }
+}
+/* PLANETFALL: the game's signature moment deserves an arrival, and then the
+   world's own voice underneath it. Both procedural; the bed is BOUNDED to the
+   vista being open and stops on close, on hidden tab, and on sound-off, so it
+   can never become a background CPU or battery cost. */
+function playArrival(tier){
+  try{
+    const a=ac(); if(!a || a.state!=='running') return;
+    const t=a.currentTime+0.02, root=110*Math.pow(2,((tier||0)%5)/12);
+    const m=a.createGain();
+    m.gain.setValueAtTime(0.0001,t);
+    m.gain.exponentialRampToValueAtTime(0.30,t+0.35);
+    m.gain.exponentialRampToValueAtTime(0.0001,t+2.0);
+    m.connect(sfxOut(a));
+    [1,1.5,2,3].forEach((mult,i)=>{
+      const o=a.createOscillator(), g2=a.createGain();
+      o.type=i?'sine':'triangle'; o.frequency.value=root*mult;
+      o.detune.value=(i%2?6:-6);
+      g2.gain.value=0.5/(i+1);
+      o.connect(g2); g2.connect(m); o.start(t+i*0.06); o.stop(t+2.0);
+    });
+  }catch(_){ }
+}
+/* the biome bed: filtered noise shaped by the world underfoot */
+let _amb=null;
+const _AMB={
+  ice:{f:520,q:0.7,g:0.055,lfo:0.11}, tundra:{f:600,q:0.6,g:0.05,lfo:0.13},
+  desert:{f:420,q:0.5,g:0.05,lfo:0.07}, glass:{f:900,q:1.1,g:0.04,lfo:0.09},
+  ocean:{f:260,q:0.8,g:0.07,lfo:0.16}, coral:{f:300,q:0.9,g:0.06,lfo:0.18},
+  lava:{f:110,q:1.4,g:0.075,lfo:0.05}, magmasea:{f:95,q:1.5,g:0.08,lfo:0.04},
+  swamp:{f:340,q:1.0,g:0.055,lfo:0.2}, jungle:{f:700,q:1.2,g:0.05,lfo:0.24},
+  gas:{f:180,q:0.6,g:0.06,lfo:0.06}, carbon:{f:240,q:0.8,g:0.045,lfo:0.08},
+  _def:{f:380,q:0.7,g:0.045,lfo:0.1}
+};
+function ambienceStart(key){
+  try{
+    ambienceStop();
+    const a=ac(); if(!a || a.state!=='running' || !sndOn) return;
+    const p=_AMB[key]||_AMB._def, t=a.currentTime;
+    /* two seconds of pink-ish noise, looped — cheaper than a long buffer */
+    const n=Math.floor(a.sampleRate*2), buf=a.createBuffer(1,n,a.sampleRate), ch=buf.getChannelData(0);
+    let last=0;
+    for(let i=0;i<n;i++){ const w=Math.random()*2-1; last=(last+w*0.14)/1.14; ch[i]=last*3.2; }
+    const src=a.createBufferSource(); src.buffer=buf; src.loop=true;
+    const bp=a.createBiquadFilter(); bp.type='bandpass'; bp.frequency.value=p.f; bp.Q.value=p.q;
+    const g2=a.createGain(); g2.gain.setValueAtTime(0.0001,t);
+    g2.gain.exponentialRampToValueAtTime(p.g,t+1.2);
+    /* a slow breath so the bed never sits flat */
+    const lfo=a.createOscillator(), lg=a.createGain();
+    lfo.frequency.value=p.lfo; lg.gain.value=p.f*0.25;
+    lfo.connect(lg); lg.connect(bp.frequency); lfo.start(t);
+    src.connect(bp); bp.connect(g2); g2.connect(sfxOut(a)); src.start(t);
+    _amb={src,g:g2,lfo,a};
+  }catch(_){ }
+}
+function ambienceStop(){
+  try{
+    if(!_amb) return;
+    const {src,g:g2,lfo,a}=_amb; _amb=null;
+    const t=a.currentTime;
+    try{ g2.gain.cancelScheduledValues(t); g2.gain.setValueAtTime(Math.max(0.0001,g2.gain.value),t);
+      g2.gain.exponentialRampToValueAtTime(0.0001,t+0.5); }catch(_){ }
+    setTimeout(()=>{ try{ src.stop(); lfo.stop(); }catch(_){ } }, 700);
+  }catch(_){ }
+}
+/* the bed must never outlive the tab's attention */
+try{ document.addEventListener('visibilitychange', ()=>{ if(document.hidden) ambienceStop(); }); }catch(_){ }
+
+/* ===== the feedback grammar — the "did that work?" moments ===== */
+function playBlip(f, dur, type, vol){
+  try{
+    const a=ac(); if(!a || a.state!=='running') return;
+    const t=a.currentTime+0.01, o=a.createOscillator(), g2=a.createGain();
+    o.type=type||'sine'; o.frequency.setValueAtTime(f,t);
+    g2.gain.setValueAtTime(0.0001,t);
+    g2.gain.exponentialRampToValueAtTime(vol==null?0.16:vol,t+0.012);
+    g2.gain.exponentialRampToValueAtTime(0.0001,t+(dur||0.12));
+    o.connect(g2); g2.connect(sfxOut(a)); o.start(t); o.stop(t+(dur||0.12)+0.02);
+  }catch(_){ }
+}
+/* v1.8 MOMENTUM's audio half: a BLOCKED action must sound unmistakably unlike a
+   successful one, so a dead tap is recognisable before the words are read */
+function playDeny(){ playBlip(200,0.10,'triangle',0.13); setTimeout(()=>playBlip(150,0.14,'triangle',0.11),80); }
+function playConfirm(){ playBlip(660,0.09,'sine',0.13); setTimeout(()=>playBlip(990,0.12,'sine',0.11),70); }
 function playThud(){
   const a=ac(); if(!a||a.state!=='running') return;
   try{
@@ -18120,9 +18455,11 @@ function playThud(){
     o.connect(g); g.connect(sfxOut(a)); o.start(t); o.stop(t+0.75);
   }catch(_){}
 }
-return Object.freeze({fxBurst, FX_GOLD, FX_GREEN, playFanfare, FX_PURP, playThud, fxShake, FX_RED});
+return Object.freeze({fxBurst, FX_GOLD, FX_GREEN, playFanfare, FX_PURP, playThud, fxShake, FX_RED,
+  /* v1.8 audio: these live in Fx and are used across the app — export them, do not strand them (the module-scope trap that cost rounds 4 and 5) */
+  playHit, playArrival, ambienceStart, ambienceStop, playBlip, playDeny, playConfirm});
 })();
-const {fxBurst, FX_GOLD, FX_GREEN, playFanfare, FX_PURP, playThud, fxShake, FX_RED}=Fx;
+const {fxBurst, FX_GOLD, FX_GREEN, playFanfare, FX_PURP, playThud, fxShake, FX_RED, playHit, playArrival, ambienceStart, ambienceStop, playBlip, playDeny, playConfirm}=Fx;
 /* @end Fx */
 
 /* ----------------------------------------------------------------
@@ -18196,6 +18533,13 @@ function breedPair(aEntry, bEntry, roll){
     removeFromCodex(aEntry.id); removeFromCodex(bEntry.id);
     return {ok:false, odds};
   }
+  /* v1.8: care counts — a successful union pays both parents' line, and a
+     lineage combination you have never made before pays a discovery bonus */
+  try{
+    const _pk=[aEntry.kind,bEntry.kind].sort().join('+');
+    awardXP(aEntry.id, 2, 'a successful union');
+    awardXPOnce(aEntry.id, 'lineage:'+_pk, 5, 'a first-of-its-kind lineage');
+  }catch(_){ }
   let child=evolveGenome(crossGenome(aEntry.genome, bEntry.genome), 1);
   child.brood=(aEntry.genome.brood||0)+(bEntry.genome.brood||0)+1;
   /* v1.6 Pass 8 ANCESTRY: remember the two parents by name for the lineage card (breedPair is
@@ -18243,6 +18587,7 @@ const FEED_EVENTS={
   ]
 };
 function feedPair(faunaEntry, floraEntry, roll){
+  const _fid=faunaEntry&&faunaEntry.id;
   removeFromCodex(floraEntry.id);                  /* the meal is always consumed */
   const S=battleStats(faunaEntry.genome);
   const tF=(floraEntry.grade?floraEntry.grade.tier:0);
@@ -18284,6 +18629,13 @@ function feedPair(faunaEntry, floraEntry, roll){
   if(wound>0) g.hurt=Math.min(0.85, h0+wound);
   if(g.hurt===0) delete g.hurt;
   const h1=(+g.hurt)||0;
+  /* v1.8: care counts — a CORRECT meal teaches the keeper, and learning a
+     beast's taste for the first time is a real discovery. Anti-farm: the
+     taste bonus pays once per creature per flavor, forever. */
+  try{
+    if(pref==='loved'){ awardXP(_fid, 1, 'a welcome meal');
+      awardXPOnce(_fid, 'taste:'+ftype, 2, 'a taste discovered'); }
+  }catch(_){ }
   return {ok:true, pois, pref, ftype, ev, delta, gut:S.ab.gutsy,
     mended:h1<h0, wounded:h1>h0, cond:creatureCondition(g)};
 }
@@ -18295,6 +18647,35 @@ function feedPair(faunaEntry, floraEntry, roll){
 const pickBox=document.getElementById('pickbox');
 const pickList=document.getElementById('pick-list');
 let _pickMode=null, _pickBase=null;
+/* v1.8 MOMENTUM — the denial contract. Returns null when the action is
+   available; otherwise {short, why, cta, go} where "short" fits on a button
+   face, "why" is a full sentence, and "go" names a surface worth opening.
+   The rule: a blocked action must always hand back a lead. */
+function _denial(mode, base){
+  try{
+    if(mode==='breed'){
+      if(!base || !codex.has(base.id)) return {short:'Not in your Compendium', why:'This specimen is not in your Compendium, so it has nothing to breed with.', cta:null, go:null};
+      const mates=[...codex.values()].filter(e=>e.kind===base.kind && e.id!==base.id);
+      if(!mates.length) return {short:'Needs another '+String(base.kind||'creature').toLowerCase(),
+        why:'A union needs two of the same kingdom, and '+base.name+' is your only '+String(base.kind||'creature').toLowerCase()+'. Land on a living world and <b>Discover Life</b> to tame another.',
+        cta:'🌍 Open the Star Atlas', go:'log'};
+    }
+    if(mode==='feed' || mode==='heal'){
+      const flora=[...codex.values()].filter(e=>e.kind==='Flora' && (!base || e.id!==base.id));
+      if(!flora.length) return {short:'Needs flora',
+        why:'Meals come from your own catalogue and you hold no flora yet. Land on a green world and <b>Scavenge</b> its plants — they feed beasts and mend you both.',
+        cta:'🌍 Open the Star Atlas', go:'log'};
+    }
+  }catch(_){ }
+  return null;
+}
+/* the contract's other half: render it as a real surface with a destination */
+function _denialHTML(d){
+  if(!d) return '';
+  try{ playDeny(); }catch(_){ }
+  return '<div class="denial"><div class="dw">'+d.why+'</div>'+
+    (d.cta?'<button type="button" class="dcta" data-deny-go="'+esc(d.go||'')+'">'+esc(d.cta)+'</button>':'')+'</div>';
+}
 function openPicker(mode, base){
   _pickMode=mode; _pickBase=base;
   const isBreed=mode==='breed', isHeal=mode==='heal';
@@ -18347,15 +18728,26 @@ function openPicker(mode, base){
     : 'Choose a flora to feed it. The plant is always consumed. A good meal grants permanent strength — a toxic one poisons it, costing real condition; a beast with nothing left to lose dies. Rarer flora: bigger gains, deeper venom.';
   document.getElementById('pick-result').innerHTML='';
   if(!cands.length){
-    pickList.innerHTML='<div style="font-size:11px;color:var(--faint);padding:12px;text-align:center">'+
-      (isBreed?'No other fauna in your Compendium — tame more wildlife first.':'No flora in your Compendium — survey green worlds and scavenge medicine.')+'</div>';
+    /* v1.8: the dead end becomes a lead — name the gap, and offer the way there */
+    const _d=_denial(isBreed?'breed':(isHeal?'heal':'feed'), base) ||
+      {why:isBreed?'No other creature of this kingdom is in your Compendium yet.':'No flora in your Compendium yet.', cta:'🌍 Open the Star Atlas', go:'log'};
+    pickList.innerHTML=_denialHTML(_d);
   } else {
     cands.sort((x,y)=>((y.grade?y.grade.tier:0)-(x.grade?x.grade.tier:0)));
     pickList.innerHTML=cands.slice(0,30).map(e=>{
       const t=(e.grade?e.grade.tier:0);
-      let oddsTxt, oddsCol;
+      let oddsTxt, oddsCol, _hint='';
       if(isBreed){
         const o=breedOdds(base,e); oddsTxt=Math.round(o*100)+'% success'; oddsCol=o>0.6?'#7fe6a0':(o>0.3?'#ffd96a':'#ff8a72');
+        /* v1.8: what the union COULD become — the band the child lands in and
+           the rarity it could reach. Never the roll itself. */
+        try{
+          const A=battleStats(base.genome), B=battleStats(e.genome);
+          const lo=Math.round(Math.min(A.total,B.total)*0.95), hi=Math.round(Math.max(A.total,B.total)*1.18);
+          const tA=(base.grade?base.grade.tier:0), tB=(e.grade?e.grade.tier:0);
+          const tHi=Math.min(TIER_MAX, Math.max(tA,tB)+1);
+          _hint='Child ≈ '+lo+'–'+hi+' power · up to <span style="color:'+(GRADE_TIERS[tHi]||{}).hex+'">'+((GRADE_TIERS[tHi]||{}).name||'')+'</span>';
+        }catch(_){ _hint=''; }
       } else if(isHeal){
         const p=clamp(0.08+t*0.07,0.05,0.6);
         const h=Math.round(12+t*9+p*30);
@@ -18367,7 +18759,9 @@ function openPicker(mode, base){
       }
       return '<div class="cand" data-pk="'+e.id+'"><img src="'+(e.art||(e.genome?artOf(e):e.art))+'" alt="">'+
         '<div class="m"><div class="nm" style="color:'+(e.grade?e.grade.hex:'')+'">'+e.name+'</div>'+
-        '<div class="ds">'+(e.grade?e.grade.name:'')+' · '+e.kind+(e.hybrid?' · hybrid':'')+'</div></div>'+
+        '<div class="ds">'+(e.grade?e.grade.name:'')+' · '+e.kind+(e.hybrid?' · hybrid':'')+
+          (e.genome?' · <span style="color:var(--faint)">'+temperamentOf(e.genome)+'</span>':'')+'</div>'+
+        (_hint?'<div class="ds why">'+_hint+'</div>':'')+'</div>'+
         '<span class="odds" style="color:'+oddsCol+'">'+oddsTxt+'</span></div>';
     }).join('');
   }
@@ -18468,7 +18862,12 @@ pickList.addEventListener('click', e=>{
   checkAch(); renderRank(); queueSave();
 });
 document.getElementById('pickclose').addEventListener('click', ()=>{ pickBox.style.display='none'; });
-pickBox.addEventListener('click', e=>{ if(e.target===pickBox) pickBox.style.display='none'; });
+pickBox.addEventListener('click', e=>{
+  /* v1.8 denial contract: the CTA is a real destination, not decoration */
+  const _dg=e.target.closest&&e.target.closest('[data-deny-go]');
+  if(_dg){ const go=_dg.dataset.denyGo; pickBox.style.display='none';
+    try{ if(go==='log'){ if(!logOpen) logBtn.click(); } }catch(_){ }
+    return; } if(e.target===pickBox) pickBox.style.display='none'; });
 
 /* ================= EXPLORER HITPOINTS =================
    The frontier bites back. Scanning life on hostile worlds can wound you;
@@ -19068,10 +19467,28 @@ document.addEventListener('focusout', ()=>{ if(_tipFor) hideTip(); });
    @section release-notes [app] — versioned release notes, update popup + history
    Owns: GAME_VERSION, RELEASES, _rnSeen, openReleaseNotes
    ---------------------------------------------------------------- */
-const GAME_VERSION='1.7.21';
-const BUILD_ID='042af0a';   /* replaced with the git sha at deploy time */
+const GAME_VERSION='1.8.0';
+const BUILD_ID='5009d4d';   /* replaced with the git sha at deploy time */
 /* newest first; categories appear in the order listed */
 const RELEASES=[
+{v:'1.8.0', title:'The Connection', date:'July 2026', sections:[
+ ['✦ New Features & Systems', [
+  '🗣 EVERY CREATURE HAS A VOICE — and it is truly its own. Earth&#8217;s animals sound like what they are: wolves roar, sparrows chirp, whales sing, rattlesnakes hiss, cicadas drone. Alien life speaks from its own genome. And when you <b>breed</b>, the child inherits BOTH parents&#8217; voices — a roarer crossed with a chirper carries each of them, and its descendants drift further into the unknown with every generation. No two bloodlines sound alike, and the same creature sounds identical for every explorer who holds its code.',
+  '⚔ THE FIGHT HAS A SOUND — duels and conquests were nearly silent. Every blow now lands with weight, critical hits ring above the impact, and ability strikes carry their own voice.',
+  '🪐 PLANETFALL ARRIVES — dropping onto a world opens with a chord, and the world itself murmurs underneath while you look out over it: wind on the tundra, surf on the ocean shelves, a low furnace on the magma seas.',
+  '💡 THE GAME TELLS YOU WHAT TO DO NEXT — when nothing has moved for a while, the objective chip stops repeating your goal and offers a concrete next step you can actually take right now, and takes you there.'],
+ ],
+ ['🧭 Gameplay', [
+  '🚫 NO MORE DEAD TAPS — every &#8220;can&#8217;t&#8221; now names what is missing, why, and where to get it, with a button that takes you there. Breed and Feed wear their shortfall on the button before you press them, and a blocked action sounds different from a successful one.',
+  '⚖ HONEST CONQUEST ODDS — the win estimate was a rough power comparison that could read 50% when the truth was zero, printed beside a warning that losing costs your champion forever. It now runs the real fight hundreds of times behind the scenes and reports what actually happens: Favored, Even, Dangerous or Overwhelming, with the reason why.',
+  '🧬 CARE COUNTS — creatures now gain experience from a welcome meal, a taste discovered, a successful union, a first-of-its-kind lineage, a bout survived, a fight taken to the wire and a conquest lost, not from victories alone.',
+  '🔮 BREEDING SHOWS ITS PROMISE — a mate&#8217;s row now previews the power band and the rarity a child could reach. Never the exact result: the reveal is the point.',
+  '✦ WORLDS NAME THEIR MOST NOTABLE RESIDENT, and every creature card speaks its temperament.'],
+ ],
+ ['🖱 UI Enhancements', [
+  '🔊 TWO NEW SWITCHES — Settings › Audio can silence creature voices and battle sound independently. Both start on.'],
+ ],
+]},
 {v:'1.7.21', title:'Right Values', date:'July 2026', sections:[
  ['🐛 Bug Fixes', [
   '🌍 EARTH REALLY KEEPS ITS HISTORY — the last fix only held if you skipped training early. Training step 4 asks you to re-chart Earth, so on any completed run your original entry was quietly replaced by a fresh one. Your ☆ favourite, discovery date, badge and notes now merge back onto it every time, and they ride the save so a mid-training reload keeps them too.',
@@ -20008,6 +20425,57 @@ function winEstimate(champ, native){
   const A=champ.stats||battleStats(champ.genome), B=battleStats(native.genome);
   return clamp(A.total/(A.total+B.total), 0.05, 0.95);
 }
+/* v1.8 / CF1715-09: the TRUE odds, by simulation. Deterministic per matchup
+   (seeded off both genomes), memoised, and bounded so the picker stays instant.
+   Falls back to the ratio only if anything throws. */
+const _oddsMemo=new Map();
+function trueOdds(champ, native, n){
+  try{
+    const cs=(champ.genome&&champ.genome.seed)||(champ.isPlayer?PLAYER_SEED:1);
+    const ns=(native.genome&&native.genome.seed)||2;
+    const key=cs+'|'+ns+'|'+((champ.genome&&champ.genome.xp)||0)+'|'+((champ.genome&&champ.genome.hurt)||0);
+    if(_oddsMemo.has(key)) return _oddsMemo.get(key);
+    const N=n||160;
+    let w=0, tot=0, close=0;
+    for(let i=0;i<N;i++){
+      const a={name:'a', genome:champ.genome||{seed:cs}, stats:champ.stats||battleStats(champ.genome), isPlayer:champ.isPlayer};
+      const b={name:'b', genome:native.genome||{seed:ns}, stats:battleStats(native.genome)};
+      /* vary the pairing seed so the sample spans the matchup's real spread */
+      a.genome={...a.genome, seed:(hashInt(cs, i, 0x51EE)>>>0)};
+      const r=runDuel(a,b);
+      if(!r.winner) continue;
+      tot++;
+      if(r.winner==='A') w++;
+      if(Math.abs(r.hpA/Math.max(1,r.maxA) - r.hpB/Math.max(1,r.maxB))<0.15) close++;
+    }
+    const o={p:tot?w/tot:0.5, close:tot?close/tot:0, n:tot};
+    if(_oddsMemo.size>400) _oddsMemo.clear();
+    _oddsMemo.set(key,o);
+    return o;
+  }catch(_){ return {p:winEstimate(champ,native), close:0, n:0}; }
+}
+/* the band a player can act on, not a number that implies false precision */
+function oddsBand(p){
+  if(p>=0.75) return {t:'Favored',      col:'#7fe6a0'};
+  if(p>=0.45) return {t:'Even',         col:'#ffd96a'};
+  if(p>=0.15) return {t:'Dangerous',    col:'#ff8a72'};
+  return         {t:'Overwhelming', col:'#ff5a4a'};
+}
+/* one factor line: WHY the band reads the way it does */
+function oddsWhy(champ, native){
+  try{
+    const A=champ.stats||battleStats(champ.genome), B=battleStats(native.genome);
+    const bits=[];
+    if(A.agi>B.agi+8) bits.push('you strike first');
+    else if(B.agi>A.agi+8) bits.push('it strikes first');
+    if(A.fer-B.res*0.45 > B.fer-A.res*0.45) bits.push('your blows land harder');
+    else bits.push('its blows land harder');
+    if(A.vit*3 > B.vit*3*1.25) bits.push('you outlast it');
+    else if(B.vit*3 > A.vit*3*1.25) bits.push('it outlasts you');
+    if(A.ab&&A.ab.n) bits.push('✧ '+A.ab.n);
+    return bits.slice(0,3).join(' · ');
+  }catch(_){ return ''; }
+}
 let _conquerTarget=null, _conquerNative=null;
 function conquerPlanet(d){
   const native=apexNative(d);
@@ -20032,14 +20500,16 @@ function openConquestPicker(d, native){
   document.getElementById('pick-result').innerHTML='';
   pickList.innerHTML=champs.map(c=>{
     const S=c.stats||battleStats(c.genome);
-    const wc=winEstimate(c, native);
-    const col=wc>0.6?'#7fe6a0':(wc>0.38?'#ffd96a':'#ff8a72');
+    const _o=trueOdds(c, native);
+    const wc=_o.p, _bd=oddsBand(wc), col=_bd.col;
+    const _why=oddsWhy(c, native);
     const pid=c.isPlayer?'__self__':c.id;
     const cc=(!c.isPlayer&&c.genome)?creatureCondition(c.genome):null;
     return '<div class="cand" data-pk="'+pid+'"><img src="'+(c.art||speciesPortrait(c.genome))+'" alt="">'+
       '<div class="m"><div class="nm" style="color:'+S.hex+'">'+(c.isPlayer?'★ '+c.name+' (you)':c.name)+'</div>'+
-      '<div class="ds">Power '+S.total+' · ✧ '+S.ab.n+(cc&&cc.h>0?' · <span style="color:'+cc.col+'">'+cc.label+'</span>':'')+'</div></div>'+
-      '<span class="odds" style="color:'+col+'">'+Math.round(wc*100)+'% win</span></div>';
+      '<div class="ds">Power '+S.total+' · ✧ '+S.ab.n+(cc&&cc.h>0?' · <span style="color:'+cc.col+'">'+cc.label+'</span>':'')+'</div>'+
+      (_why?'<div class="ds why">'+esc(_why)+'</div>':'')+'</div>'+
+      '<span class="odds" style="color:'+col+'"><b>'+_bd.t+'</b><i>'+Math.round(wc*100)+'%</i></span></div>';
   }).join('');
   pickBox.style.display='flex';
 }
@@ -20070,11 +20540,18 @@ function runConquestBattle(d, champ, native){
     onResolve:(res)=>{
       if(conquered.has(d.planetSeed)) return;   /* CF16-P2-003: idempotent — a re-fired resolve on an already-settled world must not re-pay Stardust/wins/loot */
       stats.duels++;
+      /* v1.8: a conquest LOSS pays intel — a champion that took the world's
+         defender to the brink learned the most. Never a farm: one world can
+         only be attempted meaningfully while it stays unconquered. */
+      if(res.winner!=='A' && !champ.isPlayer && champ.id){
+        const _cl=(res.hpB/Math.max(1,res.maxB))<0.3;
+        awardXP(champ.id, _cl?5:3, _cl?'a defender nearly broken':'a hard lesson');
+      }
       if(res.winner==='A'){
         stats.duelwins++;
         /* v1.5.2 D3 (Nick): conquest XP scales with the world's tier —
            leveling finally opens up with distance, like everything else */
-        if(!champ.isPlayer && champ.id) awardXP(champ.id, (native.guardian?60:20)+(d.designation?d.designation.tier:0));
+        if(!champ.isPlayer && champ.id) awardXP(champ.id, (native.guardian?60:20)+(d.designation?d.designation.tier:0), 'a world taken');
         conquered.set(d.planetSeed, {t:0, tier:(d.designation?d.designation.tier:1)});
         gameEvent('conquest', {planetSeed:d.planetSeed});
         /* v1.6 AFFIX/LOOT CORE faucet: the spoils imbue a worn piece with a
@@ -23896,7 +24373,10 @@ function _questNudge(){
   _nudged.add(g.key);
   toast(g.tt, g.ms, g.go);
 }
-document.addEventListener('pointerdown', ()=>{ _lastActT=Date.now(); }, {passive:true, capture:true});
+document.addEventListener('pointerdown', ()=>{ _lastActT=Date.now();
+  /* v1.8: 10 interactions with nothing to show for them is the shape of a quit */
+  if(tutDone){ _stall++; if(_stall>=10 && _stall-_stallShown>=10){ _stallShown=_stall; try{ _chBadge(); }catch(_){ } } }
+}, {passive:true, capture:true});
 document.addEventListener('keydown', ()=>{ _lastActT=Date.now(); }, {passive:true, capture:true});
 setTimeout(()=>{ try{ _questNudge(); }catch(_){ } }, 14000);         /* login: the plan, once the dust settles */
 setInterval(()=>{ try{
@@ -23932,9 +24412,27 @@ function _chBadge(){
     if(!g){ if(el) el.style.display='none'; _chipLast=null; return; }
     if(!el){
       el=document.createElement('div'); el.id='chchip'; el.setAttribute('role','button'); el.tabIndex=0;
-      el.addEventListener('click', ()=>{ try{ if(!chOpen) chBtn.click(); }catch(_){ } });
+      el.addEventListener('click', ()=>{ try{
+        const go=el.dataset.go;
+        _stall=0; _stallShown=0;   /* acting on it clears the stall either way */
+        if(go==='yard'){ const b=document.getElementById('cargobtn'); if(b&&b.style.display!=='none'){ b.click(); return; } }
+        if(go==='log'){ if(!logOpen) logBtn.click(); return; }
+        if(!chOpen) chBtn.click();
+      }catch(_){ } });
       document.body.appendChild(el);
     }
+    /* v1.8 STALL: nothing has moved in a while — offer the way forward instead
+       of restating the goal the player already knows they are failing */
+    const _nb=(_stall>=10)?_nextBest():null;
+    if(_nb){
+      el.classList.add('stalled');
+      el.innerHTML='💡 <b>'+esc(String(_nb.t).slice(0,44))+'</b>';
+      el.style.display='flex';
+      el.dataset.go=_nb.go||'';
+      _chipLast={key:'stall', p:0};
+      return;
+    }
+    el.classList.remove('stalled'); el.dataset.go='';
     el.innerHTML=g.ic+' <b>'+esc(String(g.t).replace(/&#8217;/g,'’').slice(0,34))+'</b>'+
       ' · '+g.p+' / '+g.n+   /* Nick live: binary charters showed NO digits and read as the old dead pill — every objective now wears its count */
       (g.more?' <span style="opacity:.55">+'+g.more+'</span>':'');
@@ -24148,7 +24646,34 @@ function ascEvent(type, detail){
   if(chOpen) renderCharters();
   _chBadge(); checkAch(); renderRank(); queueSave();
 }
+/* the progress signal: any event a player would call "something happened" */
+const _PROGRESS_EVT=new Set(['survey','landfall','fed','bred','crafted','atlas-add','conquest',
+  'specimen','searched','healed','mined','skim','tray','duel-done','chaccept','ascent-chapter']);
+let _stall=0, _stallShown=0;
+/* the best action AVAILABLE NOW — never suggest what the player cannot do */
+function _nextBest(){
+  try{
+    if(!tutDone) return null;
+    const fauna=[...codex.values()].filter(e=>e.kind==='Fauna').length;
+    const flora=[...codex.values()].filter(e=>e.kind==='Flora').length;
+    /* 1. a charter waiting to be accepted is always the cheapest forward step */
+    try{ const av=_chAvailable(); if(av && av.length && _chAccepted().length<3)
+      return {t:'Accept a charter — '+av[0].t, go:'ch'}; }catch(_){ }
+    /* 2. something you can afford to build */
+    try{ for(const it of ITEMS){ if(it.cat==='sys'&&itemCount(it.id)>0) continue;
+      if(it.sig && !primeFill[it.sig]) continue;
+      if(it.req && itemCount(it.req)<1) continue;
+      if(_canCraft(it)) return {t:'Craft '+it.name+' at the Shipyard', go:'yard'}; } }catch(_){ }
+    /* 3. the catalogue gaps that gate the creature loop (the A/B's finding) */
+    if(!flora) return {t:'Land on a living world and Scavenge for flora', go:'log'};
+    if(fauna<2) return {t:'Land on a living world and Discover Life', go:'log'};
+    /* 4. otherwise: go somewhere */
+    if(logMap.size) return {t:'Travel from your Star Atlas', go:'log'};
+    return {t:'Survey a world and press Land', go:null};
+  }catch(_){ return null; }
+}
 function gameEvent(type, detail){
+  if(_PROGRESS_EVT.has(type)){ _stall=0; _stallShown=0; try{ _chBadge(); }catch(_){ } }
   try{ if(_tutHook) _tutHook(type, detail||{}); }catch(_){}
   try{ charterEvent(type, detail||{}); }catch(_){}
   try{ if(type!=='ascent-chapter') ascEvent(type, detail||{}); }catch(_){}
@@ -24814,6 +25339,10 @@ document.getElementById('setbtn').addEventListener('click', ()=>{
   if(opening){ resetSettingsView(); closePanels('set'); }
   setPanel.style.display = opening ? 'block' : 'none';
   applyFs(); applyTone(); applyFont();
+  const vo=document.getElementById('voiceopt');
+  if(vo){ vo.classList.toggle('on', voiceOn); vo.textContent=voiceOn?'On':'Off'; }
+  const co=document.getElementById('combatopt');
+  if(co){ co.classList.toggle('on', combatSfxOn); co.textContent=combatSfxOn?'On':'Off'; }
   const so=document.getElementById('sndopt');
   if(so){ so.classList.toggle('on', sndOn); so.textContent=sndOn?'On':'Off'; }
   const co9=document.getElementById('chartopt');
@@ -24919,6 +25448,16 @@ setPanel.addEventListener('click', e=>{
     e.target.textContent=tipsOn?'On':'Off';
     queueSave();
     return;
+  }
+  if(e.target && e.target.id==='voiceopt'){
+    voiceOn=!voiceOn; e.target.classList.toggle('on', voiceOn); e.target.textContent=voiceOn?'On':'Off';
+    if(voiceOn){ try{ const any=[...codex.values()].find(x=>x.kind==='Fauna'); if(any) playVoice(any.genome, 0.4); }catch(_){ } }
+    queueSave(); return;
+  }
+  if(e.target && e.target.id==='combatopt'){
+    combatSfxOn=!combatSfxOn; e.target.classList.toggle('on', combatSfxOn); e.target.textContent=combatSfxOn?'On':'Off';
+    if(combatSfxOn) try{ playHit(0.6, true, false); }catch(_){ }
+    queueSave(); return;
   }
   if(e.target && e.target.id==='resetbtn'){
     document.getElementById('resetconfirm').style.display='block';
