@@ -2832,6 +2832,32 @@ return Object.freeze({surfaceColor, planetParams});
 const {surfaceColor, planetParams}=PlanetGen;
 /* @end PlanetGen */
 
+/* ----------------------------------------------------------------
+   HD-ART HOLD (tools/bootperf.js, 2026-07-29). ThumbArt and GalaxyArt both
+   render an instant low-res sprite and schedule the HD master on a short
+   timer. That upgrade is INVISIBLE while the first-run naming screen is modal
+   over the world — but each HD render is a 300-800ms main-thread block, and a
+   brand-new expedition queues one per body in Sol plus the galaxy face.
+   MEASURED on a 4x-throttled iPhone-class profile: the name gate PAINTED at
+   0.4s and did not answer a tap until 6.4s, with 5.8s of that pure block
+   (n2/fbm/renderPlanetSprite/makeGalaxySprite). A returning player, who never
+   builds a new system, blocked 0ms — which is what named the cause.
+   Toasts already wait for _introUp() (see the notify section's _toastQ, "held
+   while the title / explorer-name screen is up"); art now waits on the same
+   condition. DETERMINISM-SAFE BY CONSTRUCTION: sprites derive from seeds, never
+   from when they are drawn, so deferring one cannot move a fingerprint.
+   Defined at game-IIFE top level ON PURPOSE — both callers live inside nested
+   module IIFEs, and a helper belongs in the scope of its CALLERS.
+   The re-poll (rather than a flush queue) is deliberate: the hold lifts however
+   the screen closes — commit, cancel or Escape — with no hook to forget. One
+   pending sprite costs one timer. ---------------------------------------- */
+function _hdLater(fn, ms){
+  setTimeout(function(){
+    if(_introUp()){ _hdLater(fn, 250); return; }   /* still behind the intro — come back */
+    fn();
+  }, ms);
+}
+
 /* card presentation facts (band / life richness / era lights), cached in a
    side map — NEVER as fields on P/sys/pl: the determinism fingerprint
    serializes those objects and new fields would change the baseline
@@ -2979,7 +3005,7 @@ function getPlanetSprite(P, wantPx){
   if(!lo){ lo=renderPlanetSprite(P, 128); lo._lowres=true; }
   if(spriteCache.size>28){ const k=spriteCache.keys().next().value; spriteCache.delete(k); }
   spriteCache.set(key, lo);
-  setTimeout(()=>{
+  _hdLater(()=>{
     if(spriteCache.get(key)===lo) spriteCache.set(key, renderPlanetSprite(P, hdPx||P_PX));
   }, 30);
   return lo;
@@ -3526,7 +3552,7 @@ function getGalaxySprite(g2, sync){
   spr._arch=true;
   if(_galSprCache.size>64){ const k=_galSprCache.keys().next().value; _galSprCache.delete(k); }
   _galSprCache.set(key, spr);
-  setTimeout(()=>{
+  _hdLater(()=>{
     if(_galSprCache.get(key)===spr) _galSprCache.set(key, makeGalaxySprite((g2.seed^0x6A7A)>>>0, lock));
   }, 45);
   return spr;
@@ -19651,10 +19677,19 @@ document.addEventListener('focusout', ()=>{ if(_tipFor) hideTip(); });
    @section release-notes [app] — versioned release notes, update popup + history
    Owns: GAME_VERSION, RELEASES, _rnSeen, openReleaseNotes
    ---------------------------------------------------------------- */
-const GAME_VERSION='1.8.4';
-const BUILD_ID='66e0516';   /* replaced with the git sha at deploy time */
+const GAME_VERSION='1.8.5';
+const BUILD_ID='e20d62c';   /* replaced with the git sha at deploy time */
 /* newest first; categories appear in the order listed */
 const RELEASES=[
+{v:'1.8.5', title:'First Touch', date:'July 2026', sections:[
+ ['🐛 Bug Fixes', [
+  '🚀 THE FIRST SCREEN ANSWERS AT ONCE — on a phone, a brand-new expedition spent several seconds building world art you could not see yet, behind the naming screen, so the very first thing you touched did not respond. The art now waits its turn.'],
+ ],
+ ['🔧 Under the Hood', [
+  '⏱ A COLD-BOOT GATE — the moment the first screen becomes <i>answerable</i> is now measured in a real browser on a throttled phone, because a screen that is drawn is not the same as a screen that answers. That difference was five seconds, and nothing here was watching for it.',
+  '🤖 THE PLAYTEST FLEET PRESSES REAL BUTTONS — a new harness tier takes its actions through the same controls you use instead of reaching past them, so a button that is present but wired to nothing fails here first.'],
+ ],
+]},
 {v:'1.8.4', title:'Clear Ground', date:'July 2026', sections:[
  ['🐛 Bug Fixes', [
   '🗺 THE LESSON&#8217;S OWN SCREEN COMES FORWARD — on phones, Earth&#8217;s survey card sat on top of every board, so the two lessons that ask you to open the <b>Star Atlas</b> and the <b>Compendium</b> opened them underneath it. The Compendium button could not be pressed at all. Whatever the current lesson points at now takes the front — except on the landing step, where the card is the thing you need.',
